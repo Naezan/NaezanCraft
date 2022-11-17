@@ -1,4 +1,4 @@
-#include <NaezanCraft.h>
+#include <Source/NaezanCraft.h>
 #include "Global.h"
 
 int main(int argc, char** argv)
