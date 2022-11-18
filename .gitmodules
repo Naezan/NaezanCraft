@@ -1,6 +1,6 @@
 [submodule "NaezanCraft/ThirdParty/spdlog"]
 	path = NaezanCraft/ThirdParty/spdlog
 	url = https://github.com/gabime/spdlog
-[submodule "spdlog"]
-	path = spdlog
-	url = https://github.com/gabime/spdlog
+[submodule "NaezanCraft/ThirdParty/glfw"]
+	path = NaezanCraft/ThirdParty/glfw
+	url = https://github.com/glfw/glfw

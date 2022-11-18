@@ -1,13 +1,9 @@
 #pragma once
 
-#include "Config.h"
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include <iostream>
-#include <memory>
-
-class ENGINE_API MessageLog
+class MessageLog
 {
 public:
 	static void Initialize();

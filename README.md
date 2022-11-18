@@ -1,11 +1,11 @@
 # NaezanCraft
 MineCraft Copy Naezan's Engine
 
-- How to build using CMake
+- How to build using CMake(Testing)
   - 
     - git clone
   ```shell
-  git clone --recursive https://github.com/Meizoa/NaezanCraft.git
+  git clone https://github.com/Meizoa/NaezanCraft.git
   ```
 
     - Build (Find the folder where "CMakeList.txt" exists)

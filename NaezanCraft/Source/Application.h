@@ -1,13 +1,20 @@
 #pragma once
 
-#include "config.h"
+#include "Window.h"
+#include <memory>
 
-//Singleton
-class ENGINE_API Application
+//Singleton?
+class Application
 {
 public:
 	Application();
 	~Application();
 
 	void Run();
+
+	void OnKeyEvent(Event& event);
+
+private:
+	std::unique_ptr<Window> craftWindow;
+	bool isRunning = true;
 };

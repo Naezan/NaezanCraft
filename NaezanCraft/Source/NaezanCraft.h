@@ -1,4 +1,4 @@
 #pragma once
 
 #include "Application.h"
-#include "MessageLog.h"
+//#include "MessageLog.h"
