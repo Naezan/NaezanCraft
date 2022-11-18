@@ -15,3 +15,11 @@ MineCraft Copy Naezan's Engine
   cmake ..
   cmake --build .
   ```
+
+      - git command
+  ```shell
+  git status -> current git status like new file, modified, deleted etc..
+  git add * -> register current status
+  git commit -m "Text What You Want" -> commiting..
+  git push origin main -> push to main branch
+  ```
