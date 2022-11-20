@@ -12,8 +12,6 @@ public:
 
 	void Run();
 
-	void OnKeyEvent(Event& event);
-
 private:
 	std::unique_ptr<Window> craftWindow;
 	bool isRunning = true;

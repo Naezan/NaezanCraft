@@ -5,7 +5,7 @@
 Application::Application()
 {
 	craftWindow = Window::CreateCraftWindow();
-	craftWindow->SetEventCallback(std::bind(&Application::OnKeyEvent, this, std::placeholders::_1));
+	//craftWindow->SetEventCallback(std::bind(&Application::OnKeyEvent, this, std::placeholders::_1));
 }
 
 Application::~Application()
@@ -18,8 +18,4 @@ void Application::Run()
 	{
 		craftWindow->Update();
 	}
-}
-
-void Application::OnKeyEvent(Event& event)
-{
 }

@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Event\EventSystem.h" />
+    <ClInclude Include="Source\Input\InputSystem.h" />
     <ClInclude Include="Source\MessageLog.h" />
     <ClInclude Include="Source\NaezanCraft.h" />
     <ClInclude Include="Source\pch.h" />

@@ -3,6 +3,8 @@
 
 int main(int argc, char** argv)
 {
+	MessageLog::Initialize();
+
 	auto app = new Application();
 	app->Run();
 	delete app;

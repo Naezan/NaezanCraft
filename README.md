@@ -16,7 +16,7 @@ MineCraft Copy Naezan's Engine
   cmake --build .
   ```
 
-      - git command
+    - git command
   ```shell
   git status -> current git status like new file, modified, deleted etc..
   git add * -> register current status

@@ -4,3 +4,6 @@
 [submodule "NaezanCraft/ThirdParty/glfw"]
 	path = NaezanCraft/ThirdParty/glfw
 	url = https://github.com/glfw/glfw
+[submodule "NaezanCraft/ThirdParty/imgui"]
+	path = NaezanCraft/ThirdParty/imgui
+	url = https://github.com/ocornut/imgui
