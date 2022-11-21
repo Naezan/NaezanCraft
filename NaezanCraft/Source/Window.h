@@ -8,6 +8,7 @@
 #include "MessageLog.h"
 #include "Event/EventSystem.h"
 
+//Singleton? not?
 class Window
 {
 public:
@@ -19,7 +20,7 @@ public:
 	void Update();
 	void Shutdown();
 
-	void SetEventBinding();
+	void SetEventBindings();
 	void SetEventCallbacks();
 
 	static inline std::unique_ptr<Window> CreateCraftWindow(const std::string& name = "NaezanCraft", uint32_t  width = 1280, uint32_t height = 720)
@@ -44,6 +45,9 @@ public:
 	void OnMouseButton(const Event& event);
 	void OnCursorPos(const Event& event);
 	void OnScroll(const Event& event);
+
+	//TO DO add imgui Callback Function
+
 private:
 	static Dispatcher eventDispatcher;
 

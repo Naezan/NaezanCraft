@@ -41,7 +41,7 @@ void Window::Init()
 	//gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	//glfwSwapInterval(1);
 
-	SetEventBinding();
+	SetEventBindings();
 	SetEventCallbacks();
 }
 
@@ -59,9 +59,9 @@ void Window::Shutdown()
 	glfwTerminate();
 }
 
-void Window::SetEventBinding()
+void Window::SetEventBindings()
 {
-	//TO DO modify when funtion imple
+	//TO DO modify when funtion imple class pos
 	eventDispatcher.AddCallbackFunction(EventType::WindowPos, std::bind(&Window::OnWindowPos, this, _1));
 	eventDispatcher.AddCallbackFunction(EventType::WindowSize, std::bind(&Window::OnWindowSize, this, _1));
 	eventDispatcher.AddCallbackFunction(EventType::WindowClose, std::bind(&Window::OnWindowClose, this, _1));
@@ -121,12 +121,12 @@ void Window::SetEventCallbacks()
 		{
 			eventDispatcher.PostCallbackFunction(ScrollEvent(xoffset, yoffset));
 		});
-
 }
 
 void Window::OnWindowPos(const Event& event)
 {
-	NC_LOG_DEBUG("'{0}'", event.ToString(event.GetEventType()));
+	auto& e = EventTypeCast<WindowPosEvent>(event);
+	NC_LOG_DEBUG("'xpos : {0}' 'ypos : {1}'", e.Getxpos(), e.Getypos());
 }
 
 void Window::OnWindowSize(const Event& event)

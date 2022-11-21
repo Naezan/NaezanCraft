@@ -26,6 +26,7 @@ target_include_directories(NaezanCraft PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Naeza
 target_include_directories(NaezanCraft PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/GLAD/include)
 target_include_directories(NaezanCraft PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/imgui)
 target_include_directories(NaezanCraft PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/imgui/backends)
+target_include_directories(NaezanCraft PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/glm)
 
 target_precompile_headers(NaezanCraft PRIVATE NaezanCraft/Source/pch.h)
 
@@ -38,8 +39,11 @@ add_subdirectory(NaezanCraft/ThirdParty/GLAD EXCLUDE_FROM_ALL)
 # imgui (do not build imgui)
 add_subdirectory(NaezanCraft/ThirdParty/imgui EXCLUDE_FROM_ALL)
 
+# glm (do not build glm)
+add_subdirectory(NaezanCraft/ThirdParty/glm EXCLUDE_FROM_ALL)
+
 # linking
-target_link_libraries(NaezanCraft PRIVATE glfw glad imgui)
+target_link_libraries(NaezanCraft PRIVATE glfw glad imgui glm)
 target_link_libraries(imgui PRIVATE glfw)
 
 # set_target_properties(NaezanCraft PROPERTIES RUNTIME_LIBRARY_DIRECTORY ${OUTPUT_DIR})

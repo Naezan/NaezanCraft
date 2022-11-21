@@ -7,3 +7,6 @@
 [submodule "NaezanCraft/ThirdParty/imgui"]
 	path = NaezanCraft/ThirdParty/imgui
 	url = https://github.com/ocornut/imgui
+[submodule "NaezanCraft/ThirdParty/glm"]
+	path = NaezanCraft/ThirdParty/glm
+	url = https://github.com/g-truc/glm

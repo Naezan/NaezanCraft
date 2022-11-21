@@ -1,5 +1,7 @@
 #pragma once
 
+//MessageLog is just container, not need to constructor and single instance
+
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
