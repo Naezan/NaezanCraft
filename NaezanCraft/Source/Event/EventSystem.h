@@ -9,7 +9,7 @@
 
 enum class EventType
 {
-	WindowPos, WindowSize, WindowClose, WindowMax,
+	WindowPos, WindowSize, WindowClose, WindowMax, FramebufferSize,
 	Key, MouseButton, CursorPos, Scroll
 };
 
@@ -96,6 +96,20 @@ public:
 
 private:
 	int maximized;
+};
+
+class FramebufferSizeEvent : public Event
+{
+public:
+	FramebufferSizeEvent(int _width, int _height) : width(_width), height(_height) {}
+
+	inline int Getwidth() const { return width; }
+	inline int Getheight() const { return height; }
+
+	DEF_EVENT_TYPE(EventType::FramebufferSize)
+
+private:
+	int width, height;
 };
 
 class KeyEvent : public Event

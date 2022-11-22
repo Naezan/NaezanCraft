@@ -14,6 +14,11 @@ void Application::Run()
 {
 	while (isRunning)
 	{
+		if (glfwWindowShouldClose(craftWindow->GetWindowObject()))
+		{
+			isRunning = false;
+		}
+
 		craftWindow->Update();
 	}
 }

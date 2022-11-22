@@ -3,9 +3,6 @@
 #include "Window.h"
 #include <memory>
 
-//TO DO move to position ob macro function
-#define GET_WINDOW_OBJECT() Application::GetInstance()->GetWindow()->GetWindowObject()
-
 class Application
 {
 public:
@@ -29,3 +26,6 @@ private:
 
 	static Application* instance;
 };
+
+//TO DO move to position ob macro function
+#define GET_WINDOW_OBJECT() Application::GetInstance()->GetWindow()->GetWindowObject()

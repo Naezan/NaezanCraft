@@ -41,6 +41,8 @@ public:
 	void OnWindowClose(const Event& event);
 	void OnWindowMaximize(const Event& event);
 
+	void OnFramebufferSize(const Event& event);
+
 	void OnKey(const Event& event);
 	void OnMouseButton(const Event& event);
 	void OnCursorPos(const Event& event);
@@ -57,4 +59,5 @@ private:
 	uint32_t Height;
 	GLFWwindow* window;
 
+	unsigned int VBO, VAO, EBO, shaderProgram;
 };
