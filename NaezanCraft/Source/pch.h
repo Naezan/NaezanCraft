@@ -10,5 +10,7 @@
 #include <memory>
 #include <utility>
 #include <algorithm>
+#include <fstream>
+#include <sstream>
 
 #include <Windows.h>

@@ -28,7 +28,7 @@ target_include_directories(NaezanCraft PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Naeza
 target_include_directories(NaezanCraft PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/imgui/backends)
 target_include_directories(NaezanCraft PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/glm)
 
-target_precompile_headers(NaezanCraft PRIVATE NaezanCraft/Source/pch.h)
+# target_precompile_headers(NaezanCraft PRIVATE NaezanCraft/Source/pch.h)
 
 # glfw (do not build glfw)
 add_subdirectory(NaezanCraft/ThirdParty/glfw EXCLUDE_FROM_ALL)

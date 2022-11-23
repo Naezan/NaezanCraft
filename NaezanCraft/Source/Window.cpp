@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Window.h"
 #include "Input/InputSystem.h"
+#include "Renderer/Renderer.h"
 
 using namespace std::placeholders;
 
@@ -55,102 +56,16 @@ void Window::Init()
 	SetEventBindings();
 	SetEventCallbacks();
 
-	const char* vertexShaderSource = "#version 450 core\n"
-		"layout (location = 0) in vec3 aPos;\n"
-		"void main()\n"
-		"{\n"
-		"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-		"}\0";
+	renderer = Renderer::CreateRenderer();
 
-	unsigned int vertexShader;
-	//create vertex shader
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-	//connect code
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	//compile shader
-	glCompileShader(vertexShader);
-
-	const char* fragmentShaderSource = "#version 450 core\n"
-		"out vec4 FragColor;\n"
-		"void main()\n"
-		"{\n"
-		"   FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
-		"}\0";
-
-	unsigned int fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-
-	//shader program
-	shaderProgram = glCreateProgram();
-
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-	
-	/*int success;
-	char infoLog[512];
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		NC_LOG_DEBUG("{0}", infoLog);
-	}
-	else
-	{
-		NC_LOG_DEBUG("Shader Program Linking Success!");
-	}*/
-
-	float vertices[] = {
-	 0.5f,  0.5f, 0.0f,  // top right
-	 0.5f, -0.5f, 0.0f,  // bottom right
-	-0.5f, -0.5f, 0.0f,  // bottom left
-	-0.5f,  0.5f, 0.0f   // top left 
-	};
-
-	unsigned int indices[] = {  // note that we start from 0!
-	0, 1, 3,   // first triangle
-	1, 2, 3    // second triangle
-	};
-
-	//VAO
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-	//VBO, gpu에 메모리공간을 가지고있는 ID생성
-	glGenBuffers(1, &VBO);
-	//배열버퍼에 ID 바인딩
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//바인딩된 버퍼에 버텍스를 복사해줍니다.
-	/*
-	* GL_STREAM_DRAW 움직이지 않는 정점 몇번만 사용
-	* GL_STATIC_DRAW 움직이지 않는 정점 여러번 사용
-	* GL_DYNAMIC_DRAW 움직이는 정점 여러번 사용
-	*/
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	//GL_ARRAY_BUFFER에 바인딩된 VBO에의해 결정됨
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	std::cout << "Vendor : "  << glGetString(GL_VENDOR) << std::endl;
-	std::cout << "Renderer : " << glGetString(GL_RENDERER) << std::endl;
-	std::cout << "Version : " << glGetString(GL_VERSION) << std::endl;
+	//std::cout << "Vendor : "  << glGetString(GL_VENDOR) << std::endl;
+	//std::cout << "Renderer : " << glGetString(GL_RENDERER) << std::endl;
+	//std::cout << "Version : " << glGetString(GL_VERSION) << std::endl;
 }
 
 void Window::Update()
 {
-	glUseProgram(shaderProgram);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	renderer->Render();
 	//glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	//double buffering
@@ -163,16 +78,7 @@ void Window::Update()
 
 void Window::Shutdown()
 {
-	//unbind vbo, vao, ebo
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	//delete vbo, vao, ebo
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
-	glDeleteProgram(shaderProgram);
+	renderer->Shutdown();
 
 	glfwDestroyWindow(window);
 	glfwTerminate();

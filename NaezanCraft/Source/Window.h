@@ -8,6 +8,8 @@
 #include "MessageLog.h"
 #include "Event/EventSystem.h"
 
+class Renderer;
+
 //Singleton? not?
 class Window
 {
@@ -59,5 +61,5 @@ private:
 	uint32_t Height;
 	GLFWwindow* window;
 
-	unsigned int VBO, VAO, EBO, shaderProgram;
+	std::unique_ptr<Renderer> renderer;
 };
