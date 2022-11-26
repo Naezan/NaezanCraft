@@ -20,5 +20,6 @@ void Application::Run()
 		}
 
 		craftWindow->Update();
+		craftWindow->Render();
 	}
 }

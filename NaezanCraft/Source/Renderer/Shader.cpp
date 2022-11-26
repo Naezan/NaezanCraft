@@ -6,28 +6,23 @@
 Shader::Shader(const std::string& path, ShaderType shadertype)
 {
 	std::string ShaderCode;
-	std::ifstream vShaderFile;
+	std::ifstream vShaderFile(path, std::ios::in);
 
-	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	try
+	if (vShaderFile.is_open())
 	{
-		vShaderFile.open(path);
 		std::stringstream vShaderStream;
-
 		vShaderStream << vShaderFile.rdbuf();
-
-		vShaderFile.close();
-
 		ShaderCode = vShaderStream.str();
+		vShaderFile.close();
 	}
-	catch (std::ifstream::failure e)
+	else
 	{
 		NC_LOG_ERROR("ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ");
 	}
 	const char* vShaderCode = ShaderCode.c_str();
 
 	int success;
-	shaderID = glCreateShader(GetGLShader());
+	shaderID = glCreateShader(GetGLShader(shadertype));
 	glShaderSource(shaderID, 1, &vShaderCode, NULL);
 	glCompileShader(shaderID);
 
@@ -54,11 +49,12 @@ Shader::Shader(const std::string& path, ShaderType shadertype)
 void Shader::Use()
 {
 	//TO DO move to renderer.cpp
-	//glUseProgram(ID);
+	//glUseProgram(shaderID);
 }
 
-void Shader::LinkComplete()
+void Shader::LinkComplete(GLuint programID)
 {
+	glDetachShader(programID, shaderID);
 	glDeleteShader(shaderID);
 }
 

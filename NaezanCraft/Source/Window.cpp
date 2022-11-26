@@ -49,6 +49,7 @@ void Window::Init()
 	}
 
 	glViewport(0, 0, Width, Height);
+	glEnable(GL_DEPTH_TEST);
 
 	//gladLoadGL();
 	//glfwSwapInterval(1);
@@ -65,15 +66,16 @@ void Window::Init()
 
 void Window::Update()
 {
-	renderer->Render();
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	glfwPollEvents();
+}
 
+void Window::Render()
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	renderer->Render();
 	//double buffering
 	glfwSwapBuffers(window);
-	glfwPollEvents();
-
-	//glClearColor(0, 1, 0, 1);
-	//glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void Window::Shutdown()

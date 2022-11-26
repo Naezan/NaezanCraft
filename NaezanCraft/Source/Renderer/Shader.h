@@ -14,16 +14,16 @@ public:
 	Shader(const std::string& path, ShaderType shadertype);
 
 	void Use();
-	void LinkComplete();
+	void LinkComplete(GLuint programID);
 	void SetBool(const std::string& name, bool value) const;
 	void SetInt(const std::string& name, int value) const;
 	void SetFloat(const std::string& name, float value) const;
 
 	const inline uint32_t GetShaderID() const { return shaderID; }
 	const inline ShaderType GetShaderType() const { return shaderType; }
-	const inline GLenum GetGLShader()
+	const inline GLenum GetGLShader(ShaderType shadertype)
 	{
-		switch (shaderType)
+		switch (shadertype)
 		{
 		case ShaderType::VERTEX: return GL_VERTEX_SHADER;
 		case ShaderType::FRAGMENT: return GL_FRAGMENT_SHADER;

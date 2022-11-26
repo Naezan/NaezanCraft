@@ -21,8 +21,8 @@ protected:
 class VertexBuffer : public Buffer
 {
 public:
-	VertexBuffer(uint32_t size, const void* data);
-	~VertexBuffer() = default;
+	VertexBuffer(size_t size, const void* data);
+	~VertexBuffer();
 
 	virtual inline void Bind() override { glBindBuffer(GL_ARRAY_BUFFER, bufferID); }
 	virtual inline void UnBind() override { glBindBuffer(GL_ARRAY_BUFFER, 0); }
@@ -34,7 +34,7 @@ private:
 class IndexBuffer : public Buffer
 {
 public:
-	IndexBuffer(uint32_t size, const void* data);
+	IndexBuffer(size_t size, const void* data);
 	~IndexBuffer() = default;
 
 	virtual inline void Bind() override { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID); }

@@ -1,15 +1,17 @@
 #pragma once
 
-class Shader;
+#include "Shader.h"
+
 class Buffer;
 class VertexBuffer;
 class IndexBuffer;
+class VertexArray;
 
 class Renderer
 {
 public:
 	Renderer();
-	~Renderer();
+	~Renderer() = default;
 
 	void Render();
 	void Shutdown();
@@ -21,6 +23,7 @@ public:
 
 private:
 	std::vector<std::unique_ptr<Shader>> renderShaders;
+	std::shared_ptr<VertexArray> vertexArray;
 	std::shared_ptr<VertexBuffer> vertexBuffer;
 	std::shared_ptr<IndexBuffer> indexBuffer;
 
