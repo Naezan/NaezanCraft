@@ -8,21 +8,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include<GLFW/glfw3.h>
 
-glm::vec3 cubePositions[] = {
-	glm::vec3(0.0f,  0.0f,  0.0f),
-	glm::vec3(2.0f,  5.0f, -15.0f),
-	glm::vec3(-1.5f, -2.2f, -2.5f),
-	glm::vec3(-3.8f, -2.0f, -12.3f),
-	glm::vec3(2.4f, -0.4f, -3.5f),
-	glm::vec3(-1.7f,  3.0f, -7.5f),
-	glm::vec3(1.3f, -2.0f, -2.5f),
-	glm::vec3(1.5f,  2.0f, -2.5f),
-	glm::vec3(1.5f,  0.2f, -1.5f),
-	glm::vec3(-1.3f,  1.0f, -1.5f)
-};
-
 Renderer::Renderer()
 {
+	//쉐이더
 	renderShaders.push_back(Shader::CreateShader<ShaderType::VERTEX>("../Assets/Shaders/CubeVert.vs"));
 	renderShaders.push_back(Shader::CreateShader<ShaderType::FRAGMENT>("../Assets/Shaders/CubeFrag.fs"));
 
@@ -40,6 +28,7 @@ Renderer::Renderer()
 		shader->LinkComplete(shaderProgram);
 	}
 
+	//버텍스 어레이
 	vertexArray = VertexArray::CreateArray();
 
 	float vertices[] = {
@@ -86,28 +75,64 @@ Renderer::Renderer()
 	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f
 	};
 
+	//버텍스 버퍼
 	vertexBuffer = Buffer::CreateBuffer<VertexBuffer>(sizeof(vertices), vertices);
+
+	//인덱스 버퍼
+
+	//카메라
+	yaw = -90.f;
+	pitch = 0.f;
 }
+
+#include "../Input/InputSystem.h"
+glm::vec3 cubePositions[] = {
+	glm::vec3(0.0f,  0.0f,  0.0f),
+	glm::vec3(2.0f,  5.0f, -15.0f),
+	glm::vec3(-1.5f, -2.2f, -2.5f),
+	glm::vec3(-3.8f, -2.0f, -12.3f),
+	glm::vec3(2.4f, -0.4f, -3.5f),
+	glm::vec3(-1.7f,  3.0f, -7.5f),
+	glm::vec3(1.3f, -2.0f, -2.5f),
+	glm::vec3(1.5f,  2.0f, -2.5f),
+	glm::vec3(1.5f,  0.2f, -1.5f),
+	glm::vec3(-1.3f,  1.0f, -1.5f)
+};
 
 void Renderer::Render()
 {
 	glUseProgram(shaderProgram);
 
-	//glm::mat4 model = glm::mat4(1.0f);
-	//model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	//model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+	static glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+	static glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	static glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	glm::mat4 view = glm::mat4(1.0f);
-	// note that we're translating the scene in the reverse direction of where we want to move
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	glm::mat4 view;
+	view = glm::lookAt(cameraPos,
+		cameraPos + cameraFront,
+		cameraUp);
+
+	const float cameraSpeed = 0.05f; // adjust accordingly
+	if (Input::GetIsKeyPressed(GLFW_KEY_W))
+		cameraPos += cameraSpeed * cameraFront;
+	if (Input::GetIsKeyPressed(GLFW_KEY_S))
+		cameraPos -= cameraSpeed * cameraFront;
+	if (Input::GetIsKeyPressed(GLFW_KEY_A))
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (Input::GetIsKeyPressed(GLFW_KEY_D))
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction.y = sin(glm::radians(pitch));
+	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraFront = glm::normalize(direction);
+
+	NC_LOG_DEBUG("Yaw : {0}", yaw);
+	NC_LOG_DEBUG("Pitch : {0}", pitch);
 
 	glm::mat4 projection;
 	projection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
-
-	//간단한 삼각형 회전 튜토리얼
-	//glm::mat4 transform = glm::mat4(1.0f);
-	//transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f)); //위치 이동
-	//transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f)); //z회전
 
 	uint32_t viewLoc = glGetUniformLocation(shaderProgram, "view");
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));

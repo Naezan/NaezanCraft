@@ -50,6 +50,7 @@ void Window::Init()
 
 	glViewport(0, 0, Width, Height);
 	glEnable(GL_DEPTH_TEST);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	//gladLoadGL();
 	//glfwSwapInterval(1);
@@ -203,7 +204,33 @@ void Window::OnMouseButton(const Event& event)
 
 void Window::OnCursorPos(const Event& event)
 {
-	//NC_LOG_DEBUG("'{0}'", event.ToString(event.GetEventType()));
+	static const CursorPosEvent& e = EventTypeCast<CursorPosEvent>(event);
+	static float lastX = 640, lastY = 360;
+
+	static bool firstMouse = true;
+	if (firstMouse)
+	{
+		lastX = e.Getxpos();
+		lastY = e.Getypos();
+		firstMouse = false;
+	}
+
+	float xoffset = e.Getxpos() - lastX;
+	float yoffset = lastY - e.Getypos(); // reversed since y-coordinates range from bottom to top
+	lastX = e.Getxpos();
+	lastY = e.Getypos();
+
+	const float sensitivity = 0.1f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	renderer->GetYaw() += xoffset;
+	renderer->GetPitch() += yoffset;
+
+	if (renderer->GetPitch() > 89.0f)
+		renderer->GetPitch() = 89.0f;
+	if (renderer->GetPitch() < -89.0f)
+		renderer->GetPitch() = -89.0f;
 }
 
 void Window::OnScroll(const Event& event)
