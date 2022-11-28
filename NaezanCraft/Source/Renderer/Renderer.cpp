@@ -2,11 +2,10 @@
 #include "Renderer.h"
 #include "Buffer.h"
 #include "VertexArray.h"
+#include "../World/Camera.h"
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include<GLFW/glfw3.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 Renderer::Renderer()
 {
@@ -79,13 +78,8 @@ Renderer::Renderer()
 	vertexBuffer = Buffer::CreateBuffer<VertexBuffer>(sizeof(vertices), vertices);
 
 	//인덱스 버퍼
-
-	//카메라
-	yaw = -90.f;
-	pitch = 0.f;
 }
 
-#include "../Input/InputSystem.h"
 glm::vec3 cubePositions[] = {
 	glm::vec3(0.0f,  0.0f,  0.0f),
 	glm::vec3(2.0f,  5.0f, -15.0f),
@@ -99,46 +93,23 @@ glm::vec3 cubePositions[] = {
 	glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
+void Renderer::BeginRender(std::unique_ptr<Camera>& camera)
+{
+	ViewProjectionMatrix = camera->GetViewProjectionMatrix();
+}
+
 void Renderer::Render()
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glUseProgram(shaderProgram);
 
-	static glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-	static glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-	static glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	//NC_LOG_DEBUG("Yaw : {0}", yaw);
+	//NC_LOG_DEBUG("Pitch : {0}", pitch);
 
-	glm::mat4 view;
-	view = glm::lookAt(cameraPos,
-		cameraPos + cameraFront,
-		cameraUp);
-
-	const float cameraSpeed = 0.05f; // adjust accordingly
-	if (Input::GetIsKeyPressed(GLFW_KEY_W))
-		cameraPos += cameraSpeed * cameraFront;
-	if (Input::GetIsKeyPressed(GLFW_KEY_S))
-		cameraPos -= cameraSpeed * cameraFront;
-	if (Input::GetIsKeyPressed(GLFW_KEY_A))
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-	if (Input::GetIsKeyPressed(GLFW_KEY_D))
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-
-	glm::vec3 direction;
-	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	direction.y = sin(glm::radians(pitch));
-	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	cameraFront = glm::normalize(direction);
-
-	NC_LOG_DEBUG("Yaw : {0}", yaw);
-	NC_LOG_DEBUG("Pitch : {0}", pitch);
-
-	glm::mat4 projection;
-	projection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
-
-	uint32_t viewLoc = glGetUniformLocation(shaderProgram, "view");
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
-	uint32_t projectionLoc = glGetUniformLocation(shaderProgram, "projection");
-	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+	//TO DO 월드의 플레이어 -> 카메라 -> 뷰프로젝션?
+	uint32_t viewProjectionLoc = glGetUniformLocation(shaderProgram, "projectionview");
+	glUniformMatrix4fv(viewProjectionLoc, 1, GL_FALSE, glm::value_ptr(ViewProjectionMatrix));
 
 	for (unsigned int i = 0; i < 10; i++)
 	{

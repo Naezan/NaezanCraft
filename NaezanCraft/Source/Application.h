@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Window.h"
+#include "World/World.h"
 #include <memory>
 
 class Application
@@ -22,6 +23,7 @@ public:
 
 private:
 	std::unique_ptr<Window> craftWindow;
+	std::unique_ptr<World> craftWorld;
 	bool isRunning = true;
 
 	static Application* instance;

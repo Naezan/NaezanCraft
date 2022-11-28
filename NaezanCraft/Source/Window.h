@@ -2,7 +2,6 @@
 
 #include <string>
 #include <memory>
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "MessageLog.h"
@@ -20,7 +19,6 @@ public:
 
 	void Init();
 	void Update();
-	void Render();
 	void Shutdown();
 
 	void SetEventBindings();
@@ -61,6 +59,4 @@ private:
 	uint32_t Width;
 	uint32_t Height;
 	GLFWwindow* window;
-
-	std::unique_ptr<Renderer> renderer;
 };
