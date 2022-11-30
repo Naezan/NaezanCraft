@@ -17,10 +17,6 @@ Camera::Camera(glm::vec3 pos, glm::vec3 front, float fovy, float aspect, float z
 
 void Camera::Update()
 {
-	//follow to player
-	if (GetOwner() != nullptr)
-		position += static_cast<Player*>(GetOwner())->GetVelocity();
-
 	UpdateViewMatrix();
 }
 

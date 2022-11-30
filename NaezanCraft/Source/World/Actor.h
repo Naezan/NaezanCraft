@@ -23,15 +23,21 @@ public:
 	inline glm::vec3& GetScale() { return scale; }
 
 	template<typename T>
-	static std::unique_ptr<T> Create()
+	static std::unique_ptr<T> CreateUnique()
 	{
 		return std::make_unique<T>();
+	}
+	template<typename T>
+	static std::shared_ptr<T> CreateShared()
+	{
+		return std::make_shared<T>();
 	}
 
 public:
 	static const glm::vec3 UpVector;
 
 protected:
+	//TO DO need to transform struct?
 	glm::vec3 position, rotation, scale;
 
 private:

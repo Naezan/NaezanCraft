@@ -1,13 +1,14 @@
 #version 330 core
 
 // Input data
-in vec3 fragmentColor;
+in vec2 TexCoord;
 
 // Ouput data
-out vec3 color;
+out vec4 color;
+
+uniform sampler2D cubeTexture;
 
 void main()
 {
-	// Output color = red 
-	color = fragmentColor;
+	color = texture(cubeTexture, TexCoord);
 }

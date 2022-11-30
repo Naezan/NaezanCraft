@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "Application.h"
+#include "Time/Timer.h"
 
 Application* Application::instance = nullptr;
 
@@ -19,6 +20,8 @@ void Application::Run()
 		{
 			isRunning = false;
 		}
+
+		Timer::MeasuringFrameTime();
 
 		craftWindow->Update();
 		craftWorld->Update();

@@ -17,10 +17,10 @@ VertexBuffer::VertexBuffer(size_t size, const void* data)
 	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 
 	//index, size(vec3), type(점 하나의 타입), normalized(정규화 여부), stride(건너뛸 거리), pointer(시작 위치)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 }
 

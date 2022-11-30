@@ -86,7 +86,6 @@ void Window::SetEventBindings()
 	eventDispatcher.AddCallbackFunction(EventType::FramebufferSize, std::bind(&Window::OnFramebufferSize, this, _1));
 	eventDispatcher.AddCallbackFunction(EventType::Key, std::bind(&Window::OnKey, this, _1));
 	eventDispatcher.AddCallbackFunction(EventType::MouseButton, std::bind(&Window::OnMouseButton, this, _1));
-	eventDispatcher.AddCallbackFunction(EventType::CursorPos, std::bind(&Window::OnCursorPos, this, _1));
 	eventDispatcher.AddCallbackFunction(EventType::Scroll, std::bind(&Window::OnScroll, this, _1));
 }
 
@@ -189,15 +188,6 @@ void Window::OnKey(const Event& event)
 void Window::OnMouseButton(const Event& event)
 {
 	//NC_LOG_DEBUG("'{0}'", event.ToString(event.GetEventType()));
-}
-
-void Window::OnCursorPos(const Event& event)
-{
-	static const CursorPosEvent& e = EventTypeCast<CursorPosEvent>(event);
-
-	//TO DO call CameraFunc
-	e.Getxpos();
-	e.Getypos();
 }
 
 void Window::OnScroll(const Event& event)

@@ -3,6 +3,7 @@
 #include "Buffer.h"
 #include "VertexArray.h"
 #include "../World/Camera.h"
+#include "Texture.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -10,74 +11,78 @@
 Renderer::Renderer()
 {
 	//쉐이더
-	renderShaders.push_back(Shader::CreateShader<ShaderType::VERTEX>("../Assets/Shaders/CubeVert.vs"));
-	renderShaders.push_back(Shader::CreateShader<ShaderType::FRAGMENT>("../Assets/Shaders/CubeFrag.fs"));
+	renderShaders.emplace(ShaderType::VERTEX, Shader::CreateShader<ShaderType::VERTEX>("../Assets/Shaders/CubeVert.vs"));
+	renderShaders.emplace(ShaderType::FRAGMENT, Shader::CreateShader<ShaderType::FRAGMENT>("../Assets/Shaders/CubeFrag.fs"));
 
 	shaderProgram = glCreateProgram();
 
 	for (auto& shader : renderShaders)
 	{
-		glAttachShader(shaderProgram, shader->GetShaderID());
+		glAttachShader(shaderProgram, shader.second->GetShaderID());
 	}
 
 	glLinkProgram(shaderProgram);
 
 	for (auto& shader : renderShaders)
 	{
-		shader->LinkComplete(shaderProgram);
+		shader.second->LinkComplete(shaderProgram);
 	}
 
 	//버텍스 어레이
 	vertexArray = VertexArray::CreateArray();
 
 	float vertices[] = {
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f,
-	
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,
-	
-	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
-	
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
-									  
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-	
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f
+	-0.5f,  0.5f, -0.5f, 0.0f, 0.0f,//Top
+	 0.5f,  0.5f, -0.5f, 1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f, 1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f, 0.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f, 0.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,//Bottom
+	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,//Front
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,//Back
+	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+	 0.5f,  0.5f,  0.5f,  0.0f, 0.0f,//Right
+	 0.5f,  0.5f, -0.5f,  1.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+
+	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,//Left
+	-0.5f,  0.5f, -0.5f,  1.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f
 	};
 
 	//버텍스 버퍼
 	vertexBuffer = Buffer::CreateBuffer<VertexBuffer>(sizeof(vertices), vertices);
 
 	//인덱스 버퍼
+
+	//텍스쳐
+	texture = Texture::CreateTexture("../Assets/Textures/diamond_block.png");
+	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
 }
 
 glm::vec3 cubePositions[] = {
@@ -93,15 +98,16 @@ glm::vec3 cubePositions[] = {
 	glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
-void Renderer::BeginRender(std::unique_ptr<Camera>& camera)
+void Renderer::BeginRender(const glm::mat4& matrix)
 {
-	ViewProjectionMatrix = camera->GetViewProjectionMatrix();
+	ViewProjectionMatrix = matrix;
 }
 
 void Renderer::Render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glBindTexture(GL_TEXTURE_2D, texture->GetTextureID());
 	glUseProgram(shaderProgram);
 
 	//NC_LOG_DEBUG("Yaw : {0}", yaw);
@@ -120,6 +126,7 @@ void Renderer::Render()
 		uint32_t modelLoc = glGetUniformLocation(shaderProgram, "model");
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
+		//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 

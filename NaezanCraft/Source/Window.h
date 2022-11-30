@@ -33,9 +33,10 @@ public:
 	inline uint32_t GetWidth() const { return Width; }
 	inline uint32_t GetHeight() const { return Height; }
 	inline GLFWwindow* GetWindowObject() const { return window; }//static?
+	inline static Dispatcher& GetEventDispatcher() { return eventDispatcher; }
 
 	//TO DO Sync
-	
+
 	//Callback Function
 	void OnWindowPos(const Event& event);
 	void OnWindowSize(const Event& event);
@@ -46,7 +47,6 @@ public:
 
 	void OnKey(const Event& event);
 	void OnMouseButton(const Event& event);
-	void OnCursorPos(const Event& event);
 	void OnScroll(const Event& event);
 
 	//TO DO add imgui Callback Function
