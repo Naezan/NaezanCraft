@@ -32,6 +32,7 @@ private:
 	std::shared_ptr<Texture> texture;
 
 	uint32_t shaderProgram;
+	GLuint textureID;
 
 	glm::mat4 ViewProjectionMatrix;
 };

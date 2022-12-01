@@ -50,6 +50,7 @@ void Window::Init()
 
 	glViewport(0, 0, Width, Height);
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	//gladLoadGL();
