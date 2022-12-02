@@ -16,10 +16,10 @@ enum BlockType : uint8_t
 	Gold,
 	Diamond,
 	Bedrock,
-	Nothing
+	Air
 };
 
 struct Block
 {
-	BlockType blockType = BlockType::Nothing;
+	BlockType blockType = BlockType::Air;
 };
