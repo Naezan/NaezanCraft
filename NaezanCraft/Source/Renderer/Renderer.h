@@ -13,6 +13,7 @@ class IndexBuffer;
 class VertexArray;
 class Texture;
 class Camera;
+class Chunk;
 
 class Renderer
 {
@@ -24,8 +25,12 @@ public:
 	void Render();
 	void Shutdown();
 
+public:
+	//TO DO temp
+	static std::vector<glm::vec3> cubePositions;
+
 private:
-	std::map<ShaderType ,std::unique_ptr<Shader>> renderShaders;
+	std::map<ShaderType, std::unique_ptr<Shader>> renderShaders;
 	std::shared_ptr<VertexArray> vertexArray;
 	std::shared_ptr<VertexBuffer> vertexBuffer;
 	std::shared_ptr<IndexBuffer> indexBuffer;
@@ -35,4 +40,7 @@ private:
 	GLuint textureID;
 
 	glm::mat4 ViewProjectionMatrix;
+
+	//TO DO temp
+	std::vector<std::shared_ptr<Chunk>> renderChunks;
 };

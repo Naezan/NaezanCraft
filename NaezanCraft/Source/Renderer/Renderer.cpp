@@ -4,9 +4,12 @@
 #include "VertexArray.h"
 #include "../World/Camera.h"
 #include "Texture.h"
+#include "../World/Chunk.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+std::vector<glm::vec3> Renderer::cubePositions;
 
 Renderer::Renderer()
 {
@@ -75,78 +78,25 @@ Renderer::Renderer()
 	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f
 	};
 
-	//float vertices[] = {
-	//-0.5f,  0.5f, -0.5f, 0.0f, 0.0f,//Top ㄱ
-	// 0.5f,  0.5f, -0.5f, 1.0f, 0.0f,
-	// 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
-	// 0.5f,  0.5f,  0.5f, 1.0f, 1.0f,//Top ㄴ
-	//-0.5f,  0.5f,  0.5f, 0.0f, 1.0f,
-	//-0.5f,  0.5f, -0.5f, 0.0f, 0.0f,
-
-	//-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,//Bottom
-	// 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-	// 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	// 0.5f, -0.5f,  0.5f,  1.0f, 1.0f,
-	//-0.5f, -0.5f,  0.5f,  0.0f, 1.0f,
-	//-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-	//-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,//Front
-	// 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	// 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	// 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	//-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-	//-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-	//-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,//Back
-	// 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-	// 0.5f,  0.5f, -0.5f,  1.0f, 0.0f,
-	// 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	//-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	//-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-	// 0.5f,  0.5f,  0.5f,  0.0f, 0.0f,//Right
-	// 0.5f,  0.5f, -0.5f,  1.0f, 0.0f,
-	// 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-	// 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-	// 0.5f, -0.5f,  0.5f,  0.0f, 1.0f,
-	// 0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-
-	//-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,//Left
-	//-0.5f,  0.5f, -0.5f,  1.0f, 0.0f,
-	//-0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-	//-0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-	//-0.5f, -0.5f,  0.5f,  0.0f, 1.0f,
-	//-0.5f,  0.5f,  0.5f,  0.0f, 0.0f
-	//};
-
 	unsigned int indices[] = {
-		0, 1, 3, // first triangle
-		1, 2, 3  // second triangle
+		0, 1, 2,
+		2, 3, 1
 	};
 
 	//버텍스 버퍼
 	vertexBuffer = Buffer::CreateBuffer<VertexBuffer>(sizeof(vertices), vertices);
 
 	//인덱스 버퍼
-	//indexBuffer = Buffer::CreateBuffer<IndexBuffer>();
+	indexBuffer = Buffer::CreateBuffer<IndexBuffer>(sizeof(indices), indices);
 
 	//텍스쳐
 	texture = Texture::CreateTexture("../Assets/Textures/diamond_block.png");
 	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
-}
 
-glm::vec3 cubePositions[] = {
-	glm::vec3(0.0f,  0.0f,  0.0f),
-	glm::vec3(2.0f,  5.0f, -15.0f),
-	glm::vec3(-1.5f, -2.2f, -2.5f),
-	glm::vec3(-3.8f, -2.0f, -12.3f),
-	glm::vec3(2.4f, -0.4f, -3.5f),
-	glm::vec3(-1.7f,  3.0f, -7.5f),
-	glm::vec3(1.3f, -2.0f, -2.5f),
-	glm::vec3(1.5f,  2.0f, -2.5f),
-	glm::vec3(1.5f,  0.2f, -1.5f),
-	glm::vec3(-1.3f,  1.0f, -1.5f)
-};
+	//CreateChunk
+	renderChunks.push_back(std::make_shared<Chunk>(glm::vec3(0.f, 0.f, 0.f)));
+	//renderChunks[0]->CreateChunk();
+}
 
 void Renderer::BeginRender(const glm::mat4& matrix)
 {
@@ -166,12 +116,12 @@ void Renderer::Render()
 	uint32_t viewProjectionLoc = glGetUniformLocation(shaderProgram, "projectionview");
 	glUniformMatrix4fv(viewProjectionLoc, 1, GL_FALSE, glm::value_ptr(ViewProjectionMatrix));
 
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < cubePositions.size(); ++i)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, cubePositions[i]);
-		float angle = 20.0f * i;
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		//model = glm::rotate(model, glm::radians(0.f), glm::vec3(0.0f, 0.0f, 0.0f));
 		uint32_t modelLoc = glGetUniformLocation(shaderProgram, "model");
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
