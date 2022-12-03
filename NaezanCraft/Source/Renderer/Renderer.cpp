@@ -94,8 +94,8 @@ Renderer::Renderer()
 	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
 
 	//CreateChunk
-	renderChunks.push_back(Chunk::CreateChunk(glm::vec3(0.f, 0.f, 0.f)));
-	//renderChunks[0]->CreateChunk();
+	renderChunks.resize(100);//temp
+	Chunk::CreateChunk(renderChunks[0], glm::vec3(0.f, 0.f, 0.f));
 }
 
 void Renderer::BeginRender(const glm::mat4& matrix)

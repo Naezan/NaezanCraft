@@ -37,6 +37,8 @@ void Mesh::CreateMesh()
 			for (int z = 0; z < CHUNK_Z; ++z)
 			{
 				Block& block = parentChunk->chunkBlocks[x][y][z];
+				if (block.blockType == BlockType::Air)
+					continue;
 
 				glm::vec3 tempPos = glm::vec3(x, y, z);
 				glm::vec3 worldPosition;
@@ -56,8 +58,8 @@ void Mesh::AddFaces(glm::vec3& pos, BlockType& type)
 	if (pos.x > 0)
 	{
 		//만약 이전박스가 없다면 비어있으면 안되므로 현재 왼쪽면의 정보를 추가해준다
-		
-		AddFace(pos, type, FaceType::Left);
+		if (parentChunk->GetBlock(glm::vec3(pos.x - 1, pos.y, pos.z)).IsTransparent())
+			AddFace(pos, type, FaceType::Left);
 	}
 	else
 	{
@@ -69,7 +71,8 @@ void Mesh::AddFaces(glm::vec3& pos, BlockType& type)
 	if (pos.x < CHUNK_X - 1)
 	{
 		//만약 다음박스가 없다면 비어있으면 안되므로 현재 오른쪽면의 정보를 추가해준다
-		AddFace(pos, type, FaceType::Right);
+		if (parentChunk->GetBlock(glm::vec3(pos.x + 1, pos.y, pos.z)).IsTransparent())
+			AddFace(pos, type, FaceType::Right);
 	}
 	else
 	{
@@ -80,7 +83,8 @@ void Mesh::AddFaces(glm::vec3& pos, BlockType& type)
 	//Y Bottom
 	if (pos.y > 0)
 	{
-		AddFace(pos, type, FaceType::Bottom);
+		if (parentChunk->GetBlock(glm::vec3(pos.x, pos.y - 1, pos.z)).IsTransparent())
+			AddFace(pos, type, FaceType::Bottom);
 	}
 	else
 	{
@@ -90,7 +94,8 @@ void Mesh::AddFaces(glm::vec3& pos, BlockType& type)
 	//Y Top
 	if (pos.y < CHUNK_Y - 1)
 	{
-		AddFace(pos, type, FaceType::Top);
+		if (parentChunk->GetBlock(glm::vec3(pos.x, pos.y + 1, pos.z)).IsTransparent())
+			AddFace(pos, type, FaceType::Top);
 	}
 	else
 	{
@@ -100,11 +105,13 @@ void Mesh::AddFaces(glm::vec3& pos, BlockType& type)
 	//Z Back
 	if (pos.z > 0)
 	{
-		AddFace(pos, type, FaceType::Back);
+		if (parentChunk->GetBlock(glm::vec3(pos.x, pos.y, pos.z - 1)).IsTransparent())
+			AddFace(pos, type, FaceType::Back);
 	}
 	else
 	{
-		AddFace(pos, type, FaceType::Back);
+		if (parentChunk->GetBlock(glm::vec3(pos.x, pos.y, pos.z + 1)).IsTransparent())
+			AddFace(pos, type, FaceType::Back);
 	}
 
 	//Z Front
@@ -120,5 +127,5 @@ void Mesh::AddFaces(glm::vec3& pos, BlockType& type)
 
 void Mesh::AddFace(const glm::vec3& pos, const BlockType& Blocktype, const FaceType& faceType)
 {
-	
+
 }

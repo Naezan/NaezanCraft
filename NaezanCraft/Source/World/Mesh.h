@@ -31,4 +31,6 @@ private:
 	static const std::array<glm::u8vec3, 2> indices;
 	static const std::array<glm::vec2, 4> texcoords;
 	std::shared_ptr<Chunk> parentChunk;
+	//Neighbor chunk
+	std::shared_ptr<Chunk> neighborChunks[4];
 };

@@ -16,6 +16,8 @@ using array_3d = std::array<std::array<std::array<Block, CHUNK_Z>, CHUNK_Y>, CHU
 class Chunk : public std::enable_shared_from_this<Chunk>
 {
 public:
+	//You Don't new Chunk
+	Chunk(const glm::vec3& pos);
 	~Chunk() = default;
 
 	void SetBlock(const glm::vec3& blockPos, BlockType type);
@@ -24,18 +26,20 @@ public:
 	void CreateChunkMesh();
 
 	//Must called, not recommended but...
-	static std::shared_ptr<Chunk> CreateChunk(const glm::vec3& pos);
+	static void CreateChunk(std::shared_ptr<Chunk>& renderChunk, const glm::vec3& pos);
 
-private:
-	//You Can't New Chunk
-	Chunk(const glm::vec3& pos);
+	std::shared_ptr<Chunk> shared_this()
+	{
+		return shared_from_this();
+	}
 
 public:
-	//need to use heap memory? but pointer is heavy? 65,536 * 2 byte = 131,072byte?
-	//one chunk has 131.072kbyte? chunk is heavy
+	//need to use heap memory? but pointer is heavy? 65,536 * 1 byte?
+	//one chunk has 65.536kbyte? chunk is heavy
+	//100 chunks has 6.5536mbyte.
 	array_3d chunkBlocks;
 	const glm::vec3 position;
 
-private:
-	Mesh chunkMesh;
+protected:
+	std::unique_ptr<Mesh> chunkMesh;
 };

@@ -21,5 +21,8 @@ enum BlockType : uint8_t
 
 struct Block
 {
+	Block(const BlockType& type = BlockType::Air) : blockType(type) {}
 	BlockType blockType = BlockType::Air;
+
+	inline bool IsTransparent() { return blockType == BlockType::Air; }
 };

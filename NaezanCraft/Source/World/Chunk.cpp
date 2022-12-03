@@ -3,9 +3,9 @@
 #include "../Renderer/Renderer.h"
 
 Chunk::Chunk(const glm::vec3& pos) :
-	position(pos), chunkMesh(shared_from_this())
+	position(pos)
 {
-	memset(&chunkBlocks, BlockType::Air, CHUNK_X * CHUNK_Y * CHUNK_Z);
+	chunkBlocks.fill({});
 }
 
 void Chunk::SetBlock(const glm::vec3& blockPos, BlockType type)
@@ -20,17 +20,12 @@ Block& Chunk::GetBlock(const glm::vec3& blockPos)
 
 void Chunk::CreateChunkMesh()
 {
-	chunkMesh.CreateMesh();
+	chunkMesh->CreateMesh();
 	//TO DO setup Mesh State?
 }
 
-std::shared_ptr<Chunk> Chunk::CreateChunk(const glm::vec3& pos)
+void Chunk::CreateChunk(std::shared_ptr<Chunk>& renderChunk, const glm::vec3& pos)
 {
-	struct ChunkMakeShared : public Chunk
-	{
-		ChunkMakeShared(const glm::vec3& _pos) : Chunk(_pos)
-		{}
-	};
-
-	return std::make_shared<ChunkMakeShared>(std::forward<const glm::vec3&>(pos));
+	renderChunk = std::make_shared<Chunk>(std::forward<const glm::vec3&>(pos));
+	renderChunk->chunkMesh = std::make_unique<Mesh>(renderChunk->shared_this());
 }
