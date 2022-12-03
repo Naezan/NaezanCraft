@@ -26,7 +26,7 @@ public:
 	void CreateChunkMesh();
 
 	//Must called, not recommended but...
-	static void CreateChunk(std::shared_ptr<Chunk>& renderChunk, const glm::vec3& pos);
+	static void CreateChunk(std::shared_ptr<Chunk>& worldChunk, const glm::vec3& pos);
 
 	std::shared_ptr<Chunk> shared_this()
 	{

@@ -5,7 +5,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <map>
 
 class Buffer;
 class VertexBuffer;
@@ -25,10 +24,6 @@ public:
 	void Render();
 	void Shutdown();
 
-public:
-	//TO DO temp
-	static std::vector<glm::vec3> cubePositions;
-
 private:
 	std::map<ShaderType, std::unique_ptr<Shader>> renderShaders;
 	std::shared_ptr<VertexArray> vertexArray;
@@ -40,7 +35,4 @@ private:
 	GLuint textureID;
 
 	glm::mat4 ViewProjectionMatrix;
-
-	//TO DO temp
-	std::vector<std::shared_ptr<Chunk>> renderChunks;
 };

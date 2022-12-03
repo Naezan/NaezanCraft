@@ -14,12 +14,13 @@ public:
 
 	inline static Application* GetInstance()
 	{
-		if(instance == nullptr)
+		if (instance == nullptr)
 			instance = new Application();
 		return instance;
 	}
 
 	inline static std::unique_ptr<Window>& GetWindow() { return instance->craftWindow; }
+	inline static std::unique_ptr<World>& GetWorld() { return instance->craftWorld; }
 
 private:
 	std::unique_ptr<Window> craftWindow;
@@ -31,3 +32,4 @@ private:
 
 //TO DO move to position ob macro function
 #define GET_WINDOW_OBJECT() Application::GetInstance()->GetWindow()->GetWindowObject()
+#define GET_World() Application::GetInstance()->GetWorld()

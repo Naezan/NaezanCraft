@@ -9,8 +9,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-std::vector<glm::vec3> Renderer::cubePositions;
-
 Renderer::Renderer()
 {
 	//쉐이더
@@ -30,6 +28,8 @@ Renderer::Renderer()
 	{
 		shader.second->LinkComplete(shaderProgram);
 	}
+
+	//TO DO change Vertex Info
 
 	//버텍스 어레이
 	vertexArray = VertexArray::CreateArray();
@@ -92,10 +92,6 @@ Renderer::Renderer()
 	//텍스쳐
 	texture = Texture::CreateTexture("../Assets/Textures/diamond_block.png");
 	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
-
-	//CreateChunk
-	renderChunks.resize(100);//temp
-	Chunk::CreateChunk(renderChunks[0], glm::vec3(0.f, 0.f, 0.f));
 }
 
 void Renderer::BeginRender(const glm::mat4& matrix)
@@ -109,24 +105,21 @@ void Renderer::Render()
 
 	glUseProgram(shaderProgram);
 
-	//NC_LOG_DEBUG("Yaw : {0}", yaw);
-	//NC_LOG_DEBUG("Pitch : {0}", pitch);
-
-	//TO DO 월드의 플레이어 -> 카메라 -> 뷰프로젝션?
+	//TO DO RenderChunkBegin && RenderChunk
 	uint32_t viewProjectionLoc = glGetUniformLocation(shaderProgram, "projectionview");
 	glUniformMatrix4fv(viewProjectionLoc, 1, GL_FALSE, glm::value_ptr(ViewProjectionMatrix));
 
-	for (int i = 0; i < cubePositions.size(); ++i)
-	{
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, cubePositions[i]);
-		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-		//model = glm::rotate(model, glm::radians(0.f), glm::vec3(0.0f, 0.0f, 0.0f));
-		uint32_t modelLoc = glGetUniformLocation(shaderProgram, "model");
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//for (int i = 0; i < cubePositions.size(); ++i)
+	//{
+	//	glm::mat4 model = glm::mat4(1.0f);
+	//	model = glm::translate(model, cubePositions[i]);
+	//	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+	//	//model = glm::rotate(model, glm::radians(0.f), glm::vec3(0.0f, 0.0f, 0.0f));
+	//	uint32_t modelLoc = glGetUniformLocation(shaderProgram, "model");
+	//	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-	}
+	//	glDrawArrays(GL_TRIANGLES, 0, 36);
+	//}
 
 	//glDrawArrays(GL_TRIANGLES, 0, 36);
 	//Render VertexBuffer, IndexBuffer, FrameBuffer

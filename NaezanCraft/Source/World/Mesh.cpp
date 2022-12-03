@@ -2,6 +2,8 @@
 #include "Mesh.h"
 #include "Chunk.h"
 #include "Block.h"
+#include "World.h"
+#include "../Application.h"
 
 const std::array<glm::vec3, 4> Mesh::vertices[]
 {
@@ -30,6 +32,12 @@ Mesh::Mesh(std::shared_ptr<Chunk> chunk)
 
 void Mesh::CreateMesh()
 {
+	//GetSideChunk
+	LeftChunk = GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x - 1), static_cast<int>(parentChunk->position.z)));
+	RightChunk = GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x + 1), static_cast<int>(parentChunk->position.z)));
+	BackChunk = GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x), static_cast<int>(parentChunk->position.z - 1)));
+	FrontChunk = GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x), static_cast<int>(parentChunk->position.z + 1)));
+
 	for (int x = 0; x < CHUNK_X; ++x)
 	{
 		for (int y = 0; y < CHUNK_Y; ++y)
@@ -64,7 +72,8 @@ void Mesh::AddFaces(glm::vec3& pos, BlockType& type)
 	else
 	{
 		//만약 이전 청크의 마지막이 없다면 0번째위치 왼쪽면의 정보를 추가해준다
-		AddFace(pos, type, FaceType::Left);
+		if (LeftChunk == nullptr || LeftChunk->GetBlock(glm::vec3(CHUNK_X - 1, pos.y, pos.z)).IsTransparent())
+			AddFace(pos, type, FaceType::Left);
 	}
 
 	//X Right
@@ -77,7 +86,8 @@ void Mesh::AddFaces(glm::vec3& pos, BlockType& type)
 	else
 	{
 		//만약 다음 청크의 0번째가 없다면 CHUNK_X - 1위치 으론쪽면의 정보를 추가해준다
-		AddFace(pos, type, FaceType::Right);
+		if (RightChunk == nullptr || RightChunk->GetBlock(glm::vec3(0, pos.y, pos.z)).IsTransparent())
+			AddFace(pos, type, FaceType::Right);
 	}
 
 	//Y Bottom
@@ -88,6 +98,7 @@ void Mesh::AddFaces(glm::vec3& pos, BlockType& type)
 	}
 	else
 	{
+		//Just add Bottom Face
 		AddFace(pos, type, FaceType::Bottom);
 	}
 
@@ -99,6 +110,7 @@ void Mesh::AddFaces(glm::vec3& pos, BlockType& type)
 	}
 	else
 	{
+		//Just add Top Face
 		AddFace(pos, type, FaceType::Top);
 	}
 
@@ -110,22 +122,24 @@ void Mesh::AddFaces(glm::vec3& pos, BlockType& type)
 	}
 	else
 	{
-		if (parentChunk->GetBlock(glm::vec3(pos.x, pos.y, pos.z + 1)).IsTransparent())
+		if (BackChunk == nullptr || BackChunk->GetBlock(glm::vec3(pos.x, pos.y, CHUNK_Z - 1)).IsTransparent())
 			AddFace(pos, type, FaceType::Back);
 	}
 
 	//Z Front
 	if (pos.z < CHUNK_Z - 1)
 	{
-		AddFace(pos, type, FaceType::Front);
+		if (parentChunk->GetBlock(glm::vec3(pos.x, pos.y, pos.z + 1)).IsTransparent())
+			AddFace(pos, type, FaceType::Front);
 	}
 	else
 	{
-		AddFace(pos, type, FaceType::Front);
+		if (FrontChunk == nullptr || FrontChunk->GetBlock(glm::vec3(pos.x, pos.y, 0)).IsTransparent())
+			AddFace(pos, type, FaceType::Front);
 	}
 }
 
 void Mesh::AddFace(const glm::vec3& pos, const BlockType& Blocktype, const FaceType& faceType)
 {
-
+	//TO DO use position & facetype, set texcoord, Add to vertex
 }

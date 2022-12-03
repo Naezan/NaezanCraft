@@ -32,5 +32,8 @@ private:
 	static const std::array<glm::vec2, 4> texcoords;
 	std::shared_ptr<Chunk> parentChunk;
 	//Neighbor chunk
-	std::shared_ptr<Chunk> neighborChunks[4];
+	std::shared_ptr<Chunk> LeftChunk;
+	std::shared_ptr<Chunk> RightChunk;
+	std::shared_ptr<Chunk> FrontChunk;
+	std::shared_ptr<Chunk> BackChunk;
 };

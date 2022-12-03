@@ -21,11 +21,11 @@ Block& Chunk::GetBlock(const glm::vec3& blockPos)
 void Chunk::CreateChunkMesh()
 {
 	chunkMesh->CreateMesh();
-	//TO DO setup Mesh State?
+	//TO DO Setup Chunk GenerateState
 }
 
-void Chunk::CreateChunk(std::shared_ptr<Chunk>& renderChunk, const glm::vec3& pos)
+void Chunk::CreateChunk(std::shared_ptr<Chunk>& worldChunk, const glm::vec3& pos)
 {
-	renderChunk = std::make_shared<Chunk>(std::forward<const glm::vec3&>(pos));
-	renderChunk->chunkMesh = std::make_unique<Mesh>(renderChunk->shared_this());
+	worldChunk = std::make_shared<Chunk>(std::forward<const glm::vec3&>(pos));
+	worldChunk->chunkMesh = std::make_unique<Mesh>(worldChunk->shared_this());
 }
