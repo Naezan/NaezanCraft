@@ -19,7 +19,7 @@ const std::array<glm::vec3, 4> Mesh::vertices[]
 
 const std::array<glm::u8vec3, 2> Mesh::indices
 {
-	glm::u8vec3(0, 1, 2) , glm::u8vec3(2, 3, 1)
+	glm::u8vec3(0, 1, 2) , glm::u8vec3(2, 3, 0)
 };
 
 const std::array<glm::u8vec2, 4> Mesh::texcoords
@@ -31,17 +31,18 @@ Mesh::Mesh(std::shared_ptr<Chunk> chunk)
 {
 	parentChunk = chunk;
 	//TO DO too much
+	indicesCount = 0;
 	meshVertices.reserve(CHUNK_SIZE * 6);
+	meshIndices.resize(CHUNK_SIZE * 6);
 
 	//CreateArray & Buffer
 	vertexArray = VertexArray::CreateArray();
 
+	vertexArray->Bind();
 	vertexBuffer = Buffer::CreateBuffer<VertexBuffer>(
 		static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, pos),
 		static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord));
 
-	std::vector<GLuint> meshIndices;
-	meshIndices.resize(CHUNK_SIZE * 6);
 	for (int i = 0; i < CHUNK_SIZE; ++i)
 	{
 		meshIndices[i * 6 + 0] = indices[0].x + 4 * i;
@@ -51,7 +52,9 @@ Mesh::Mesh(std::shared_ptr<Chunk> chunk)
 		meshIndices[i * 6 + 4] = indices[1].y + 4 * i;
 		meshIndices[i * 6 + 5] = indices[1].z + 4 * i;
 	}
-	std::shared_ptr<IndexBuffer> indexBuffer = Buffer::CreateBuffer<IndexBuffer>(CHUNK_SIZE * 6 * sizeof(GLuint), &meshIndices.front());
+	vertexArray->Bind();
+	indexBuffer = Buffer::CreateBuffer<IndexBuffer>(CHUNK_SIZE * 6 * sizeof(GLuint), &meshIndices.front());
+	indicesCount = meshIndices.size();
 	meshIndices.clear();
 }
 

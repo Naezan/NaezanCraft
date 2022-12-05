@@ -56,7 +56,7 @@ void Renderer::Render(std::shared_ptr<Chunk> chunk)
 	uint32_t modelLoc = glGetUniformLocation(shaderProgram, "model");
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	chunk->chunkMesh->BindVertexArray();
-	glDrawElements(GL_TRIANGLES, chunk->chunkMesh->GetMeshVerticesCapacity(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, chunk->chunkMesh->GetIndicesCount(), GL_UNSIGNED_INT, 0);
 	chunk->chunkMesh->UnBindVertexArray();
 }
 

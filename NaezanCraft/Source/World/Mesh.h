@@ -17,6 +17,7 @@ enum FaceType
 class Chunk;
 class VertexArray;
 class VertexBuffer;
+class IndexBuffer;
 
 struct VertTexCoord
 {
@@ -36,11 +37,12 @@ public:
 	void BindVertexArray();
 	void UnBindVertexArray();
 
-	inline size_t GetMeshVerticesCapacity() { return meshVertices.capacity(); }
+	inline size_t GetIndicesCount() { return indicesCount; }
 
 public:
 	std::shared_ptr<VertexArray> vertexArray;
 	std::shared_ptr<VertexBuffer> vertexBuffer;
+	std::shared_ptr<IndexBuffer> indexBuffer;
 
 private:
 	static const std::array<glm::vec3, 4> vertices[];
@@ -48,6 +50,9 @@ private:
 	static const std::array<glm::u8vec2, 4> texcoords;
 	//청크 하나의 모든 점이 여기에 저장된다. 65,536 보다 큰 수의 점들이 저장된다.
 	std::vector<VertTexCoord> meshVertices;
+	std::vector<unsigned int> meshIndices;
+	int indicesCount;
+
 	std::shared_ptr<Chunk> parentChunk;
 	//Neighbor chunk
 	std::shared_ptr<Chunk> LeftChunk;
