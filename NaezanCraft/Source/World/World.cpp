@@ -10,7 +10,8 @@ World::World()
 	scene = std::make_unique<Scene>();
 
 	//CreateChunk memory
-	worldChunks.reserve(100);
+	worldChunks.reserve(LOOK_CHUNK_SIZE * LOOK_CHUNK_SIZE);
+	Chunk::CreateChunk(worldChunks[std::pair<int, int>(0, 0)], glm::vec3(0.f, 0.f, 0.f));
 }
 
 World::~World()
@@ -25,12 +26,22 @@ void World::Update()
 
 void World::Render()
 {
-	//TO DO CraeteChunks by 10 * 10, need to Chunk state? Generated or Ungenerated
-	Chunk::CreateChunk(worldChunks[std::pair<int, int>(0, 0)], glm::vec3(0.f, 0.f, 0.f));
+	//TO DO CraeteChunks by 20 * 20
+	//Setup Neighbor chunk?
+	auto chunk = GetChunkByPos(std::pair<int, int>(0, 0));
+	if (chunk->chunkLoadState == ChunkLoadState::UnGenerated)
+	{
+		chunk->CreateChunkMesh();
+	}
 
 	//if Generated
 	renderer->BeginRender(*Scene::ViewProjectionMatrix);
-	renderer->Render();
+	renderer->Render(chunk);
+
+	/*for (auto chunk : worldChunks)
+	{
+		renderer->Render();
+	}*/
 }
 
 void World::Shutdown()

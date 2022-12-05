@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <glad/glad.h>
 
 enum class ShaderType
 {
@@ -14,23 +13,14 @@ public:
 	Shader(const std::string& path, ShaderType shadertype);
 
 	void Use();
-	void LinkComplete(GLuint programID);
+	void LinkComplete(unsigned int programID);
 	void SetBool(const std::string& name, bool value) const;
 	void SetInt(const std::string& name, int value) const;
 	void SetFloat(const std::string& name, float value) const;
 
 	const inline uint32_t GetShaderID() const { return shaderID; }
 	const inline ShaderType GetShaderType() const { return shaderType; }
-	const inline GLenum GetGLShader(ShaderType shadertype)
-	{
-		switch (shadertype)
-		{
-		case ShaderType::VERTEX: return GL_VERTEX_SHADER;
-		case ShaderType::FRAGMENT: return GL_FRAGMENT_SHADER;
-		}
-
-		return -1;
-	}
+	const inline unsigned int GetGLShader(ShaderType shadertype);
 
 	const static inline std::string ToString(ShaderType type)
 	{

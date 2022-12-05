@@ -5,13 +5,14 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Block.h"
-#include "Mesh.h"
-
-#define CHUNK_X 16
-#define CHUNK_Y 256
-#define CHUNK_Z 16
 
 using array_3d = std::array<std::array<std::array<Block, CHUNK_Z>, CHUNK_Y>, CHUNK_X>;
+class Mesh;
+
+enum class ChunkLoadState
+{
+	Generated, UnGenerated
+};
 
 class Chunk : public std::enable_shared_from_this<Chunk>
 {
@@ -39,7 +40,8 @@ public:
 	//100 chunks has 6.5536mbyte.
 	array_3d chunkBlocks;
 	const glm::vec3 position;
+	ChunkLoadState chunkLoadState;
+	std::unique_ptr<Mesh> chunkMesh;
 
 protected:
-	std::unique_ptr<Mesh> chunkMesh;
 };

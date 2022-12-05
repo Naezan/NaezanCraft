@@ -25,5 +25,7 @@ void Application::Run()
 
 		craftWindow->Update();
 		craftWorld->Update();
+
+		craftWorld->Render();
 	}
 }

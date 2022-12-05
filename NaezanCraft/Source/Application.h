@@ -2,7 +2,6 @@
 
 #include "Window.h"
 #include "World/World.h"
-#include <memory>
 
 class Application
 {

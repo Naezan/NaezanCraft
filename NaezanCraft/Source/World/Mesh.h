@@ -15,21 +15,39 @@ enum FaceType
 };
 
 class Chunk;
+class VertexArray;
+class VertexBuffer;
+
+struct VertTexCoord
+{
+	glm::u8vec3 pos;
+	glm::u8vec2 texcoord;
+};
 
 class Mesh
 {
 public:
 	Mesh(std::shared_ptr<Chunk> chunk);
-	~Mesh() = default;
+	~Mesh();
 
 	void CreateMesh();
 	void AddFaces(glm::vec3& pos, BlockType& type);
 	void AddFace(const glm::vec3& pos, const BlockType& Blocktype, const FaceType& faceType);
+	void BindVertexArray();
+	void UnBindVertexArray();
+
+	inline size_t GetMeshVerticesCapacity() { return meshVertices.capacity(); }
+
+public:
+	std::shared_ptr<VertexArray> vertexArray;
+	std::shared_ptr<VertexBuffer> vertexBuffer;
 
 private:
-	static const std::array<glm::vec3, 4> vertices [];
+	static const std::array<glm::vec3, 4> vertices[];
 	static const std::array<glm::u8vec3, 2> indices;
-	static const std::array<glm::vec2, 4> texcoords;
+	static const std::array<glm::u8vec2, 4> texcoords;
+	//청크 하나의 모든 점이 여기에 저장된다. 65,536 보다 큰 수의 점들이 저장된다.
+	std::vector<VertTexCoord> meshVertices;
 	std::shared_ptr<Chunk> parentChunk;
 	//Neighbor chunk
 	std::shared_ptr<Chunk> LeftChunk;

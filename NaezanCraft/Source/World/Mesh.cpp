@@ -1,18 +1,20 @@
 #include "../pch.h"
 #include "Mesh.h"
 #include "Chunk.h"
-#include "Block.h"
 #include "World.h"
 #include "../Application.h"
 
+#include "../Renderer/VertexArray.h"
+#include "../Renderer/Buffer.h"
+
 const std::array<glm::vec3, 4> Mesh::vertices[]
 {
-	{ glm::vec3(0.5f, 0.5f, -0.5f) ,glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(-0.5f, 0.5f, 0.5f),glm::vec3(0.5f, 0.5f, 0.5f) },
-	{ glm::vec3(0.5f, -0.5f,  0.5f) ,glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(-0.5f, -0.5f, -0.5f),glm::vec3(0.5f, -0.5f, -0.5f) },
-	{ glm::vec3(-0.5f, -0.5f,  0.5f) ,glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(0.5f,  0.5f,  0.5f),glm::vec3(-0.5f,  0.5f,  0.5f) },
-	{ glm::vec3(0.5f, -0.5f, -0.5f) ,glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(-0.5f,  0.5f, -0.5f),glm::vec3(0.5f,  0.5f, -0.5f) },
-	{ glm::vec3(0.5f, -0.5f,  0.5f) ,glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.5f,  0.5f, -0.5f),glm::vec3(0.5f,  0.5f,  0.5f) },
-	{ glm::vec3(-0.5f, -0.5f, -0.5f) ,glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(-0.5f,  0.5f,  0.5f),glm::vec3(-0.5f,  0.5f, -0.5f) }
+	{ glm::vec3(0.5f, 0.5f, -0.5f),		glm::vec3(-0.5f, 0.5f, -0.5f),	glm::vec3(-0.5f, 0.5f, 0.5f),	glm::vec3(0.5f, 0.5f, 0.5f) },
+	{ glm::vec3(0.5f, -0.5f,  0.5f),	glm::vec3(-0.5f, -0.5f,  0.5f),	glm::vec3(-0.5f, -0.5f, -0.5f),	glm::vec3(0.5f, -0.5f, -0.5f) },
+	{ glm::vec3(-0.5f, -0.5f,  0.5f),	glm::vec3(0.5f, -0.5f,  0.5f),	glm::vec3(0.5f,  0.5f,  0.5f),	glm::vec3(-0.5f,  0.5f,  0.5f) },
+	{ glm::vec3(0.5f, -0.5f, -0.5f),	glm::vec3(-0.5f, -0.5f, -0.5f),	glm::vec3(-0.5f,  0.5f, -0.5f),	glm::vec3(0.5f,  0.5f, -0.5f) },
+	{ glm::vec3(0.5f, -0.5f,  0.5f),	glm::vec3(0.5f, -0.5f, -0.5f),	glm::vec3(0.5f,  0.5f, -0.5f),	glm::vec3(0.5f,  0.5f,  0.5f) },
+	{ glm::vec3(-0.5f, -0.5f, -0.5f),	glm::vec3(-0.5f, -0.5f,  0.5f),	glm::vec3(-0.5f,  0.5f,  0.5f),	glm::vec3(-0.5f,  0.5f, -0.5f) }
 };
 
 const std::array<glm::u8vec3, 2> Mesh::indices
@@ -20,18 +22,47 @@ const std::array<glm::u8vec3, 2> Mesh::indices
 	glm::u8vec3(0, 1, 2) , glm::u8vec3(2, 3, 1)
 };
 
-const std::array<glm::vec2, 4> Mesh::texcoords
+const std::array<glm::u8vec2, 4> Mesh::texcoords
 {
-	glm::vec2(0.0f, 1.0f) ,glm::vec2(1.0f, 1.0f), glm::vec2(1.0f, 0.0f), glm::vec2(0.0f, 0.0f)
+	glm::u8vec2(0, 1) ,glm::u8vec2(1, 1), glm::u8vec2(1, 0), glm::u8vec2(0, 0)
 };
 
 Mesh::Mesh(std::shared_ptr<Chunk> chunk)
 {
 	parentChunk = chunk;
+	//TO DO too much
+	meshVertices.reserve(CHUNK_SIZE * 6);
+
+	//CreateArray & Buffer
+	vertexArray = VertexArray::CreateArray();
+
+	vertexBuffer = Buffer::CreateBuffer<VertexBuffer>(
+		static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, pos),
+		static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord));
+
+	std::vector<GLuint> meshIndices;
+	meshIndices.resize(CHUNK_SIZE * 6);
+	for (int i = 0; i < CHUNK_SIZE; ++i)
+	{
+		meshIndices[i * 6 + 0] = indices[0].x + 4 * i;
+		meshIndices[i * 6 + 1] = indices[0].y + 4 * i;
+		meshIndices[i * 6 + 2] = indices[0].z + 4 * i;
+		meshIndices[i * 6 + 3] = indices[1].x + 4 * i;
+		meshIndices[i * 6 + 4] = indices[1].y + 4 * i;
+		meshIndices[i * 6 + 5] = indices[1].z + 4 * i;
+	}
+	std::shared_ptr<IndexBuffer> indexBuffer = Buffer::CreateBuffer<IndexBuffer>(CHUNK_SIZE * 6 * sizeof(GLuint), &meshIndices.front());
+	meshIndices.clear();
+}
+
+Mesh::~Mesh()
+{
+	meshVertices.clear();
 }
 
 void Mesh::CreateMesh()
 {
+	meshVertices.clear();//size to zero
 	//GetSideChunk
 	LeftChunk = GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x - 1), static_cast<int>(parentChunk->position.z)));
 	RightChunk = GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x + 1), static_cast<int>(parentChunk->position.z)));
@@ -53,10 +84,16 @@ void Mesh::CreateMesh()
 				worldPosition.x = parentChunk->position.x * CHUNK_X + x;
 				worldPosition.y = y;
 				worldPosition.x = parentChunk->position.z * CHUNK_Z + z;
-				worldPosition /= 2;
+				worldPosition /= 2;//scaled pos?
 				AddFaces(tempPos, block.blockType);
 			}
 		}
+	}
+
+	//SetVertexBuffer && texCoord
+	if (!meshVertices.empty())
+	{
+		vertexBuffer->SetBufferData(meshVertices.size() * sizeof(VertTexCoord), &meshVertices.front());
 	}
 }
 
@@ -141,5 +178,53 @@ void Mesh::AddFaces(glm::vec3& pos, BlockType& type)
 
 void Mesh::AddFace(const glm::vec3& pos, const BlockType& Blocktype, const FaceType& faceType)
 {
-	//TO DO use position & facetype, set texcoord, Add to vertex
+	switch (faceType)
+	{
+	case Top:
+		meshVertices.push_back({ pos + vertices[Top][0],texcoords[0] });
+		meshVertices.push_back({ pos + vertices[Top][1],texcoords[1] });
+		meshVertices.push_back({ pos + vertices[Top][2],texcoords[2] });
+		meshVertices.push_back({ pos + vertices[Top][3],texcoords[3] });
+		break;
+	case Bottom:
+		meshVertices.push_back({ pos + vertices[Bottom][0],texcoords[0] });
+		meshVertices.push_back({ pos + vertices[Bottom][1],texcoords[1] });
+		meshVertices.push_back({ pos + vertices[Bottom][2],texcoords[2] });
+		meshVertices.push_back({ pos + vertices[Bottom][3],texcoords[3] });
+		break;
+	case Front:
+		meshVertices.push_back({ pos + vertices[Front][0],texcoords[0] });
+		meshVertices.push_back({ pos + vertices[Front][1],texcoords[1] });
+		meshVertices.push_back({ pos + vertices[Front][2],texcoords[2] });
+		meshVertices.push_back({ pos + vertices[Front][3],texcoords[3] });
+		break;
+	case Back:
+		meshVertices.push_back({ pos + vertices[Back][0],texcoords[0] });
+		meshVertices.push_back({ pos + vertices[Back][1],texcoords[1] });
+		meshVertices.push_back({ pos + vertices[Back][2],texcoords[2] });
+		meshVertices.push_back({ pos + vertices[Back][3],texcoords[3] });
+		break;
+	case Right:
+		meshVertices.push_back({ pos + vertices[Right][0],texcoords[0] });
+		meshVertices.push_back({ pos + vertices[Right][1],texcoords[1] });
+		meshVertices.push_back({ pos + vertices[Right][2],texcoords[2] });
+		meshVertices.push_back({ pos + vertices[Right][3],texcoords[3] });
+		break;
+	case Left:
+		meshVertices.push_back({ pos + vertices[Left][0],texcoords[0] });
+		meshVertices.push_back({ pos + vertices[Left][1],texcoords[1] });
+		meshVertices.push_back({ pos + vertices[Left][2],texcoords[2] });
+		meshVertices.push_back({ pos + vertices[Left][3],texcoords[3] });
+		break;
+	}
+}
+
+void Mesh::BindVertexArray()
+{
+	vertexArray->Bind();
+}
+
+void Mesh::UnBindVertexArray()
+{
+	vertexArray->UnBind();
 }

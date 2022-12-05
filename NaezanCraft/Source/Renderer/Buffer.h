@@ -1,5 +1,5 @@
 #pragma once
-#include <glad/glad.h>
+
 class Buffer
 {
 public:
@@ -19,11 +19,13 @@ protected:
 class VertexBuffer : public Buffer
 {
 public:
-	VertexBuffer(size_t size, const void* data);
+	VertexBuffer(int vertexStride, const void* vertexPointer, int texcoordStride, const void* texcoordPointer);
 	~VertexBuffer();
 
-	virtual inline void Bind() override { glBindBuffer(GL_ARRAY_BUFFER, bufferID); }
-	virtual inline void UnBind() override { glBindBuffer(GL_ARRAY_BUFFER, 0); }
+	virtual void Bind() override;
+	virtual void UnBind() override;
+
+	void SetBufferData(size_t size, const void* data);
 
 private:
 
@@ -35,8 +37,8 @@ public:
 	IndexBuffer(size_t size, const void* data);
 	~IndexBuffer() = default;
 
-	virtual inline void Bind() override { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID); }
-	virtual inline void UnBind() override { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
+	virtual void Bind() override;
+	virtual void UnBind() override;
 
 private:
 

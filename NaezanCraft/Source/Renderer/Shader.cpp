@@ -2,6 +2,7 @@
 #include "Shader.h"
 #include "../MessageLog.h"
 
+#include <glad/glad.h>
 
 Shader::Shader(const std::string& path, ShaderType shadertype)
 {
@@ -52,7 +53,7 @@ void Shader::Use()
 	//glUseProgram(shaderID);
 }
 
-void Shader::LinkComplete(GLuint programID)
+void Shader::LinkComplete(unsigned int programID)
 {
 	glDetachShader(programID, shaderID);
 	glDeleteShader(shaderID);
@@ -69,4 +70,15 @@ void Shader::SetInt(const std::string& name, int value) const
 void Shader::SetFloat(const std::string& name, float value) const
 {
 	glUniform1f(glGetUniformLocation(shaderID, name.c_str()), value);
+}
+
+inline const unsigned int Shader::GetGLShader(ShaderType shadertype)
+{
+	switch (shadertype)
+	{
+	case ShaderType::VERTEX: return GL_VERTEX_SHADER;
+	case ShaderType::FRAGMENT: return GL_FRAGMENT_SHADER;
+	}
+
+	return -1;
 }
