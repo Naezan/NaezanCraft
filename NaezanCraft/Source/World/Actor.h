@@ -22,15 +22,15 @@ public:
 	inline glm::vec3& GetRotation() { return rotation; }
 	inline glm::vec3& GetScale() { return scale; }
 
-	template<typename T>
-	static std::unique_ptr<T> CreateUnique()
+	template<typename T, typename... Args>
+	static std::unique_ptr<T> CreateUnique(Args... args)
 	{
-		return std::make_unique<T>();
+		return std::make_unique<T>(args...);
 	}
-	template<typename T>
-	static std::shared_ptr<T> CreateShared()
+	template<typename T, typename... Args>
+	static std::shared_ptr<T> CreateShared(Args... args)
 	{
-		return std::make_shared<T>();
+		return std::make_shared<T>(args...);
 	}
 
 public:

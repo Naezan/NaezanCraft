@@ -31,5 +31,5 @@ void Chunk::CreateChunkMesh()
 void Chunk::CreateChunk(std::shared_ptr<Chunk>& worldChunk, const glm::vec3& pos)
 {
 	worldChunk = std::make_shared<Chunk>(std::forward<const glm::vec3&>(pos));
-	worldChunk->chunkMesh = std::make_unique<Mesh>(worldChunk->shared_this());
+	worldChunk->chunkMesh = std::make_unique<Mesh>(worldChunk);
 }

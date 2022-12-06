@@ -7,7 +7,8 @@ const glm::mat4* Scene::ViewProjectionMatrix;
 
 Scene::Scene()
 {
-	player = Actor::CreateUnique<Player>();
+	//TO DO player position setting
+	player = Actor::CreateUnique<Player>(glm::vec3(0.f, 70.f, 50.f), glm::vec3(10.f, 10.f, 10.f));
 	playerCamera = player->GetCamera();
 	ViewProjectionMatrix = &player->GetCamera()->GetViewProjectionMatrix();
 }

@@ -14,7 +14,7 @@ enum class ChunkLoadState
 	Generated, UnGenerated
 };
 
-class Chunk : public std::enable_shared_from_this<Chunk>
+class Chunk
 {
 public:
 	//You Don't new Chunk
@@ -28,11 +28,6 @@ public:
 
 	//Must called, not recommended but...
 	static void CreateChunk(std::shared_ptr<Chunk>& worldChunk, const glm::vec3& pos);
-
-	std::shared_ptr<Chunk> shared_this()
-	{
-		return shared_from_this();
-	}
 
 public:
 	//need to use heap memory? but pointer is heavy? 65,536 * 1 byte?

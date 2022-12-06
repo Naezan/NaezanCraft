@@ -28,7 +28,7 @@ struct VertTexCoord
 class Mesh
 {
 public:
-	Mesh(std::shared_ptr<Chunk> chunk);
+	Mesh(std::shared_ptr<Chunk>& chunk);
 	~Mesh();
 
 	void CreateMesh();

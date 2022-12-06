@@ -17,7 +17,7 @@ public:
 	~Renderer() = default;
 
 	void BeginRender(const glm::mat4& matrix);
-	void Render(std::shared_ptr<Chunk> chunk);
+	void Render(std::shared_ptr<Chunk>& chunk);
 	void Shutdown();
 
 private:

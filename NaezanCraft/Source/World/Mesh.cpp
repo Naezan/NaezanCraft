@@ -27,13 +27,13 @@ const std::array<glm::u8vec2, 4> Mesh::texcoords
 	glm::u8vec2(0, 1) ,glm::u8vec2(1, 1), glm::u8vec2(1, 0), glm::u8vec2(0, 0)
 };
 
-Mesh::Mesh(std::shared_ptr<Chunk> chunk)
+Mesh::Mesh(std::shared_ptr<Chunk>& chunk)
 {
 	parentChunk = chunk;
 	//TO DO too much
 	indicesCount = 0;
-	meshVertices.reserve(CHUNK_SIZE * 6);
-	meshIndices.resize(CHUNK_SIZE * 6);
+	meshVertices.reserve(CHUNK_SIZE * 6);//한면당4개의점 * chunkSize 1024 -> 2304 576 (256 + 320)
+	meshIndices.resize(CHUNK_SIZE * 6 * 4);//1536 -> 3000?
 
 	//CreateArray & Buffer
 	vertexArray = VertexArray::CreateArray();
@@ -43,7 +43,7 @@ Mesh::Mesh(std::shared_ptr<Chunk> chunk)
 		static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, pos),
 		static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord));
 
-	for (int i = 0; i < CHUNK_SIZE; ++i)
+	for (int i = 0; i < CHUNK_SIZE * 4; ++i)
 	{
 		meshIndices[i * 6 + 0] = indices[0].x + 4 * i;
 		meshIndices[i * 6 + 1] = indices[0].y + 4 * i;
@@ -53,7 +53,7 @@ Mesh::Mesh(std::shared_ptr<Chunk> chunk)
 		meshIndices[i * 6 + 5] = indices[1].z + 4 * i;
 	}
 	vertexArray->Bind();
-	indexBuffer = Buffer::CreateBuffer<IndexBuffer>(CHUNK_SIZE * 6 * sizeof(GLuint), &meshIndices.front());
+	indexBuffer = Buffer::CreateBuffer<IndexBuffer>(meshIndices.size() * sizeof(GLuint), &meshIndices.front());
 	indicesCount = meshIndices.size();
 	meshIndices.clear();
 }
@@ -67,10 +67,22 @@ void Mesh::CreateMesh()
 {
 	meshVertices.clear();//size to zero
 	//GetSideChunk
-	LeftChunk = GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x - 1), static_cast<int>(parentChunk->position.z)));
-	RightChunk = GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x + 1), static_cast<int>(parentChunk->position.z)));
-	BackChunk = GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x), static_cast<int>(parentChunk->position.z - 1)));
-	FrontChunk = GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x), static_cast<int>(parentChunk->position.z + 1)));
+	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x - 1), static_cast<int>(parentChunk->position.z)), LeftChunk))
+	{
+		LeftChunk = nullptr;
+	}
+	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x + 1), static_cast<int>(parentChunk->position.z)), RightChunk))
+	{
+		RightChunk = nullptr;
+	}
+	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x), static_cast<int>(parentChunk->position.z - 1)), BackChunk))
+	{
+		BackChunk = nullptr;
+	}
+	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x), static_cast<int>(parentChunk->position.z + 1)), FrontChunk))
+	{
+		FrontChunk = nullptr;
+	}
 
 	for (int x = 0; x < CHUNK_X; ++x)
 	{
@@ -83,11 +95,6 @@ void Mesh::CreateMesh()
 					continue;
 
 				glm::vec3 tempPos = glm::vec3(x, y, z);
-				glm::vec3 worldPosition;
-				worldPosition.x = parentChunk->position.x * CHUNK_X + x;
-				worldPosition.y = y;
-				worldPosition.x = parentChunk->position.z * CHUNK_Z + z;
-				worldPosition /= 2;//scaled pos?
 				AddFaces(tempPos, block.blockType);
 			}
 		}
@@ -138,7 +145,7 @@ void Mesh::AddFaces(glm::vec3& pos, BlockType& type)
 	}
 	else
 	{
-		//Just add Bottom Face
+		//Just add Bottom Face Once
 		AddFace(pos, type, FaceType::Bottom);
 	}
 
@@ -150,7 +157,7 @@ void Mesh::AddFaces(glm::vec3& pos, BlockType& type)
 	}
 	else
 	{
-		//Just add Top Face
+		//Just add Top Face Once
 		AddFace(pos, type, FaceType::Top);
 	}
 

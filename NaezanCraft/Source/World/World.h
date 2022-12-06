@@ -19,7 +19,7 @@ public:
 		return std::make_unique<World>();
 	}
 
-	std::shared_ptr<Chunk> GetChunkByPos(const std::pair<int, int> key);
+	bool GetChunkByPos(const std::pair<int, int>& key, std::shared_ptr<Chunk>& outChunk);
 
 private:
 	std::unique_ptr<Renderer> renderer;
