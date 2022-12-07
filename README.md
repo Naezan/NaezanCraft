@@ -20,6 +20,7 @@ MineCraft Copy Naezan's Engine
   ```shell
   git status -> current git status like new file, modified, deleted etc..
   git add * -> register current status
+  git reset . -> reset add *
   git commit -m "Text What You Want" -> commiting..
   git push origin main -> push to main branch
   ```

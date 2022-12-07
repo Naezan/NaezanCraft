@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 enum class ShaderType
 {
@@ -11,6 +12,7 @@ class Shader
 {
 public:
 	Shader(const std::string& path, ShaderType shadertype);
+	virtual ~Shader() = default;
 
 	void Use();
 	void LinkComplete(unsigned int programID);
@@ -39,7 +41,7 @@ public:
 		return std::make_unique<Shader>(path, T);
 	}
 
-private:
+protected:
 	uint32_t shaderID;
 	ShaderType shaderType;
 };

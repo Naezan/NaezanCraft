@@ -3,7 +3,7 @@
 #include "Texture.h"
 #include "../World/Camera.h"
 #include "../World/Chunk.h"
-#include "../World/Mesh.h"
+#include "../World/ChunkMesh.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -28,8 +28,7 @@ Renderer::Renderer()
 		shader.second->LinkComplete(shaderProgram);
 	}
 
-	//TO DO change Vertex Info
-	//텍스쳐
+	//텍스쳐 Atlas
 	texture = Texture::CreateTexture("../Assets/Textures/Atlas.png");
 	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
 }

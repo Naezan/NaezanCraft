@@ -6,6 +6,7 @@
 
 class Player;
 class Camera;
+class SkyBox;
 
 class Scene
 {
@@ -14,10 +15,12 @@ public:
 	~Scene();
 
 	void Update();
+	void Render();
 
 public:
 	static const glm::mat4* ViewProjectionMatrix;
 private:
 	std::unique_ptr<Player> player;//현재 플레이어는 1명만
 	std::shared_ptr<Camera> playerCamera;
+	std::unique_ptr<SkyBox> sky;
 };

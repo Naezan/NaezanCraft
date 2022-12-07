@@ -20,6 +20,7 @@ public:
 	inline const float& GetFov() { return fov; }
 	inline const glm::vec3& GetForwadDir() { return cameraFront; }
 	inline const glm::mat4& GetViewMatrix() { return viewMatrix; }
+	inline const glm::mat4& GetProjectionMatrix() { return projectionMatrix; }
 	inline const glm::mat4& GetViewProjectionMatrix() { return projectionXviewMatrix; }
 
 	void SetFov(float _fov);

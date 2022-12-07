@@ -13,6 +13,14 @@ Buffer::~Buffer()
 	glDeleteBuffers(1, &bufferID);
 }
 
+VertexBuffer::VertexBuffer(int vertexStride, const void* vertexPointer)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
+
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, vertexStride, vertexPointer);
+	glEnableVertexAttribArray(0);
+}
+
 VertexBuffer::VertexBuffer(int vertexStride, const void* vertexPointer, int texcoordStride, const void* texcoordPointer)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);

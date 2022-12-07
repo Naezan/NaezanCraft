@@ -32,6 +32,8 @@ void World::Update()
 
 void World::Render()
 {
+	scene->Render();
+
 	//TO DO CraeteChunks by 20 * 20
 	//Setup Neighbor chunk?
 

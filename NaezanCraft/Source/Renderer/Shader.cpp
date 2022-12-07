@@ -50,7 +50,7 @@ Shader::Shader(const std::string& path, ShaderType shadertype)
 void Shader::Use()
 {
 	//TO DO move to renderer.cpp
-	//glUseProgram(shaderID);
+	glUseProgram(shaderID);
 }
 
 void Shader::LinkComplete(unsigned int programID)

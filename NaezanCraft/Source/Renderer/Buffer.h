@@ -19,6 +19,7 @@ protected:
 class VertexBuffer : public Buffer
 {
 public:
+	VertexBuffer(int vertexStride, const void* vertexPointer);
 	VertexBuffer(int vertexStride, const void* vertexPointer, int texcoordStride, const void* texcoordPointer);
 	~VertexBuffer();
 

@@ -7,7 +7,7 @@
 #include "Block.h"
 
 using array_3d = std::array<std::array<std::array<Block, CHUNK_Z>, CHUNK_Y>, CHUNK_X>;
-class Mesh;
+class ChunkMesh;
 
 enum class ChunkLoadState
 {
@@ -36,7 +36,7 @@ public:
 	array_3d chunkBlocks;
 	const glm::vec3 position;
 	ChunkLoadState chunkLoadState;
-	std::unique_ptr<Mesh> chunkMesh;
+	std::unique_ptr<ChunkMesh> chunkMesh;
 
 protected:
 };
