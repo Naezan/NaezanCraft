@@ -22,8 +22,8 @@ VertexBuffer::VertexBuffer(int vertexStride, const void* vertexPointer, int texc
 	glVertexAttribPointer(0, 3, GL_UNSIGNED_BYTE, GL_FALSE, vertexStride, vertexPointer);
 	glEnableVertexAttribArray(0);
 
-	//texture(u8vec2)
-	glVertexAttribPointer(1, 2, GL_UNSIGNED_BYTE, GL_FALSE, texcoordStride, texcoordPointer);
+	//texture(vec2)
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, texcoordStride, texcoordPointer);
 	glEnableVertexAttribArray(1);
 }
 

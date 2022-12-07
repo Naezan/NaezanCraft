@@ -22,7 +22,7 @@ class IndexBuffer;
 struct VertTexCoord
 {
 	glm::u8vec3 pos;
-	glm::u8vec2 texcoord;
+	glm::vec2 texcoord;
 };
 
 class Mesh
@@ -32,10 +32,12 @@ public:
 	~Mesh();
 
 	void CreateMesh();
-	void AddFaces(glm::vec3& pos, BlockType& type);
-	void AddFace(const glm::vec3& pos, const BlockType& Blocktype, const FaceType& faceType);
+	void AddFaces(const glm::vec3& pos, BlockType& type, const glm::vec2& texcoord);
+	void AddFace(const glm::vec3& pos, const BlockType& Blocktype, const FaceType& faceType, const glm::vec2& texcoord);
 	void BindVertexArray();
 	void UnBindVertexArray();
+
+	glm::vec2& GetTexCoord(BlockType& type);
 
 	inline size_t GetIndicesCount() { return indicesCount; }
 
@@ -47,7 +49,6 @@ public:
 private:
 	static const std::array<glm::vec3, 4> vertices[];
 	static const std::array<glm::u8vec3, 2> indices;
-	static const std::array<glm::u8vec2, 4> texcoords;
 	//청크 하나의 모든 점이 여기에 저장된다. 65,536 보다 큰 수의 점들이 저장된다.
 	std::vector<VertTexCoord> meshVertices;
 	std::vector<unsigned int> meshIndices;

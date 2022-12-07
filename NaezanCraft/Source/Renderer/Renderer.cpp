@@ -30,7 +30,7 @@ Renderer::Renderer()
 
 	//TO DO change Vertex Info
 	//ÅØ½ºÃÄ
-	texture = Texture::CreateTexture("../Assets/Textures/diamond_block.png");
+	texture = Texture::CreateTexture("../Assets/Textures/Atlas.png");
 	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
 }
 
@@ -44,7 +44,6 @@ void Renderer::Render(std::shared_ptr<Chunk>& chunk)
 {
 	glUseProgram(shaderProgram);
 
-	//TO DO RenderChunkBegin && RenderChunk
 	uint32_t viewProjectionLoc = glGetUniformLocation(shaderProgram, "projectionview");
 	glUniformMatrix4fv(viewProjectionLoc, 1, GL_FALSE, glm::value_ptr(ViewProjectionMatrix));
 

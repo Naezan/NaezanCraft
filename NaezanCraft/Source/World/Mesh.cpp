@@ -22,18 +22,13 @@ const std::array<glm::u8vec3, 2> Mesh::indices
 	glm::u8vec3(0, 1, 2) , glm::u8vec3(2, 3, 0)
 };
 
-const std::array<glm::u8vec2, 4> Mesh::texcoords
-{
-	glm::u8vec2(0, 1) ,glm::u8vec2(1, 1), glm::u8vec2(1, 0), glm::u8vec2(0, 0)
-};
-
 Mesh::Mesh(std::shared_ptr<Chunk>& chunk)
 {
 	parentChunk = chunk;
 	//TO DO too much
 	indicesCount = 0;
 	meshVertices.reserve(CHUNK_SIZE * 6);//한면당4개의점 * chunkSize 1024 -> 2304 576 (256 + 320)
-	meshIndices.resize(CHUNK_SIZE * 6 * 4);//1536 -> 3000?
+	meshIndices.resize(CHUNK_SIZE * 6);//1536 -> 3000?
 
 	//CreateArray & Buffer
 	vertexArray = VertexArray::CreateArray();
@@ -43,7 +38,7 @@ Mesh::Mesh(std::shared_ptr<Chunk>& chunk)
 		static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, pos),
 		static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord));
 
-	for (int i = 0; i < CHUNK_SIZE * 4; ++i)
+	for (int i = 0; i < CHUNK_SIZE; ++i)
 	{
 		meshIndices[i * 6 + 0] = indices[0].x + 4 * i;
 		meshIndices[i * 6 + 1] = indices[0].y + 4 * i;
@@ -94,8 +89,9 @@ void Mesh::CreateMesh()
 				if (block.blockType == BlockType::Air)
 					continue;
 
-				glm::vec3 tempPos = glm::vec3(x, y, z);
-				AddFaces(tempPos, block.blockType);
+				//GetBlockTypeAndGetTexCoord
+				auto texcord = GetTexCoord(block.blockType);
+				AddFaces(glm::vec3(x, y, z), block.blockType, texcord);
 			}
 		}
 	}
@@ -107,20 +103,20 @@ void Mesh::CreateMesh()
 	}
 }
 
-void Mesh::AddFaces(glm::vec3& pos, BlockType& type)
+void Mesh::AddFaces(const glm::vec3& pos, BlockType& type, const glm::vec2& texcoord)
 {
 	//X Left
 	if (pos.x > 0)
 	{
 		//만약 이전박스가 없다면 비어있으면 안되므로 현재 왼쪽면의 정보를 추가해준다
 		if (parentChunk->GetBlock(glm::vec3(pos.x - 1, pos.y, pos.z)).IsTransparent())
-			AddFace(pos, type, FaceType::Left);
+			AddFace(pos, type, FaceType::Left, texcoord);
 	}
 	else
 	{
 		//만약 이전 청크의 마지막이 없다면 0번째위치 왼쪽면의 정보를 추가해준다
 		if (LeftChunk == nullptr || LeftChunk->GetBlock(glm::vec3(CHUNK_X - 1, pos.y, pos.z)).IsTransparent())
-			AddFace(pos, type, FaceType::Left);
+			AddFace(pos, type, FaceType::Left, texcoord);
 	}
 
 	//X Right
@@ -128,66 +124,73 @@ void Mesh::AddFaces(glm::vec3& pos, BlockType& type)
 	{
 		//만약 다음박스가 없다면 비어있으면 안되므로 현재 오른쪽면의 정보를 추가해준다
 		if (parentChunk->GetBlock(glm::vec3(pos.x + 1, pos.y, pos.z)).IsTransparent())
-			AddFace(pos, type, FaceType::Right);
+			AddFace(pos, type, FaceType::Right, texcoord);
 	}
 	else
 	{
 		//만약 다음 청크의 0번째가 없다면 CHUNK_X - 1위치 으론쪽면의 정보를 추가해준다
 		if (RightChunk == nullptr || RightChunk->GetBlock(glm::vec3(0, pos.y, pos.z)).IsTransparent())
-			AddFace(pos, type, FaceType::Right);
+			AddFace(pos, type, FaceType::Right, texcoord);
 	}
 
 	//Y Bottom
 	if (pos.y > 0)
 	{
 		if (parentChunk->GetBlock(glm::vec3(pos.x, pos.y - 1, pos.z)).IsTransparent())
-			AddFace(pos, type, FaceType::Bottom);
+			AddFace(pos, type, FaceType::Bottom, texcoord);
 	}
 	else
 	{
 		//Just add Bottom Face Once
-		AddFace(pos, type, FaceType::Bottom);
+		AddFace(pos, type, FaceType::Bottom, texcoord);
 	}
 
 	//Y Top
 	if (pos.y < CHUNK_Y - 1)
 	{
 		if (parentChunk->GetBlock(glm::vec3(pos.x, pos.y + 1, pos.z)).IsTransparent())
-			AddFace(pos, type, FaceType::Top);
+			AddFace(pos, type, FaceType::Top, texcoord);
 	}
 	else
 	{
 		//Just add Top Face Once
-		AddFace(pos, type, FaceType::Top);
+		AddFace(pos, type, FaceType::Top, texcoord);
 	}
 
 	//Z Back
 	if (pos.z > 0)
 	{
 		if (parentChunk->GetBlock(glm::vec3(pos.x, pos.y, pos.z - 1)).IsTransparent())
-			AddFace(pos, type, FaceType::Back);
+			AddFace(pos, type, FaceType::Back, texcoord);
 	}
 	else
 	{
 		if (BackChunk == nullptr || BackChunk->GetBlock(glm::vec3(pos.x, pos.y, CHUNK_Z - 1)).IsTransparent())
-			AddFace(pos, type, FaceType::Back);
+			AddFace(pos, type, FaceType::Back, texcoord);
 	}
 
 	//Z Front
 	if (pos.z < CHUNK_Z - 1)
 	{
 		if (parentChunk->GetBlock(glm::vec3(pos.x, pos.y, pos.z + 1)).IsTransparent())
-			AddFace(pos, type, FaceType::Front);
+			AddFace(pos, type, FaceType::Front, texcoord);
 	}
 	else
 	{
 		if (FrontChunk == nullptr || FrontChunk->GetBlock(glm::vec3(pos.x, pos.y, 0)).IsTransparent())
-			AddFace(pos, type, FaceType::Front);
+			AddFace(pos, type, FaceType::Front, texcoord);
 	}
 }
 
-void Mesh::AddFace(const glm::vec3& pos, const BlockType& Blocktype, const FaceType& faceType)
+void Mesh::AddFace(const glm::vec3& pos, const BlockType& Blocktype, const FaceType& faceType, const glm::vec2& texcoord)
 {
+	const std::array<glm::vec2, 4> texcoords {
+		glm::vec2((SPRITE_WIDTH * texcoord.x) / ATLAS_WIDTH, (SPRITE_HEIGHT * (texcoord.y + 1.f)) / ATLAS_HEIGHT),
+		glm::vec2((SPRITE_WIDTH * (texcoord.x + 1.f)) / ATLAS_WIDTH, (SPRITE_HEIGHT * (texcoord.y + 1.f)) / ATLAS_HEIGHT),
+		glm::vec2((SPRITE_WIDTH * (texcoord.x + 1.f)) / ATLAS_WIDTH, (SPRITE_HEIGHT * texcoord.y) / ATLAS_HEIGHT),
+		glm::vec2((SPRITE_WIDTH * texcoord.x) / ATLAS_WIDTH, (SPRITE_HEIGHT * texcoord.y) / ATLAS_HEIGHT)
+	};
+
 	switch (faceType)
 	{
 	case Top:
@@ -237,4 +240,11 @@ void Mesh::BindVertexArray()
 void Mesh::UnBindVertexArray()
 {
 	vertexArray->UnBind();
+}
+
+glm::vec2& Mesh::GetTexCoord(BlockType& type)
+{
+	// TODO: insert return statement here
+	auto temp = glm::vec2(15, 2);
+	return temp;
 }
