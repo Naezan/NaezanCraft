@@ -2,6 +2,8 @@
 
 #include "../../Renderer/Shader.h"
 
+//Something wrong in shader class.. :(
+
 class SkyBoxShader;
 class Mesh;
 class Camera;
@@ -18,6 +20,7 @@ public:
 	void Render(std::shared_ptr<Camera>& camera);
 
 private:
+	uint32_t shaderProgram;
 	std::map<ShaderType, std::unique_ptr<SkyBoxShader>> skyBoxShaders;
 	//std::unique_ptr<Mesh> skyMesh;
 	std::shared_ptr<VertexArray> vertexArray;

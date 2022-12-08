@@ -4,3 +4,5 @@
 Mesh::Mesh()
 {
 }
+
+Mesh::~Mesh() = default;

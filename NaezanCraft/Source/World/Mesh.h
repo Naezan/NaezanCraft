@@ -4,7 +4,7 @@ class Mesh
 {
 public:
 	Mesh();
-	~Mesh() = default;
+	~Mesh();
 
 private:
 

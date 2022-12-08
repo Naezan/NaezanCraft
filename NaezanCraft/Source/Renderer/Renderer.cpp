@@ -41,6 +41,9 @@ void Renderer::BeginRender(const glm::mat4& matrix)
 
 void Renderer::Render(std::shared_ptr<Chunk>& chunk)
 {
+	glDisable(GL_BLEND);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 	glUseProgram(shaderProgram);
 
 	uint32_t viewProjectionLoc = glGetUniformLocation(shaderProgram, "projectionview");

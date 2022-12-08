@@ -13,47 +13,66 @@
 
 SkyBox::SkyBox()
 {
+    //Shader
 	skyBoxShaders.emplace(ShaderType::VERTEX, std::make_unique<SkyBoxShader>("../Assets/Shaders/ProcSky.vs", ShaderType::VERTEX));
 	skyBoxShaders.emplace(ShaderType::FRAGMENT, std::make_unique<SkyBoxShader>("../Assets/Shaders/ProcSky.fs", ShaderType::FRAGMENT));
 
-    constexpr GLfloat SIZE = 500;
+    shaderProgram = glCreateProgram();
 
+    for (auto& shader : skyBoxShaders)
+    {
+        glAttachShader(shaderProgram, shader.second->GetShaderID());
+    }
+
+    glLinkProgram(shaderProgram);
+
+    for (auto& shader : skyBoxShaders)
+    {
+        shader.second->LinkComplete(shaderProgram);
+    }
+
+    skyBoxShaders[ShaderType::VERTEX]->GetUniform(shaderProgram);
+
+    //Mesh
+    //skyMesh = std::make_unique<Mesh>();
+
+    //4th value is weight value, for change specific weather color
     std::vector<GLfloat> vertexCoords{
         //Back
-        SIZE, -SIZE, -SIZE, 3,
-        -SIZE, -SIZE, -SIZE, 0,
-        -SIZE,  SIZE, -SIZE, 1,
-        SIZE,  SIZE, -SIZE, 2,
+        SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 3,
+        -SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 0,
+        -SKY_SIZE,  SKY_SIZE, -SKY_SIZE, 1,
+        SKY_SIZE,  SKY_SIZE, -SKY_SIZE, 2,
 
         //Front
-        -SIZE, -SIZE, SIZE, 4,
-        SIZE, -SIZE, SIZE, 7,
-        SIZE,  SIZE, SIZE, 5,
-        -SIZE,  SIZE, SIZE, 6,
+        -SKY_SIZE, -SKY_SIZE, SKY_SIZE, 4,
+        SKY_SIZE, -SKY_SIZE, SKY_SIZE, 7,
+        SKY_SIZE,  SKY_SIZE, SKY_SIZE, 5,
+        -SKY_SIZE,  SKY_SIZE, SKY_SIZE, 6,
 
         //Right
-        SIZE, -SIZE,  SIZE, 7,
-        SIZE, -SIZE, -SIZE, 3,
-        SIZE,  SIZE, -SIZE, 2,
-        SIZE,  SIZE,  SIZE, 5,
+        SKY_SIZE, -SKY_SIZE,  SKY_SIZE, 7,
+        SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 3,
+        SKY_SIZE,  SKY_SIZE, -SKY_SIZE, 2,
+        SKY_SIZE,  SKY_SIZE,  SKY_SIZE, 5,
 
         //Left
-        -SIZE, -SIZE, -SIZE, 0,
-        -SIZE, -SIZE,  SIZE, 4,
-        -SIZE,  SIZE,  SIZE, 6,
-        -SIZE,  SIZE, -SIZE, 1,
+        -SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 0,
+        -SKY_SIZE, -SKY_SIZE,  SKY_SIZE, 4,
+        -SKY_SIZE,  SKY_SIZE,  SKY_SIZE, 6,
+        -SKY_SIZE,  SKY_SIZE, -SKY_SIZE, 1,
 
         //Top
-        -SIZE, SIZE,  SIZE, 6,
-        SIZE, SIZE,  SIZE, 5,
-        SIZE, SIZE, -SIZE, 2,
-        -SIZE, SIZE, -SIZE, 1,
+        -SKY_SIZE, SKY_SIZE,  SKY_SIZE, 6,
+        SKY_SIZE, SKY_SIZE,  SKY_SIZE, 5,
+        SKY_SIZE, SKY_SIZE, -SKY_SIZE, 2,
+        -SKY_SIZE, SKY_SIZE, -SKY_SIZE, 1,
 
         //Bottom
-        -SIZE, -SIZE, -SIZE, 0,
-        SIZE, -SIZE, -SIZE, 3,
-        SIZE, -SIZE,  SIZE, 7,
-        -SIZE, -SIZE,  SIZE, 4,
+        -SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 0,
+        SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 3,
+        SKY_SIZE, -SKY_SIZE,  SKY_SIZE, 7,
+        -SKY_SIZE, -SKY_SIZE,  SKY_SIZE, 4,
     };
 
     std::vector<GLuint> indices{
@@ -77,9 +96,13 @@ SkyBox::SkyBox()
     };
 
     vertexArray = VertexArray::CreateArray();
+    vertexArray->Bind();
+
     vertexBuffer = Buffer::CreateBuffer<VertexBuffer>(0, (void*)0);
-    vertexBuffer->SetBufferData(vertexCoords.size() * sizeof(GLfloat), vertexCoords.data());
-    indexBuffer = Buffer::CreateBuffer<IndexBuffer>(indices.size() * sizeof(GLuint), indices.data());
+    vertexBuffer->SetBufferData(vertexCoords.size() * sizeof(GLfloat), &vertexCoords.front());
+
+    vertexArray->Bind();
+    indexBuffer = Buffer::CreateBuffer<IndexBuffer>(indices.size() * sizeof(GLuint), &indices.front());
     indicesSize = indices.size();
     indices.clear();
 }
@@ -88,13 +111,12 @@ SkyBox::~SkyBox() = default;
 
 void SkyBox::Render(std::shared_ptr<Camera>& camera)
 {
-    for (auto& shader : skyBoxShaders)
-    {
-        shader.second->Use();
-    }
+    glDisable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+    glUseProgram(shaderProgram);
 
+    vertexArray->Bind();
 	skyBoxShaders[ShaderType::VERTEX]->Update(camera);
-
-
     glDrawElements(GL_TRIANGLES, indicesSize, GL_UNSIGNED_INT, nullptr);
+    vertexArray->UnBind();
 }

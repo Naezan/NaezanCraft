@@ -32,14 +32,13 @@ void World::Update()
 
 void World::Render()
 {
+	renderer->BeginRender(*Scene::ViewProjectionMatrix);
+
 	scene->Render();
 
 	//TO DO CraeteChunks by 20 * 20
 	//Setup Neighbor chunk?
-
 	//if Generated
-	renderer->BeginRender(*Scene::ViewProjectionMatrix);
-
 	for (auto chunk : worldChunks)
 	{
 		if (chunk.second->chunkLoadState == ChunkLoadState::UnGenerated)
