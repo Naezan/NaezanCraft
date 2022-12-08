@@ -26,17 +26,10 @@ ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>& chunk)
 {
 	parentChunk = chunk;
 	//TO DO too much
-	indicesCount = 0;
 	meshVertices.reserve(CHUNK_SIZE * 6);//한면당4개의점 * chunkSize 1024 -> 2304 576 (256 + 320)
 	meshIndices.resize(CHUNK_SIZE * 6);//1536 -> 3000?
 
-	//CreateArray & Buffer
-	vertexArray = VertexArray::CreateArray();
-
-	vertexArray->Bind();
-	vertexBuffer = Buffer::CreateBuffer<VertexBuffer>(
-		static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, pos),
-		static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord));
+	CreateVertexBuffer();
 
 	for (int i = 0; i < CHUNK_SIZE; ++i)
 	{
@@ -47,16 +40,12 @@ ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>& chunk)
 		meshIndices[i * 6 + 4] = indices[1].y + 4 * i;
 		meshIndices[i * 6 + 5] = indices[1].z + 4 * i;
 	}
+
 	vertexArray->Bind();
-	indexBuffer = Buffer::CreateBuffer<IndexBuffer>(meshIndices.size() * sizeof(GLuint), &meshIndices.front());
-	indicesCount = meshIndices.size();
-	meshIndices.clear();
+	CreateIndexBuffer();
 }
 
-ChunkMesh::~ChunkMesh()
-{
-	meshVertices.clear();
-}
+ChunkMesh::~ChunkMesh() = default;
 
 void ChunkMesh::CreateMesh()
 {
@@ -230,16 +219,6 @@ void ChunkMesh::AddFace(const glm::vec3& pos, const BlockType& Blocktype, const 
 		meshVertices.push_back({ pos + vertices[Left][3],texcoords[3] });
 		break;
 	}
-}
-
-void ChunkMesh::BindVertexArray()
-{
-	vertexArray->Bind();
-}
-
-void ChunkMesh::UnBindVertexArray()
-{
-	vertexArray->UnBind();
 }
 
 glm::vec2& ChunkMesh::GetTexCoord(BlockType& type)

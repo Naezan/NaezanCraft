@@ -45,7 +45,7 @@ void World::Render()
 		{
 			chunk.second->CreateChunkMesh();
 		}
-		renderer->Render(chunk.second);
+		renderer->RenderChunk(chunk.second);
 	}
 }
 

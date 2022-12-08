@@ -19,11 +19,12 @@ void SkyBoxShader::GetUniform(uint32_t shaderID)
 
 void SkyBoxShader::Update(std::shared_ptr<Camera>& camera)
 {
+	//TO DO AddDeltaTime
 	static int deltaTime = 4000;
 	glUniformMatrix4fv(viewMatrix, 1, GL_FALSE, glm::value_ptr(camera->GetViewMatrix()));
 	glUniformMatrix4fv(projectionMatrix, 1, GL_FALSE, glm::value_ptr(camera->GetProjectionMatrix()));
-	glUniform1f(dayTime, deltaTime);//DeltaTime?
-	++deltaTime;
+	glUniform1f(dayTime, deltaTime);
+	deltaTime += 1;
 	if (deltaTime > 23999) {
 		deltaTime = 0;
 	}

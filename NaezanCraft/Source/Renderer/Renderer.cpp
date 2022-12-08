@@ -1,9 +1,10 @@
 #include "../pch.h"
 #include "Renderer.h"
-#include "Texture.h"
 #include "../World/Camera.h"
 #include "../World/Chunk.h"
 #include "../World/ChunkMesh.h"
+
+#include "../TextureManager.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -29,7 +30,7 @@ Renderer::Renderer()
 	}
 
 	//ÅØ½ºÃÄ Atlas
-	texture = Texture::CreateTexture("../Assets/Textures/Atlas.png");
+	TextureManager::AddTexture("CubeAtlas", "../Assets/Textures/Atlas.png");
 	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
 }
 
@@ -39,7 +40,7 @@ void Renderer::BeginRender(const glm::mat4& matrix)
 	ViewProjectionMatrix = matrix;
 }
 
-void Renderer::Render(std::shared_ptr<Chunk>& chunk)
+void Renderer::RenderChunk(std::shared_ptr<Chunk>& chunk)
 {
 	glDisable(GL_BLEND);
 	glEnable(GL_CULL_FACE);
@@ -56,6 +57,7 @@ void Renderer::Render(std::shared_ptr<Chunk>& chunk)
 	uint32_t modelLoc = glGetUniformLocation(shaderProgram, "model");
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	chunk->chunkMesh->BindVertexArray();
+	TextureManager::BindTexture("CubeAtlas");
 	glDrawElements(GL_TRIANGLES, chunk->chunkMesh->GetIndicesCount(), GL_UNSIGNED_INT, 0);
 	chunk->chunkMesh->UnBindVertexArray();
 }
