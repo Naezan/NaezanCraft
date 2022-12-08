@@ -26,7 +26,7 @@ VertexBuffer::VertexBuffer(int vertexStride, const void* vertexPointer, int texc
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 
 	//index, size(vec3 개수), type(점 하나의 타입, 크기), normalized(정규화 여부), stride(건너뛸 거리), pointer(상대적 시작 위치, 거리?)
-	//position(u8vec3)
+	//position(i8vec3)
 	glVertexAttribPointer(0, 3, GL_UNSIGNED_BYTE, GL_FALSE, vertexStride, vertexPointer);
 	glEnableVertexAttribArray(0);
 

@@ -20,6 +20,7 @@ Scene::~Scene() = default;
 void Scene::Update()
 {
 	player->Update();
+	sky->Update(player->GetPosition());
 }
 
 void Scene::Render()

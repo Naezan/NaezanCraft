@@ -31,6 +31,20 @@ void Mesh::CreateIndexBuffer()
 	meshIndices.clear();
 }
 
+void Mesh::SetVertexBufferData(std::vector<VertTexCoord>& _meshVertices)
+{
+	meshVertices.clear();
+	meshVertices.assign(_meshVertices.begin(), _meshVertices.end());
+
+	vertexBuffer->SetBufferData(meshVertices.size() * sizeof(VertTexCoord), &meshVertices.front());
+}
+
+void Mesh::SetIndexBufferVector(std::vector<unsigned int>& indexData)
+{
+	meshIndices.clear();
+	meshIndices.assign(indexData.begin(), indexData.end());
+}
+
 void Mesh::BindVertexArray()
 {
 	vertexArray->Bind();

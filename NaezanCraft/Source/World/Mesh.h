@@ -10,7 +10,7 @@ class IndexBuffer;
 
 struct VertTexCoord
 {
-	glm::u8vec3 pos;
+	glm::i8vec3 pos;
 	glm::vec2 texcoord;
 };
 
@@ -24,6 +24,8 @@ public:
 
 	virtual void CreateVertexBuffer();
 	virtual void CreateIndexBuffer();
+	virtual void SetVertexBufferData(std::vector<VertTexCoord>& _meshVertices);
+	virtual void SetIndexBufferVector(std::vector<unsigned int>& indexData);
 	void BindVertexArray();
 	void UnBindVertexArray();
 
