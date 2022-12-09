@@ -11,7 +11,7 @@ SunMoonShader::SunMoonShader(const std::string& path, ShaderType shadertype) :
 
 void SunMoonShader::GetUniform(uint32_t shaderID)
 {
-	dayTime = glGetUniformLocation(shaderID, "dayTime");
+	SunMoonTime = glGetUniformLocation(shaderID, "SunMoonTime");
 	projectionViewMatrix = glGetUniformLocation(shaderID, "projectionview");
 	modelMatrix = glGetUniformLocation(shaderID, "model");
 }
@@ -19,14 +19,11 @@ void SunMoonShader::GetUniform(uint32_t shaderID)
 void SunMoonShader::Update(std::shared_ptr<Camera>& camera, const glm::mat4& _modelMatrix)
 {
 	//TO DO SetTime
-	static int deltaTime = 4000;
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, camera->GetPosition());
-	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-	glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, glm::value_ptr(model));
+	static float deltaTime = 4000;
 	glUniformMatrix4fv(projectionViewMatrix, 1, GL_FALSE, glm::value_ptr(camera->GetViewProjectionMatrix()));
-	glUniform1f(dayTime, ((float)deltaTime / 24000) * 360);
-	deltaTime += 1;
+	glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, glm::value_ptr(_modelMatrix));
+	glUniform1f(SunMoonTime, ((float)deltaTime / 24000) * 360);
+	deltaTime += .1f;
 	if (deltaTime > 23999) {
 		deltaTime = 0;
 	}

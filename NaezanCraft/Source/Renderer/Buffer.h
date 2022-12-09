@@ -20,7 +20,7 @@ class VertexBuffer : public Buffer
 {
 public:
 	VertexBuffer(int vertexStride, const void* vertexPointer);
-	VertexBuffer(int vertexStride, const void* vertexPointer, int texcoordStride, const void* texcoordPointer);
+	VertexBuffer(int vertexStride, const void* vertexPointer, int texcoordStride, const void* texcoordPointer, unsigned int posType, unsigned int texType);
 	~VertexBuffer();
 
 	virtual void Bind() override;

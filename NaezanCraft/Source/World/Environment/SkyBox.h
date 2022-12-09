@@ -35,9 +35,6 @@ private:
 	std::map<ShaderType, std::unique_ptr<SunMoonShader>> sunMoonShaders;
 	std::unique_ptr<Mesh> sunMesh;
 	std::unique_ptr<Mesh> moonMesh;
-	std::shared_ptr<VertexArray> vertexArray1;
-	std::shared_ptr<VertexBuffer> vertexBuffer1;
-	std::shared_ptr<IndexBuffer> indexBuffer1;
 	int sunMoonIndicesSize;
 
 	glm::mat4 sunMoonTransformMatrix;

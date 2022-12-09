@@ -8,12 +8,6 @@ class VertexArray;
 class VertexBuffer;
 class IndexBuffer;
 
-struct VertTexCoord
-{
-	glm::u8vec3 pos;
-	glm::vec2 texcoord;
-};
-
 class Mesh
 {
 public:
@@ -22,9 +16,9 @@ public:
 
 	inline size_t GetIndicesCount() { return indicesCount; }
 
-	virtual void CreateVertexBuffer();
+	virtual void CreateVertexBuffer(int vertexStride, const void* vertexPointer, int texcoordStride, const void* texcoordPointer, unsigned int posType, unsigned int texType);
 	virtual void CreateIndexBuffer();
-	virtual void SetVertexBufferData(std::vector<VertTexCoord>& _meshVertices);
+	virtual void SetVertexBufferData(size_t size, const void* data);
 	virtual void SetIndexBufferVector(std::vector<unsigned int>& indexData);
 	void BindVertexArray();
 	void UnBindVertexArray();
@@ -34,7 +28,6 @@ protected:
 	std::shared_ptr<VertexBuffer> vertexBuffer;
 	std::shared_ptr<IndexBuffer> indexBuffer;
 
-	std::vector<VertTexCoord> meshVertices;
 	std::vector<unsigned int> meshIndices;
 	int indicesCount;
 };

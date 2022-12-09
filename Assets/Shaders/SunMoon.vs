@@ -17,6 +17,6 @@ mat4 rotationX( in float angle ) {
 }
 
 void main(){
-    gl_Position = projectionview * model * vec4(SunMoonVertexPosition.xyz, 1.0);
+    gl_Position = projectionview * model * rotationX(SunMoonTime) * vec4(SunMoonVertexPosition.xyz, 1.0);
     vsTexCoord = vec2(SunMoonTextureCoord.x, SunMoonTextureCoord.y);
 }

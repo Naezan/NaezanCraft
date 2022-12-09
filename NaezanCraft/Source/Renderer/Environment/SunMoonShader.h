@@ -13,7 +13,7 @@ public:
 	void Update(std::shared_ptr<Camera>& camera, const glm::mat4& _modelMatrix);
 
 private:
-	unsigned int dayTime;
+	unsigned int SunMoonTime;
 	unsigned int projectionViewMatrix;
 	unsigned int modelMatrix;
 };

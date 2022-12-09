@@ -12,16 +12,13 @@ Mesh::Mesh()
 	indicesCount = 0;
 }
 
-Mesh::~Mesh()
-{
-	meshVertices.clear();
-}
+Mesh::~Mesh() = default;
 
-void Mesh::CreateVertexBuffer()
+void Mesh::CreateVertexBuffer(int vertexStride, const void* vertexPointer, int texcoordStride, const void* texcoordPointer, unsigned int posType, unsigned int texType)
 {
 	vertexBuffer = Buffer::CreateBuffer<VertexBuffer>(
-		static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, pos),
-		static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord));
+		static_cast<int>(vertexStride), vertexPointer,
+		static_cast<int>(texcoordStride), texcoordPointer, posType, texType);
 }
 
 void Mesh::CreateIndexBuffer()
@@ -31,12 +28,9 @@ void Mesh::CreateIndexBuffer()
 	meshIndices.clear();
 }
 
-void Mesh::SetVertexBufferData(std::vector<VertTexCoord>& _meshVertices)
+void Mesh::SetVertexBufferData(size_t size, const void* data)
 {
-	meshVertices.clear();
-	meshVertices.assign(_meshVertices.begin(), _meshVertices.end());
-
-	vertexBuffer->SetBufferData(meshVertices.size() * sizeof(VertTexCoord), &meshVertices.front());
+	vertexBuffer->SetBufferData(size, data);
 }
 
 void Mesh::SetIndexBufferVector(std::vector<unsigned int>& indexData)

@@ -29,7 +29,8 @@ ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>& chunk)
 	meshVertices.reserve(CHUNK_SIZE * 6);//한면당4개의점 * chunkSize 1024 -> 2304 576 (256 + 320)
 	meshIndices.resize(CHUNK_SIZE * 6);//1536 -> 3000?
 
-	CreateVertexBuffer();
+	CreateVertexBuffer(static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, pos),
+	static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord), GL_UNSIGNED_BYTE, GL_FLOAT);
 
 	for (int i = 0; i < CHUNK_SIZE; ++i)
 	{
@@ -88,7 +89,7 @@ void ChunkMesh::CreateMesh()
 	//SetVertexBuffer && texCoord
 	if (!meshVertices.empty())
 	{
-		vertexBuffer->SetBufferData(meshVertices.size() * sizeof(VertTexCoord), &meshVertices.front());
+		SetVertexBufferData(meshVertices.size() * sizeof(VertTexCoord), &meshVertices.front());
 	}
 }
 
