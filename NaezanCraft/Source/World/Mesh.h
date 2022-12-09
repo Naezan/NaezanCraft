@@ -10,7 +10,7 @@ class IndexBuffer;
 
 struct VertTexCoord
 {
-	glm::i8vec3 pos;
+	glm::u8vec3 pos;
 	glm::vec2 texcoord;
 };
 

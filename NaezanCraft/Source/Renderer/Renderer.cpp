@@ -11,6 +11,10 @@
 
 Renderer::Renderer()
 {
+	//텍스쳐 Atlas
+	TextureManager::AddTexture("CubeAtlas", "../Assets/Textures/Atlas.png");
+	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
+
 	//쉐이더
 	renderShaders.emplace(ShaderType::VERTEX, Shader::CreateShader<ShaderType::VERTEX>("../Assets/Shaders/CubeVert.vs"));
 	renderShaders.emplace(ShaderType::FRAGMENT, Shader::CreateShader<ShaderType::FRAGMENT>("../Assets/Shaders/CubeFrag.fs"));
@@ -28,10 +32,6 @@ Renderer::Renderer()
 	{
 		shader.second->LinkComplete(shaderProgram);
 	}
-
-	//텍스쳐 Atlas
-	TextureManager::AddTexture("CubeAtlas", "../Assets/Textures/Atlas.png");
-	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
 }
 
 void Renderer::BeginRender(const glm::mat4& matrix)

@@ -16,6 +16,9 @@
 
 SkyBox::SkyBox()
 {
+	TextureManager::AddTexture("Sun", "../Assets/Textures/sun.png");
+	TextureManager::AddTexture("Moon", "../Assets/Textures/moon_phases.png");
+
 	//SkyShader
 	{
 		skyBoxShaders.emplace(ShaderType::VERTEX, std::make_unique<SkyBoxShader>("../Assets/Shaders/ProcSky.vs", ShaderType::VERTEX));
@@ -130,52 +133,65 @@ SkyBox::SkyBox()
 			shader.second->LinkComplete(sunMoonShaderProgram);
 		}
 
-		TextureManager::AddTexture("Sun", "../Assets/Textures/sun.png");
-		TextureManager::AddTexture("Moon", "../Assets/Textures/moon_phases.png");
 		sunMoonShaders[ShaderType::VERTEX]->GetUniform(sunMoonShaderProgram);
 		glUniform1i(glGetUniformLocation(sunMoonShaderProgram, "sunMoonTexture"), 0);
-
 	}
 
 	//SunMoonVertex
 	{
-		std::vector<VertTexCoord> sunVertexCoords{
-			{ glm::i8vec3(-25,  25, -400),	glm::vec2(0, 1) },
-			{ glm::i8vec3(25,  25, -400),	glm::vec2(1, 1) },
-			{ glm::i8vec3(25, -25, -400),	glm::vec2(1, 0) },
-			{ glm::i8vec3(-25, -25, -400),	glm::vec2(0, 0) }
+		//This is weired
+		std::vector<VertTexCoord> sunVertexCoords
+		{
+			{ glm::u8vec3{1,  -1, -1},	glm::vec2{0, 1}	},
+			{ glm::u8vec3{-1,  -1, -1	},	glm::vec2{1, 1} },
+			{ glm::u8vec3{-1, 1, -1	},	glm::vec2{1, 0} },
+			{ glm::u8vec3{1, 1, -1},	glm::vec2{0, 0} }
 		};
 
 		//TO DO change random Moon texCoord
-		std::vector<VertTexCoord> MoonVertexCoords{
-			{ glm::i8vec3(-15,  15, -400),	glm::vec2(0, 1) },
-			{ glm::i8vec3(15,  15, -400),	glm::vec2(.25f, 1) },
-			{ glm::i8vec3(15, -15, -400),	glm::vec2(.25f, 0) },
-			{ glm::i8vec3(-15, -15, -400),	glm::vec2(0, 0) }
-		};
+		/*std::vector<VertTexCoord> MoonVertexCoords
+		{
+			{ glm::u8vec3(-15,  15, -100),	glm::vec2(0, 1) },
+			{ glm::u8vec3(15,  15, -100),	glm::vec2(.25f, 1) },
+			{ glm::u8vec3(15, -15, -100),	glm::vec2(.25f, 0) },
+			{ glm::u8vec3(-15, -15, -100),	glm::vec2(0, 0) }
+		};*/
 
-		std::vector<unsigned int> IndexCoords{
+		std::vector<unsigned int> IndexCoords
+		{
 			0, 1, 2,
 			2, 3, 0
 		};
 
-		//Create Sun Moon
-		sunMesh = std::make_unique<Mesh>();
+		vertexArray1 = VertexArray::CreateArray();
+		vertexArray1->Bind();
+
+		vertexBuffer1 = Buffer::CreateBuffer<VertexBuffer>(
+			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, pos),
+			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord));
+		vertexBuffer1->SetBufferData(sunVertexCoords.size() * sizeof(VertTexCoord), &sunVertexCoords.front());
+		
+		vertexArray1->Bind();
+		indexBuffer1 = Buffer::CreateBuffer<IndexBuffer>(IndexCoords.size() * sizeof(GLuint), &IndexCoords.front());
+		sunMoonIndicesSize = IndexCoords.size();
+		IndexCoords.clear();
+
+
+		//Create Sun Moon TO DO Change Vertex, Index
+		/*sunMesh = std::make_unique<Mesh>();
 		sunMesh->CreateVertexBuffer();
 		sunMesh->SetVertexBufferData(sunVertexCoords);
 		sunMesh->BindVertexArray();
 		sunMesh->SetIndexBufferVector(IndexCoords);
-		sunMesh->CreateIndexBuffer();
+		sunMesh->CreateIndexBuffer();*/
 
 
-		moonMesh = std::make_unique<Mesh>();
+		/*moonMesh = std::make_unique<Mesh>();
 		moonMesh->CreateVertexBuffer();
 		moonMesh->SetVertexBufferData(MoonVertexCoords);
 		moonMesh->BindVertexArray();
 		moonMesh->SetIndexBufferVector(IndexCoords);
-		moonMesh->CreateIndexBuffer();
-
-		sunMoonIndicesSize = IndexCoords.size();
+		moonMesh->CreateIndexBuffer();*/
 	}
 }
 
@@ -204,14 +220,12 @@ void SkyBox::Render(std::shared_ptr<Camera>& camera)
 	glEnable(GL_BLEND);
 	glUseProgram(sunMoonShaderProgram);
 
-	//UpdateTime this is bad..
-	sunMoonShaders[ShaderType::VERTEX]->Update(camera, sunMoonTransformMatrix);
-
 	//Sun
-	sunMesh->BindVertexArray();
+	vertexArray1->Bind();
 	TextureManager::BindTexture("Sun");
+	sunMoonShaders[ShaderType::VERTEX]->Update(camera, sunMoonTransformMatrix);
 	glDrawElements(GL_TRIANGLES, sunMoonIndicesSize, GL_UNSIGNED_INT, nullptr);
-	sunMesh->UnBindVertexArray();
+	vertexArray1->UnBind();
 
 	//Moon
 	/*moonMesh->BindVertexArray();

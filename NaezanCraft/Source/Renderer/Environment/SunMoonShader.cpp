@@ -20,8 +20,11 @@ void SunMoonShader::Update(std::shared_ptr<Camera>& camera, const glm::mat4& _mo
 {
 	//TO DO SetTime
 	static int deltaTime = 4000;
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, camera->GetPosition());
+	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+	glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, glm::value_ptr(model));
 	glUniformMatrix4fv(projectionViewMatrix, 1, GL_FALSE, glm::value_ptr(camera->GetViewProjectionMatrix()));
-	glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, glm::value_ptr(_modelMatrix));
 	glUniform1f(dayTime, ((float)deltaTime / 24000) * 360);
 	deltaTime += 1;
 	if (deltaTime > 23999) {
