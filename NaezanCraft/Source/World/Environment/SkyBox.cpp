@@ -1,12 +1,13 @@
 #include "../../pch.h"
 #include "SkyBox.h"
-#include "../Mesh.h"
+#include "../../TextureManager.h"
 #include "../../Renderer/Environment/SkyBoxShader.h"
 #include "../../Renderer/Environment/SunMoonShader.h"
 #include "../../Renderer/VertexArray.h"
 #include "../../Renderer/Buffer.h"
+#include "../Mesh.h"
+#include "Cloud.h"
 
-#include "../../TextureManager.h"
 
 #include <glad/glad.h>
 
@@ -17,7 +18,8 @@
 SkyBox::SkyBox()
 {
 	TextureManager::AddTexture("Sun", "../Assets/Textures/Sun.png");
-	TextureManager::AddTexture("Moon", "../Assets/Textures/Moon.png");
+	TextureManager::AddTexture("Moon", "../Assets/Textures/moon_phases.png");
+	TextureManager::AddTexture("Cloud", "../Assets/Textures/clouds.png");
 
 	//SkyShader
 	{
@@ -146,19 +148,19 @@ SkyBox::SkyBox()
 
 		std::vector<SunMoonVertexCoord> sunVertexCoords
 		{
-			{ glm::vec3(-15,  15, 400),	glm::vec2(0, 1) },
-			{ glm::vec3(15,  15, 400),	glm::vec2(1, 1) },
-			{ glm::vec3(15, -15, 400),	glm::vec2(1, 0) },
-			{ glm::vec3(-15, -15, 400),	glm::vec2(0, 0) }
+			{ glm::vec3(-20,  20, 400),	glm::vec2(0, 1) },
+			{ glm::vec3(20,  20, 400),	glm::vec2(1, 1) },
+			{ glm::vec3(20, -20, 400),	glm::vec2(1, 0) },
+			{ glm::vec3(-20, -20, 400),	glm::vec2(0, 0) }
 		};
 
 		//TO DO change random Moon texCoord
 		std::vector<SunMoonVertexCoord> MoonVertexCoords
 		{
-			{ glm::vec3(-10,  10, -400),glm::vec2(0, 1) },
-			{ glm::vec3(10,  10, -400),	glm::vec2(1, 1) },
-			{ glm::vec3(10, -10, -400),	glm::vec2(1, 0) },
-			{ glm::vec3(-10, -10, -400),glm::vec2(0, 0) }
+			{ glm::vec3(-15,  15, -400),glm::vec2(0, .5) },
+			{ glm::vec3(15,  15, -400),	glm::vec2(.25, .5) },
+			{ glm::vec3(15, -15, -400),	glm::vec2(.25, 0) },
+			{ glm::vec3(-15, -15, -400),glm::vec2(0, 0) }
 		};
 
 		std::vector<unsigned int> IndexCoords
@@ -189,6 +191,11 @@ SkyBox::SkyBox()
 
 		sunMoonIndicesSize = IndexCoords.size();
 	}
+
+	//TODO Cloud
+	{
+		cloud = std::make_unique<Cloud>();
+	}
 }
 
 SkyBox::~SkyBox() = default;
@@ -196,6 +203,8 @@ SkyBox::~SkyBox() = default;
 void SkyBox::Update(glm::vec3& playerPos)
 {
 	TransformMatrix = glm::translate(glm::mat4(1.0f), playerPos);
+
+	cloud->Update();
 }
 
 void SkyBox::Render(std::shared_ptr<Camera>& camera)
@@ -212,25 +221,30 @@ void SkyBox::Render(std::shared_ptr<Camera>& camera)
 		vertexArray->UnBind();
 	}
 
-	glDisable(GL_CULL_FACE);
-	glEnable(GL_BLEND);
-	glUseProgram(sunMoonShaderProgram);
-	sunMoonShaders[ShaderType::VERTEX]->Update(camera, TransformMatrix);
-	glUniform1i(glGetUniformLocation(sunMoonShaderProgram, "sunMoonTexture"), 0);
+	{
+		glDisable(GL_CULL_FACE);
+		glEnable(GL_BLEND);
+		glUseProgram(sunMoonShaderProgram);
+		sunMoonShaders[ShaderType::VERTEX]->Update(camera, TransformMatrix);
+		glUniform1i(glGetUniformLocation(sunMoonShaderProgram, "sunMoonTexture"), 0);
 
-	//Sun
-	TextureManager::BindTexture("Sun");
+		//Sun
+		TextureManager::BindTexture("Sun");
 
-	sunMesh->BindVertexArray();
-	glDrawElements(GL_TRIANGLES, sunMoonIndicesSize, GL_UNSIGNED_INT, nullptr);
-	sunMesh->UnBindVertexArray();
+		sunMesh->BindVertexArray();
+		glDrawElements(GL_TRIANGLES, sunMoonIndicesSize, GL_UNSIGNED_INT, nullptr);
+		sunMesh->UnBindVertexArray();
 
-	//Moon
-	TextureManager::BindTexture("Moon");
+		//Moon
+		TextureManager::BindTexture("Moon");
 
-	moonMesh->BindVertexArray();
-	glDrawElements(GL_TRIANGLES, sunMoonIndicesSize, GL_UNSIGNED_INT, nullptr);
-	moonMesh->UnBindVertexArray();
+		moonMesh->BindVertexArray();
+		glDrawElements(GL_TRIANGLES, sunMoonIndicesSize, GL_UNSIGNED_INT, nullptr);
+		moonMesh->UnBindVertexArray();
+	}
 
 	//TO DO Cloud
+	{
+		cloud->Render();
+	}
 }

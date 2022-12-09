@@ -3,6 +3,7 @@
 Binaries/
 Intermediate/
 Build/
+tmp/
 
 # Files
 *.user

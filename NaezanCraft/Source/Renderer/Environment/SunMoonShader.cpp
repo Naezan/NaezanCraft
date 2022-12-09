@@ -7,6 +7,7 @@
 SunMoonShader::SunMoonShader(const std::string& path, ShaderType shadertype) :
 	Shader(path, shadertype)
 {
+	
 }
 
 void SunMoonShader::GetUniform(uint32_t shaderID)
