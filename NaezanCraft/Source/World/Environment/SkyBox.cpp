@@ -195,7 +195,7 @@ SkyBox::~SkyBox() = default;
 
 void SkyBox::Update(glm::vec3& playerPos)
 {
-	sunMoonTransformMatrix = glm::translate(glm::mat4(1.0f), playerPos);
+	TransformMatrix = glm::translate(glm::mat4(1.0f), playerPos);
 }
 
 void SkyBox::Render(std::shared_ptr<Camera>& camera)
@@ -205,7 +205,7 @@ void SkyBox::Render(std::shared_ptr<Camera>& camera)
 		glDisable(GL_CULL_FACE);
 		glEnable(GL_BLEND);
 		glUseProgram(skyShaderProgram);
-		skyBoxShaders[ShaderType::VERTEX]->Update(camera);
+		skyBoxShaders[ShaderType::VERTEX]->Update(camera, TransformMatrix);
 
 		vertexArray->Bind();
 		glDrawElements(GL_TRIANGLES, skyIndicesSize, GL_UNSIGNED_INT, nullptr);
@@ -215,7 +215,7 @@ void SkyBox::Render(std::shared_ptr<Camera>& camera)
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glUseProgram(sunMoonShaderProgram);
-	sunMoonShaders[ShaderType::VERTEX]->Update(camera, sunMoonTransformMatrix);
+	sunMoonShaders[ShaderType::VERTEX]->Update(camera, TransformMatrix);
 	glUniform1i(glGetUniformLocation(sunMoonShaderProgram, "sunMoonTexture"), 0);
 
 	//Sun

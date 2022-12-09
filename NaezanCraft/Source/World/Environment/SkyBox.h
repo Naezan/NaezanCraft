@@ -37,5 +37,5 @@ private:
 	std::unique_ptr<Mesh> moonMesh;
 	int sunMoonIndicesSize;
 
-	glm::mat4 sunMoonTransformMatrix;
+	glm::mat4 TransformMatrix;
 };

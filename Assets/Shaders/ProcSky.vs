@@ -2,8 +2,8 @@
 
 layout(location = 0) in vec4  inVertexPosition;
 
-uniform mat4 projectionMatrix;
-uniform mat4 viewMatrix;
+uniform mat4 model;
+uniform mat4 projectionview;
 uniform float dayTime;
 uniform float light;
 
@@ -102,7 +102,7 @@ vec3 getColor(float time, vec4 vertex){
 }
 
 void main(){
-	gl_Position = projectionMatrix * viewMatrix * vec4(inVertexPosition.xyz, 1.0);
+	gl_Position = projectionview * model * vec4(inVertexPosition.xyz, 1.0);
 	//passColor = getColor(dayTime, inVertexPosition);
 	passColor = getColor(dayTime, inVertexPosition) * light;
 }

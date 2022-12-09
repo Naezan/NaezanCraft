@@ -11,11 +11,11 @@ public:
 	~SkyBoxShader() = default;
 
 	void GetUniform(uint32_t shaderID);
-	void Update(std::shared_ptr<Camera>& camera);
+	void Update(std::shared_ptr<Camera>& camera, const glm::mat4& _modelMatrix);
 
 private:
 	unsigned int dayTime;
-	unsigned int projectionMatrix;
-	unsigned int viewMatrix;
+	unsigned int projectionViewMatrix;
+	unsigned int modelMatrix;
 	float light;
 };
