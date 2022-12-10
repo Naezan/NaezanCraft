@@ -36,6 +36,7 @@ MineCraft Copy Naezan's Engine
         * ~~Sun & Moon~~
         * Cloud
     - [ ] Map Generator
+        * ~~Render Chunk When Player Move~~
         * 청크 랜덤 블록 렌더링
         * Instancing
         * 세이브 로드 청크, 월드(SaveWorld, LoadWorld, SaveChunk, LoadChunk)
