@@ -17,6 +17,9 @@ public:
 	void Update();
 	void Render();
 
+	inline std::unique_ptr<Player>& GetPlayer() { return player; }
+	glm::vec3& GetPlayerPosition();
+
 public:
 	static const glm::mat4* ViewProjectionMatrix;
 private:

@@ -1,5 +1,9 @@
 #pragma once
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 class Renderer;
 class Scene;
 class Chunk;
@@ -20,6 +24,8 @@ public:
 	}
 
 	bool GetChunkByPos(const std::pair<int, int>& key, std::shared_ptr<Chunk>& outChunk);
+	bool IsChunkCreatedByPos(int x, int y);
+	bool IsChunkCreatedByPos(const std::pair<int, int>& pos);
 
 private:
 	std::unique_ptr<Renderer> renderer;
@@ -40,4 +46,7 @@ private:
 	};
 	//I hate c++ hash, need to chage map?
 	std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> worldChunks;
+
+	const int renderDistance = 10;
+	glm::vec3 playerPosition;
 };
