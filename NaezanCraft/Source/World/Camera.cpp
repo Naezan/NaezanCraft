@@ -3,16 +3,16 @@
 #include "Player.h"
 #include "../Renderer/FrustomCulling.h"
 
-Camera::Camera(glm::vec3 pos, glm::vec3 front, float fovy, float aspect, float zNear, float zFar)
+Camera::Camera(glm::vec3 pos, glm::vec3 front, float _fovy, float _aspect, float _zNear, float _zFar)
 {
 	position = pos; cameraFront = front;
-	fov = fovy; this->aspect = aspect; this->zNear = zNear; this->zFar = zFar;
+	fov = _fovy; this->aspect = _aspect; this->zNear = _zNear; this->zFar = _zFar;
 
 	viewMatrix = glm::lookAt(position,
 		position + cameraFront,
 		cameraUp);
 
-	projectionMatrix = glm::perspective(glm::radians(fovy), aspect, zNear, zFar);
+	projectionMatrix = glm::perspective(glm::radians(_fovy), _aspect, _zNear, _zFar);
 	projectionXviewMatrix = projectionMatrix * viewMatrix;//view -> projection 수행 행렬에선 반대로 계산
 }
 

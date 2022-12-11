@@ -4,11 +4,12 @@
 #include "../Renderer/Renderer.h"
 
 Chunk::Chunk(const glm::vec3& pos) :
-	position(pos), chunkLoadState(ChunkLoadState::UnGenerated), chunkBox(pos, CHUNK_X, CHUNK_Y, CHUNK_Z)
+	position(pos), chunkLoadState(ChunkLoadState::UnGenerated),
+	chunkBox(glm::vec3(pos.x * CHUNK_X, pos.y * CHUNK_Y, pos.z * CHUNK_Z), CHUNK_X, CHUNK_Y, CHUNK_Z)
 {
 	//TO DO change blocktype
 	//memset(&chunkBlocks[0][0][0], BlockType::Diamond, CHUNK_X * CHUNK_Y * CHUNK_Z * sizeof(Block));
-	std::fill(&chunkBlocks[0][0][0], &chunkBlocks[0][0][0] + CHUNK_X* CHUNK_Y * CHUNK_Z, BlockType::Diamond);
+	std::fill(&chunkBlocks[0][0][0], &chunkBlocks[0][0][0] + CHUNK_X * CHUNK_Y * CHUNK_Z, BlockType::Diamond);
 }
 
 Chunk::~Chunk() = default;
@@ -25,7 +26,7 @@ Block& Chunk::GetBlock(const glm::vec3& blockPos)
 
 void Chunk::CreateChunkMesh()
 {
-	if(chunkLoadState == ChunkLoadState::UnGenerated)
+	if (chunkLoadState == ChunkLoadState::UnGenerated)
 		chunkLoadState = ChunkLoadState::Generated;
 
 	chunkMesh = std::make_unique<ChunkMesh>(shared_from_this());
