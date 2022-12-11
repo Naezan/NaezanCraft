@@ -51,6 +51,14 @@ void VertexBuffer::UnBind()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void VertexBuffer::DeleteBuffer()
+{
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDeleteBuffers(1, &bufferID);
+}
+
 void VertexBuffer::SetBufferData(size_t size, const void* data)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
@@ -63,6 +71,12 @@ IndexBuffer::IndexBuffer(size_t size, const void* data)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 }
 
+IndexBuffer::~IndexBuffer()
+{
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glDeleteBuffers(1, &bufferID);
+}
+
 void IndexBuffer::Bind()
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
@@ -71,4 +85,10 @@ void IndexBuffer::Bind()
 void IndexBuffer::UnBind()
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void IndexBuffer::DeleteBuffer()
+{
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glDeleteBuffers(1, &bufferID);
 }

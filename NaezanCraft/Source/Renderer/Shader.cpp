@@ -47,6 +47,8 @@ Shader::Shader(const std::string& path, ShaderType shadertype)
 	//}
 }
 
+Shader::~Shader() = default;
+
 void Shader::Use()
 {
 	//TO DO move to renderer.cpp

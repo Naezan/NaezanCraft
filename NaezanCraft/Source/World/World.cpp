@@ -39,6 +39,7 @@ void World::Update()
 		{
 			if (!IsChunkCreatedByPos(x, z))
 			{
+				//TO DO memory Leak maybe circle ref?
 				Chunk::CreateChunk(worldChunks[std::pair<int, int>(x, z)], glm::vec3(x, 0.f, z));
 			}
 		}
@@ -52,7 +53,7 @@ void World::Render()
 	scene->Render();
 
 	std::vector<decltype(worldChunks)::key_type> deletableKey;
-	for (auto chunk : worldChunks)
+	for (auto& chunk : worldChunks)
 	{
 		if (chunk.second->chunkLoadState == ChunkLoadState::UnGenerated)
 		{
@@ -66,8 +67,8 @@ void World::Render()
 			chunk.second->position.z > static_cast<int>(playerPosition.z / CHUNK_Z) + renderDistance)
 		{
 			deletableKey.push_back(std::make_pair(
-			static_cast<int>(chunk.second->position.x),
-			static_cast<int>(chunk.second->position.z)
+				static_cast<int>(chunk.second->position.x),
+				static_cast<int>(chunk.second->position.z)
 			));
 		}
 
@@ -77,6 +78,7 @@ void World::Render()
 	//last erase unvisible chunk
 	for (auto key : deletableKey)
 	{
+		//TO DO memory Leak
 		worldChunks.erase(key);
 	}
 	deletableKey.clear();
@@ -87,7 +89,7 @@ void World::Shutdown()
 	renderer->Shutdown();
 }
 
-bool World::GetChunkByPos(const std::pair<int, int>& key, std::shared_ptr<Chunk>& outChunk)
+bool World::GetChunkByPos(const std::pair<int, int>& key, std::weak_ptr<Chunk>& outChunk)
 {
 	auto chunkIt = worldChunks.find(key);
 
@@ -102,12 +104,12 @@ bool World::GetChunkByPos(const std::pair<int, int>& key, std::shared_ptr<Chunk>
 
 bool World::IsChunkCreatedByPos(int x, int y)
 {
-	auto iter = worldChunks.find(std::make_pair(x ,y));
+	auto iter = worldChunks.find(std::make_pair(x, y));
 	if (iter == worldChunks.end())
 	{
 		return false;
 	}
-	
+
 	return true;
 }
 

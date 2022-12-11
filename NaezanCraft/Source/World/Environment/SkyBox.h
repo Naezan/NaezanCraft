@@ -20,7 +20,7 @@ public:
 	~SkyBox();
 
 	void Update(glm::vec3& playerPos);
-	void Render(std::shared_ptr<Camera>& camera);
+	void Render(std::weak_ptr<Camera>& camera);
 
 private:
 	uint32_t skyShaderProgram;
@@ -30,9 +30,9 @@ private:
 	glm::mat4 TransformMatrix;
 
 	//SkyBox Mesh
-	std::shared_ptr<VertexArray> vertexArray;
-	std::shared_ptr<VertexBuffer> vertexBuffer;
-	std::shared_ptr<IndexBuffer> indexBuffer;
+	std::unique_ptr<VertexArray> vertexArray;
+	std::unique_ptr<VertexBuffer> vertexBuffer;
+	std::unique_ptr<IndexBuffer> indexBuffer;
 	int skyIndicesSize;
 
 	//SunMoon Mesh

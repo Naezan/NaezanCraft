@@ -8,9 +8,7 @@ public:
 
 	virtual void Bind() = 0;
 	virtual void UnBind() = 0;
-
-	template<typename T,typename... Args>
-	inline static std::shared_ptr<T> CreateBuffer(Args... args) {return std::make_shared<T>(args...); }
+	virtual void DeleteBuffer() = 0;
 
 protected:
 	uint32_t bufferID;
@@ -25,6 +23,7 @@ public:
 
 	virtual void Bind() override;
 	virtual void UnBind() override;
+	virtual void DeleteBuffer() override;
 
 	void SetBufferData(size_t size, const void* data);
 
@@ -36,10 +35,11 @@ class IndexBuffer : public Buffer
 {
 public:
 	IndexBuffer(size_t size, const void* data);
-	~IndexBuffer() = default;
+	~IndexBuffer();
 
 	virtual void Bind() override;
 	virtual void UnBind() override;
+	virtual void DeleteBuffer() override;
 
 private:
 

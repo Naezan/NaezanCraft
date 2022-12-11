@@ -9,7 +9,7 @@ Player::Player(glm::vec3 pos, glm::vec3 vel, glm::vec3 acc, glm::vec3 dir)
 	: velocity(vel), acceleration(acc), forwardDirection(dir)
 {
 	position = pos;
-	mainCamera = Actor::CreateShared<Camera>(position);
+	mainCamera = std::make_shared<Camera>(position);
 	mainCamera->SetOwner(this);
 	//SetupEventCallback
 	Window::GetEventDispatcher().AddCallbackFunction(EventType::CursorPos, std::bind(&Player::OnCursorPos, this, std::placeholders::_1));

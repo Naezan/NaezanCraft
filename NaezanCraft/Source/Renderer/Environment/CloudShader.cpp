@@ -13,7 +13,7 @@ void CloudShader::GetUniform(uint32_t shaderID)
 	//glGetUniformLocation(shaderID, );
 }
 
-void CloudShader::Update(std::shared_ptr<Camera>& camera, const glm::mat4& _modelMatrix)
+void CloudShader::Update(std::weak_ptr<Camera>& camera, const glm::mat4& _modelMatrix)
 {
 	//TODO SetUniformValue
 }

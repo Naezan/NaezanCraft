@@ -11,6 +11,8 @@ Chunk::Chunk(const glm::vec3& pos) :
 	std::fill(&chunkBlocks[0][0][0], &chunkBlocks[0][0][0] + CHUNK_X* CHUNK_Y * CHUNK_Z, BlockType::Diamond);
 }
 
+Chunk::~Chunk() = default;
+
 void Chunk::SetBlock(const glm::vec3& blockPos, BlockType type)
 {
 	chunkBlocks[blockPos.x][blockPos.y][blockPos.z].blockType = type;

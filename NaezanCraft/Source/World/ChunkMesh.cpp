@@ -22,7 +22,7 @@ const std::array<glm::u8vec3, 2> ChunkMesh::indices
 	glm::u8vec3(0, 1, 2) , glm::u8vec3(2, 3, 0)
 };
 
-ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>& chunk)
+ChunkMesh::ChunkMesh(std::weak_ptr<Chunk> chunk)
 {
 	parentChunk = chunk;
 	//TO DO too much
@@ -46,27 +46,32 @@ ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>& chunk)
 	CreateIndexBuffer();
 }
 
-ChunkMesh::~ChunkMesh() = default;
+ChunkMesh::~ChunkMesh()
+{
+	DeleteMesh();
+	meshIndices.clear();
+	meshVertices.clear();
+}
 
 void ChunkMesh::CreateMesh()
 {
 	meshVertices.clear();//size to zero
 	//GetSideChunk
-	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x - 1), static_cast<int>(parentChunk->position.z)), LeftChunk))
+	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk.lock()->position.x - 1), static_cast<int>(parentChunk.lock()->position.z)), LeftChunk))
 	{
-		LeftChunk = nullptr;
+		LeftChunk.lock() = nullptr;
 	}
-	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x + 1), static_cast<int>(parentChunk->position.z)), RightChunk))
+	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk.lock()->position.x + 1), static_cast<int>(parentChunk.lock()->position.z)), RightChunk))
 	{
-		RightChunk = nullptr;
+		RightChunk.lock() = nullptr;
 	}
-	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x), static_cast<int>(parentChunk->position.z - 1)), BackChunk))
+	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk.lock()->position.x), static_cast<int>(parentChunk.lock()->position.z - 1)), BackChunk))
 	{
-		BackChunk = nullptr;
+		BackChunk.lock() = nullptr;
 	}
-	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk->position.x), static_cast<int>(parentChunk->position.z + 1)), FrontChunk))
+	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk.lock()->position.x), static_cast<int>(parentChunk.lock()->position.z + 1)), FrontChunk))
 	{
-		FrontChunk = nullptr;
+		FrontChunk.lock() = nullptr;
 	}
 
 	for (int x = 0; x < CHUNK_X; ++x)
@@ -75,7 +80,7 @@ void ChunkMesh::CreateMesh()
 		{
 			for (int z = 0; z < CHUNK_Z; ++z)
 			{
-				Block& block = parentChunk->chunkBlocks[x][y][z];
+				Block& block = parentChunk.lock()->chunkBlocks[x][y][z];
 				if (block.blockType == BlockType::Air)
 					continue;
 
@@ -99,13 +104,13 @@ void ChunkMesh::AddFaces(const glm::vec3& pos, BlockType& type, const glm::vec2&
 	if (pos.x > 0)
 	{
 		//만약 이전박스가 없다면 비어있으면 안되므로 현재 왼쪽면의 정보를 추가해준다
-		if (parentChunk->GetBlock(glm::vec3(pos.x - 1, pos.y, pos.z)).IsTransparent())
+		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x - 1, pos.y, pos.z)).IsTransparent())
 			AddFace(pos, type, FaceType::Left, texcoord);
 	}
 	else
 	{
 		//만약 이전 청크의 마지막이 없다면 0번째위치 왼쪽면의 정보를 추가해준다
-		if (LeftChunk == nullptr || LeftChunk->GetBlock(glm::vec3(CHUNK_X - 1, pos.y, pos.z)).IsTransparent())
+		if (LeftChunk.lock() == nullptr || LeftChunk.lock()->GetBlock(glm::vec3(CHUNK_X - 1, pos.y, pos.z)).IsTransparent())
 			AddFace(pos, type, FaceType::Left, texcoord);
 	}
 
@@ -113,20 +118,20 @@ void ChunkMesh::AddFaces(const glm::vec3& pos, BlockType& type, const glm::vec2&
 	if (pos.x < CHUNK_X - 1)
 	{
 		//만약 다음박스가 없다면 비어있으면 안되므로 현재 오른쪽면의 정보를 추가해준다
-		if (parentChunk->GetBlock(glm::vec3(pos.x + 1, pos.y, pos.z)).IsTransparent())
+		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x + 1, pos.y, pos.z)).IsTransparent())
 			AddFace(pos, type, FaceType::Right, texcoord);
 	}
 	else
 	{
 		//만약 다음 청크의 0번째가 없다면 CHUNK_X - 1위치 으론쪽면의 정보를 추가해준다
-		if (RightChunk == nullptr || RightChunk->GetBlock(glm::vec3(0, pos.y, pos.z)).IsTransparent())
+		if (RightChunk.lock() == nullptr || RightChunk.lock()->GetBlock(glm::vec3(0, pos.y, pos.z)).IsTransparent())
 			AddFace(pos, type, FaceType::Right, texcoord);
 	}
 
 	//Y Bottom
 	if (pos.y > 0)
 	{
-		if (parentChunk->GetBlock(glm::vec3(pos.x, pos.y - 1, pos.z)).IsTransparent())
+		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y - 1, pos.z)).IsTransparent())
 			AddFace(pos, type, FaceType::Bottom, texcoord);
 	}
 	else
@@ -138,7 +143,7 @@ void ChunkMesh::AddFaces(const glm::vec3& pos, BlockType& type, const glm::vec2&
 	//Y Top
 	if (pos.y < CHUNK_Y - 1)
 	{
-		if (parentChunk->GetBlock(glm::vec3(pos.x, pos.y + 1, pos.z)).IsTransparent())
+		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y + 1, pos.z)).IsTransparent())
 			AddFace(pos, type, FaceType::Top, texcoord);
 	}
 	else
@@ -150,24 +155,24 @@ void ChunkMesh::AddFaces(const glm::vec3& pos, BlockType& type, const glm::vec2&
 	//Z Back
 	if (pos.z > 0)
 	{
-		if (parentChunk->GetBlock(glm::vec3(pos.x, pos.y, pos.z - 1)).IsTransparent())
+		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, pos.z - 1)).IsTransparent())
 			AddFace(pos, type, FaceType::Back, texcoord);
 	}
 	else
 	{
-		if (BackChunk == nullptr || BackChunk->GetBlock(glm::vec3(pos.x, pos.y, CHUNK_Z - 1)).IsTransparent())
+		if (BackChunk.lock() == nullptr || BackChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, CHUNK_Z - 1)).IsTransparent())
 			AddFace(pos, type, FaceType::Back, texcoord);
 	}
 
 	//Z Front
 	if (pos.z < CHUNK_Z - 1)
 	{
-		if (parentChunk->GetBlock(glm::vec3(pos.x, pos.y, pos.z + 1)).IsTransparent())
+		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, pos.z + 1)).IsTransparent())
 			AddFace(pos, type, FaceType::Front, texcoord);
 	}
 	else
 	{
-		if (FrontChunk == nullptr || FrontChunk->GetBlock(glm::vec3(pos.x, pos.y, 0)).IsTransparent())
+		if (FrontChunk.lock() == nullptr || FrontChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, 0)).IsTransparent())
 			AddFace(pos, type, FaceType::Front, texcoord);
 	}
 }
@@ -220,6 +225,17 @@ void ChunkMesh::AddFace(const glm::vec3& pos, const BlockType& Blocktype, const 
 		meshVertices.push_back({ pos + vertices[Left][3],texcoords[3] });
 		break;
 	}
+}
+
+void ChunkMesh::DeleteMesh()
+{
+	Mesh::DeleteMesh();
+
+	parentChunk.reset();
+	LeftChunk.reset();
+	RightChunk.reset();
+	FrontChunk.reset();
+	BackChunk.reset();
 }
 
 glm::vec2& ChunkMesh::GetTexCoord(BlockType& type)

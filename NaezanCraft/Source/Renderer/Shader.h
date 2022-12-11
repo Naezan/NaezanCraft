@@ -16,7 +16,7 @@ class Shader
 {
 public:
 	Shader(const std::string& path, ShaderType shadertype);
-	virtual ~Shader() = default;
+	virtual ~Shader();
 
 	void Use();
 	void LinkComplete(unsigned int programID);

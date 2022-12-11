@@ -19,7 +19,7 @@ class Chunk
 public:
 	//You Don't new Chunk
 	Chunk(const glm::vec3& pos);
-	~Chunk() = default;
+	~Chunk();
 
 	void SetBlock(const glm::vec3& blockPos, BlockType type);
 	Block& GetBlock(const glm::vec3& blockPos);

@@ -23,12 +23,13 @@ struct VertTexCoord
 class ChunkMesh : public Mesh
 {
 public:
-	ChunkMesh(std::shared_ptr<Chunk>& chunk);
+	ChunkMesh(std::weak_ptr<Chunk> chunk);
 	~ChunkMesh();
 
 	void CreateMesh();
 	void AddFaces(const glm::vec3& pos, BlockType& type, const glm::vec2& texcoord);
 	void AddFace(const glm::vec3& pos, const BlockType& Blocktype, const FaceType& faceType, const glm::vec2& texcoord);
+	virtual void DeleteMesh() override;
 
 	glm::vec2& GetTexCoord(BlockType& type);
 
@@ -38,10 +39,10 @@ private:
 	//청크 하나의 모든 점이 여기에 저장된다. 65,536 보다 큰 수의 점들이 저장된다.
 	std::vector<VertTexCoord> meshVertices;
 
-	std::shared_ptr<Chunk> parentChunk;
+	std::weak_ptr<Chunk> parentChunk;
 	//Neighbor chunk
-	std::shared_ptr<Chunk> LeftChunk;
-	std::shared_ptr<Chunk> RightChunk;
-	std::shared_ptr<Chunk> FrontChunk;
-	std::shared_ptr<Chunk> BackChunk;
+	std::weak_ptr<Chunk> LeftChunk;
+	std::weak_ptr<Chunk> RightChunk;
+	std::weak_ptr<Chunk> FrontChunk;
+	std::weak_ptr<Chunk> BackChunk;
 };

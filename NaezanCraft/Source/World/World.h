@@ -23,7 +23,7 @@ public:
 		return std::make_unique<World>();
 	}
 
-	bool GetChunkByPos(const std::pair<int, int>& key, std::shared_ptr<Chunk>& outChunk);
+	bool GetChunkByPos(const std::pair<int, int>& key, std::weak_ptr<Chunk>& outChunk);
 	bool IsChunkCreatedByPos(int x, int y);
 	bool IsChunkCreatedByPos(const std::pair<int, int>& pos);
 

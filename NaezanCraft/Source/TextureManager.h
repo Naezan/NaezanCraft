@@ -9,7 +9,7 @@ public:
 	~TextureManager();
 
 	static void AddTexture(const std::string& key, const std::string& path);
-	static std::shared_ptr<Texture> GetTexture(const std::string& key);
+	static std::weak_ptr<Texture> GetTexture(const std::string& key);
 	static void BindTexture(const std::string& key);
 
 private:

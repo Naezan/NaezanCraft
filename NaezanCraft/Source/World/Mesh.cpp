@@ -6,24 +6,29 @@
 
 Mesh::Mesh()
 {
-	vertexArray = VertexArray::CreateArray();
+	vertexArray = std::make_unique<VertexArray>();
 	vertexArray->Bind();
 
 	indicesCount = 0;
 }
 
-Mesh::~Mesh() = default;
+Mesh::~Mesh()
+{
+	vertexArray.reset();
+	vertexBuffer.reset();
+	indexBuffer.reset();
+}
 
 void Mesh::CreateVertexBuffer(int vertexStride, const void* vertexPointer, int texcoordStride, const void* texcoordPointer, unsigned int posType, unsigned int texType)
 {
-	vertexBuffer = Buffer::CreateBuffer<VertexBuffer>(
+	vertexBuffer = std::make_unique<VertexBuffer>(
 		static_cast<int>(vertexStride), vertexPointer,
 		static_cast<int>(texcoordStride), texcoordPointer, posType, texType);
 }
 
 void Mesh::CreateIndexBuffer()
 {
-	indexBuffer = Buffer::CreateBuffer<IndexBuffer>(meshIndices.size() * sizeof(unsigned int), &meshIndices.front());
+	indexBuffer = std::make_unique<IndexBuffer>(meshIndices.size() * sizeof(unsigned int), &meshIndices.front());
 	indicesCount = meshIndices.size();
 	meshIndices.clear();
 }
@@ -47,4 +52,10 @@ void Mesh::BindVertexArray()
 void Mesh::UnBindVertexArray()
 {
 	vertexArray->UnBind();
+}
+
+void Mesh::DeleteMesh()
+{
+	vertexArray->DeleteArray();
+	vertexBuffer->DeleteBuffer();
 }

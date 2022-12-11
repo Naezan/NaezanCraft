@@ -104,14 +104,14 @@ SkyBox::SkyBox()
 			22, 23, 20
 		};
 
-		vertexArray = VertexArray::CreateArray();
+		vertexArray = std::make_unique<VertexArray>();
 		vertexArray->Bind();
 
-		vertexBuffer = Buffer::CreateBuffer<VertexBuffer>(0, (void*)0);
+		vertexBuffer = std::make_unique<VertexBuffer>(0, (void*)0);
 		vertexBuffer->SetBufferData(vertexCoords.size() * sizeof(GLfloat), &vertexCoords.front());
 
 		vertexArray->Bind();
-		indexBuffer = Buffer::CreateBuffer<IndexBuffer>(indices.size() * sizeof(GLuint), &indices.front());
+		indexBuffer = std::make_unique<IndexBuffer>(indices.size() * sizeof(GLuint), &indices.front());
 		skyIndicesSize = indices.size();
 		indices.clear();
 	}
@@ -198,7 +198,16 @@ SkyBox::SkyBox()
 	}
 }
 
-SkyBox::~SkyBox() = default;
+SkyBox::~SkyBox()
+{
+	vertexArray->DeleteArray();
+	vertexBuffer->DeleteBuffer();
+	indexBuffer->DeleteBuffer();
+
+	vertexArray.reset();
+	vertexBuffer.reset();
+	indexBuffer.reset();
+}
 
 void SkyBox::Update(glm::vec3& playerPos)
 {
@@ -207,7 +216,7 @@ void SkyBox::Update(glm::vec3& playerPos)
 	cloud->Update();
 }
 
-void SkyBox::Render(std::shared_ptr<Camera>& camera)
+void SkyBox::Render(std::weak_ptr<Camera>& camera)
 {
 	//Render Sky
 	{

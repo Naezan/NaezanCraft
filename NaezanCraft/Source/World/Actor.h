@@ -27,11 +27,6 @@ public:
 	{
 		return std::make_unique<T>(args...);
 	}
-	template<typename T, typename... Args>
-	static std::shared_ptr<T> CreateShared(Args... args)
-	{
-		return std::make_shared<T>(args...);
-	}
 
 public:
 	static const glm::vec3 UpVector;

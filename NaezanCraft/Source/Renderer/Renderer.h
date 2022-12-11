@@ -16,7 +16,7 @@ public:
 	~Renderer() = default;
 
 	void BeginRender(const glm::mat4& matrix);
-	void RenderChunk(std::shared_ptr<Chunk>& chunk);
+	void RenderChunk(std::weak_ptr<Chunk> chunk);
 	void Shutdown();
 
 private:

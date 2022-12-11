@@ -23,3 +23,9 @@ void VertexArray::UnBind()
 {
 	glBindVertexArray(0);
 }
+
+void VertexArray::DeleteArray()
+{
+	glBindVertexArray(0);
+	glDeleteVertexArrays(1, &arrayID);
+}

@@ -11,7 +11,7 @@ public:
 	~CloudShader() = default;
 
 	void GetUniform(uint32_t shaderID);
-	void Update(std::shared_ptr<Camera>& camera, const glm::mat4& _modelMatrix);
+	void Update(std::weak_ptr<Camera>& camera, const glm::mat4& _modelMatrix);
 
 private:
 	//Uniform ID
