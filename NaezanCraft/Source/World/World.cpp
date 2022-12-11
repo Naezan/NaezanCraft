@@ -1,8 +1,9 @@
 #include "../pch.h"
 #include "World.h"
 #include "Scene.h"
-#include "../Renderer/Renderer.h"
+#include "Camera.h"
 #include "Chunk.h"
+#include "../Renderer/Renderer.h"
 
 World::World()
 {
@@ -30,10 +31,9 @@ World::~World()
 
 void World::Update()
 {
-	playerPosition = scene->GetPlayerPosition();
-
 	scene->Update();
 
+	playerPosition = scene->GetPlayerPosition();
 	for (int x = static_cast<int>(playerPosition.x / CHUNK_X) - renderDistance; x <= static_cast<int>(playerPosition.x / CHUNK_X) + renderDistance; ++x)
 	{
 		for (int z = static_cast<int>(playerPosition.z / CHUNK_Z) - renderDistance; z <= static_cast<int>(playerPosition.z / CHUNK_Z) + renderDistance; ++z)
@@ -48,10 +48,11 @@ void World::Update()
 
 void World::Render()
 {
-	renderer->BeginRender(*Scene::ViewProjectionMatrix);
+	renderer->BeginRender(scene->GetCamera().lock()->GetViewProjectionMatrix());
 
 	scene->Render();
 
+	int ChunkCount = 0;
 	std::vector<decltype(worldChunks)::key_type> deletableKey;
 	for (auto& chunk : worldChunks)
 	{
@@ -72,8 +73,14 @@ void World::Render()
 			));
 		}
 
-		renderer->RenderChunk(chunk.second);
+		if (scene->GetCamera().lock()->GetFrustum().AABB(chunk.second->chunkBox) != CullingState::OUTSIDE)
+		{
+			renderer->RenderChunk(chunk.second);
+			ChunkCount++;
+		}
 	}
+
+	//std::cout << "ChunkCount : " << ChunkCount << std::endl;
 
 	//last erase unvisible chunk
 	for (auto key : deletableKey)

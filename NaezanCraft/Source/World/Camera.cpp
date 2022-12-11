@@ -1,6 +1,7 @@
 #include "../pch.h"
 #include "Camera.h"
 #include "Player.h"
+#include "../Renderer/FrustomCulling.h"
 
 Camera::Camera(glm::vec3 pos, glm::vec3 front, float fovy, float aspect, float zNear, float zFar)
 {
@@ -18,6 +19,7 @@ Camera::Camera(glm::vec3 pos, glm::vec3 front, float fovy, float aspect, float z
 void Camera::Update()
 {
 	UpdateViewMatrix();
+	frustom.UpdateFrustum(projectionXviewMatrix);
 }
 
 void Camera::UpdateRotation(double xpos, double ypos)

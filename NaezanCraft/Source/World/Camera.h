@@ -2,11 +2,13 @@
 
 #include "Actor.h"
 
+#include "../Renderer/FrustomCulling.h"
+
 class Camera : public Actor
 {
 public:
 	Camera(glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f), glm::vec3 front = glm::vec3(0.f, 0.f, -1.f),
-		float fovy = 45.f, float aspect = 1280.0f / 720.0f, float zNear = 0.1f, float zFar = 1000.0f);
+		float fovy = 45.f, float aspect = 1280.0f / 720.0f, float zNear = 0.01f, float zFar = 1000.0f);
 	~Camera() = default;
 
 	virtual void Update() override;
@@ -23,6 +25,8 @@ public:
 	inline const glm::mat4& GetProjectionMatrix() { return projectionMatrix; }
 	inline const glm::mat4& GetViewProjectionMatrix() { return projectionXviewMatrix; }
 
+	inline Frustum& GetFrustum() { return frustom; }
+
 	void SetFov(float _fov);
 	void SetAspect(float _aspect);
 	void SetNearFar(float _near, float _far);
@@ -32,4 +36,6 @@ private:
 	float fov, aspect, zNear, zFar;
 	glm::vec3 cameraFront, cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::mat4 viewMatrix, projectionMatrix, projectionXviewMatrix;
+
+	Frustum frustom;
 };

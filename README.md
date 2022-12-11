@@ -30,7 +30,7 @@ MineCraft Copy Naezan's Engine
     - [x] ~~Create Rectangle~~
     - [x] ~~Create RenderBuffer & RenderShader~~
     - [x] ~~Create Camera & Player~~
-    - [ ] 프러스텀컬링(오컬루전 컬링)
+    - [ ] 프러스텀컬링(오컬루전 컬링) + 옥트리
     - [x] ~~Chunk Object Rendering~~
     - [ ] SkyBox
         * ~~Sun & Moon~~
@@ -50,7 +50,7 @@ MineCraft Copy Naezan's Engine
     - [ ] Collision
         * 레이케스트
         * aabb
-        * 쿼드 트리?
+        * 쿼드 트리 -> 옥트리
     - [ ] AI(Too Much, if i can, i do)
         * A* or JPS
         * 브레젠험

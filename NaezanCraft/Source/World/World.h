@@ -44,7 +44,7 @@ private:
 			return hash1;
 		}
 	};
-	//I hate c++ hash, need to chage map?
+	//need to chage map?
 	std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> worldChunks;
 
 	const int renderDistance = 10;

@@ -23,22 +23,22 @@ void Player::Update()
 	if (Input::GetIsKeyPressed(GLFW_KEY_W))
 	{
 		position += cameraSpeed * mainCamera->GetForwadDir() * velocity;
-		mainCamera->GetPosition() += cameraSpeed * mainCamera->GetForwadDir() * velocity;
+		mainCamera->GetPosition() = position;
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_S))
 	{
 		position -= cameraSpeed * mainCamera->GetForwadDir() * velocity;
-		mainCamera->GetPosition() -= cameraSpeed * mainCamera->GetForwadDir() * velocity;
+		mainCamera->GetPosition() = position;
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_A))
 	{
 		position -= glm::normalize(glm::cross(mainCamera->GetForwadDir(), Actor::UpVector)) * cameraSpeed * velocity;
-		mainCamera->GetPosition() -= glm::normalize(glm::cross(mainCamera->GetForwadDir(), Actor::UpVector)) * cameraSpeed * velocity;
+		mainCamera->GetPosition() = position;
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_D))
 	{
 		position += glm::normalize(glm::cross(mainCamera->GetForwadDir(), Actor::UpVector)) * cameraSpeed * velocity;
-		mainCamera->GetPosition() += glm::normalize(glm::cross(mainCamera->GetForwadDir(), Actor::UpVector)) * cameraSpeed * velocity;
+		mainCamera->GetPosition() = position;
 	}
 
 	mainCamera->Update();

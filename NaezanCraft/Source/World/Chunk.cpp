@@ -4,7 +4,7 @@
 #include "../Renderer/Renderer.h"
 
 Chunk::Chunk(const glm::vec3& pos) :
-	position(pos), chunkLoadState(ChunkLoadState::UnGenerated)
+	position(pos), chunkLoadState(ChunkLoadState::UnGenerated), chunkBox(pos, CHUNK_X, CHUNK_Y, CHUNK_Z)
 {
 	//TO DO change blocktype
 	//memset(&chunkBlocks[0][0][0], BlockType::Diamond, CHUNK_X * CHUNK_Y * CHUNK_Z * sizeof(Block));

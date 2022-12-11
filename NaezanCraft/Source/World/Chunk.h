@@ -1,10 +1,7 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include "Block.h"
+#include "../Renderer/FrustomCulling.h"
 
 using array_3d = std::array<std::array<std::array<Block, CHUNK_Z>, CHUNK_Y>, CHUNK_X>;
 class ChunkMesh;
@@ -34,6 +31,8 @@ public:
 	const glm::vec3 position;
 	ChunkLoadState chunkLoadState;
 	std::unique_ptr<ChunkMesh> chunkMesh;
+
+	AABox chunkBox;
 
 protected:
 };
