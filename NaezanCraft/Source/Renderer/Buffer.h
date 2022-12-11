@@ -8,7 +8,6 @@ public:
 
 	virtual void Bind() = 0;
 	virtual void UnBind() = 0;
-	virtual void DeleteBuffer() = 0;
 
 protected:
 	uint32_t bufferID;
@@ -23,7 +22,6 @@ public:
 
 	virtual void Bind() override;
 	virtual void UnBind() override;
-	virtual void DeleteBuffer() override;
 
 	void SetBufferData(size_t size, const void* data);
 
@@ -39,7 +37,6 @@ public:
 
 	virtual void Bind() override;
 	virtual void UnBind() override;
-	virtual void DeleteBuffer() override;
 
 private:
 

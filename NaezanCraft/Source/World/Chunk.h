@@ -14,7 +14,7 @@ enum class ChunkLoadState
 	Generated, UnGenerated
 };
 
-class Chunk
+class Chunk : public std::enable_shared_from_this<Chunk>
 {
 public:
 	//You Don't new Chunk
@@ -25,9 +25,6 @@ public:
 	Block& GetBlock(const glm::vec3& blockPos);
 
 	void CreateChunkMesh();
-
-	//Must called, not recommended but...
-	static void CreateChunk(std::shared_ptr<Chunk>& worldChunk, const glm::vec3& pos);
 
 public:
 	//need to use heap memory? but pointer is heavy? 65,536 * 1 byte?

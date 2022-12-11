@@ -32,22 +32,12 @@ Shader::Shader(const std::string& path, ShaderType shadertype)
 	{
 		NC_LOG_ERROR("ERROR::SHADER::{0}::COMPILATION_FAILED", ToString(shaderType));
 	};
-
-	//TO DO move to renderer.cpp
-	/*ID = glCreateProgram();
-	glAttachShader(ID, shader);*/
-
-	//TO DO move to renderer.cpp
-	//glLinkProgram(ID);
-	//// print linking errors if any
-	//glGetProgramiv(ID, GL_LINK_STATUS, &success);
-	//if (!success)
-	//{
-	//	NC_LOG_ERROR("ERROR::SHADER::PROGRAM::LINKING_FAILED");
-	//}
 }
 
-Shader::~Shader() = default;
+Shader::~Shader()
+{
+	glDeleteProgram(shaderID);
+}
 
 void Shader::Use()
 {

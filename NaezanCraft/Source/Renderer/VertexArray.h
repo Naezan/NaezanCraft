@@ -8,7 +8,6 @@ public:
 
 	void Bind();
 	void UnBind();
-	void DeleteArray();
 
 	inline const uint32_t GetArrayID() const { return arrayID; }
 

@@ -14,6 +14,7 @@ Mesh::Mesh()
 
 Mesh::~Mesh()
 {
+	UnbindAll();
 	vertexArray.reset();
 	vertexBuffer.reset();
 	indexBuffer.reset();
@@ -54,8 +55,9 @@ void Mesh::UnBindVertexArray()
 	vertexArray->UnBind();
 }
 
-void Mesh::DeleteMesh()
+void Mesh::UnbindAll()
 {
-	vertexArray->DeleteArray();
-	vertexBuffer->DeleteBuffer();
+	vertexArray->UnBind();
+	vertexBuffer->UnBind();
+	indexBuffer->UnBind();
 }

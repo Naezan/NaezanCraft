@@ -110,10 +110,13 @@ SkyBox::SkyBox()
 		vertexBuffer = std::make_unique<VertexBuffer>(0, (void*)0);
 		vertexBuffer->SetBufferData(vertexCoords.size() * sizeof(GLfloat), &vertexCoords.front());
 
-		vertexArray->Bind();
 		indexBuffer = std::make_unique<IndexBuffer>(indices.size() * sizeof(GLuint), &indices.front());
 		skyIndicesSize = indices.size();
 		indices.clear();
+
+		vertexArray->UnBind();
+		vertexBuffer->UnBind();
+		indexBuffer->UnBind();
 	}
 
 	//SunMoonShader
@@ -169,51 +172,48 @@ SkyBox::SkyBox()
 			2, 3, 0
 		};
 
-
 		sunMesh = std::make_unique<Mesh>();
 		sunMesh->CreateVertexBuffer(static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, pos),
 			static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, texcoord),
 			GL_FLOAT, GL_FLOAT);
 		sunMesh->SetVertexBufferData(sunVertexCoords.size() * sizeof(SunMoonVertexCoord), &sunVertexCoords.front());
-		sunMesh->BindVertexArray();
 		sunMesh->SetIndexBufferVector(IndexCoords);
 		sunMesh->CreateIndexBuffer();
-
+		sunMesh->UnbindAll();
 
 		moonMesh = std::make_unique<Mesh>();
 		moonMesh->CreateVertexBuffer(static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, pos),
 			static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, texcoord),
 			GL_FLOAT, GL_FLOAT);
 		moonMesh->SetVertexBufferData(MoonVertexCoords.size() * sizeof(SunMoonVertexCoord), &MoonVertexCoords.front());
-		moonMesh->BindVertexArray();
 		moonMesh->SetIndexBufferVector(IndexCoords);
 		moonMesh->CreateIndexBuffer();
+		moonMesh->UnbindAll();
 
 		sunMoonIndicesSize = IndexCoords.size();
+
 	}
 
 	//TODO Cloud
 	{
-		cloud = std::make_unique<Cloud>();
+		//cloud = std::make_unique<Cloud>();
 	}
 }
 
 SkyBox::~SkyBox()
 {
-	vertexArray->DeleteArray();
-	vertexBuffer->DeleteBuffer();
-	indexBuffer->DeleteBuffer();
-
 	vertexArray.reset();
 	vertexBuffer.reset();
 	indexBuffer.reset();
+	glDeleteProgram(skyShaderProgram);
+	glDeleteProgram(sunMoonShaderProgram);
 }
 
 void SkyBox::Update(glm::vec3& playerPos)
 {
 	TransformMatrix = glm::translate(glm::mat4(1.0f), playerPos);
 
-	cloud->Update();
+	//cloud->Update();
 }
 
 void SkyBox::Render(std::weak_ptr<Camera>& camera)
@@ -254,6 +254,6 @@ void SkyBox::Render(std::weak_ptr<Camera>& camera)
 
 	//TO DO Cloud
 	{
-		cloud->Render();
+		//cloud->Render();
 	}
 }

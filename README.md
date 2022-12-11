@@ -55,3 +55,7 @@ MineCraft Copy Naezan's Engine
         * A* or JPS
         * 브레젠험
         * FSM(상태머신)
+
+- BUG
+  - 
+    - [ ] 16 * 16 Chunk is 15 * 15 Chunk

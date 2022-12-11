@@ -29,9 +29,8 @@ public:
 	void CreateMesh();
 	void AddFaces(const glm::vec3& pos, BlockType& type, const glm::vec2& texcoord);
 	void AddFace(const glm::vec3& pos, const BlockType& Blocktype, const FaceType& faceType, const glm::vec2& texcoord);
-	virtual void DeleteMesh() override;
 
-	glm::vec2& GetTexCoord(BlockType& type);
+	glm::vec2 GetTexCoord(BlockType& type);
 
 private:
 	static const std::array<glm::vec3, 4> vertices[];

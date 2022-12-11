@@ -12,12 +12,13 @@ World::World()
 	playerPosition = scene->GetPlayerPosition();
 
 	//CreateChunk memory
+	//TO DO 16*16청크가 15*15청크로 바뀌면서 메모리 릭이 생기는 느낌
 	worldChunks.reserve(LOOK_CHUNK_SIZE * LOOK_CHUNK_SIZE);
 	for (int x = static_cast<int>(playerPosition.x / CHUNK_X) - renderDistance; x <= static_cast<int>(playerPosition.x / CHUNK_X) + renderDistance; ++x)
 	{
 		for (int z = static_cast<int>(playerPosition.z / CHUNK_Z) - renderDistance; z <= static_cast<int>(playerPosition.z / CHUNK_Z) + renderDistance; ++z)
 		{
-			Chunk::CreateChunk(worldChunks[std::pair<int, int>(x, z)], glm::vec3(x, 0.f, z));
+			worldChunks[std::pair<int, int>(x, z)] = std::make_shared<Chunk>(glm::vec3(x, 0.f, z));
 		}
 	}
 }
@@ -39,8 +40,7 @@ void World::Update()
 		{
 			if (!IsChunkCreatedByPos(x, z))
 			{
-				//TO DO memory Leak maybe circle ref?
-				Chunk::CreateChunk(worldChunks[std::pair<int, int>(x, z)], glm::vec3(x, 0.f, z));
+				worldChunks[std::pair<int, int>(x, z)] = std::make_shared<Chunk>(glm::vec3(x, 0.f, z));
 			}
 		}
 	}
@@ -78,7 +78,6 @@ void World::Render()
 	//last erase unvisible chunk
 	for (auto key : deletableKey)
 	{
-		//TO DO memory Leak
 		worldChunks.erase(key);
 	}
 	deletableKey.clear();

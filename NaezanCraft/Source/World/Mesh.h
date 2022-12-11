@@ -22,7 +22,7 @@ public:
 	virtual void SetIndexBufferVector(std::vector<unsigned int>& indexData);
 	void BindVertexArray();
 	void UnBindVertexArray();
-	virtual void DeleteMesh();
+	void UnbindAll();
 
 protected:
 	std::unique_ptr<VertexArray> vertexArray;

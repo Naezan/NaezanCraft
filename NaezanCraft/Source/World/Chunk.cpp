@@ -27,11 +27,7 @@ void Chunk::CreateChunkMesh()
 {
 	if(chunkLoadState == ChunkLoadState::UnGenerated)
 		chunkLoadState = ChunkLoadState::Generated;
-	chunkMesh->CreateMesh();
-}
 
-void Chunk::CreateChunk(std::shared_ptr<Chunk>& worldChunk, const glm::vec3& pos)
-{
-	worldChunk = std::make_shared<Chunk>(std::forward<const glm::vec3&>(pos));
-	worldChunk->chunkMesh = std::make_unique<ChunkMesh>(worldChunk);
+	chunkMesh = std::make_unique<ChunkMesh>(shared_from_this());
+	chunkMesh->CreateMesh();
 }

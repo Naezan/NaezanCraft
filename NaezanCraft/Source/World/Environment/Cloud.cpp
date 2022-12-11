@@ -41,7 +41,10 @@ Cloud::Cloud()
 	}
 }
 
-Cloud::~Cloud() = default;
+Cloud::~Cloud()
+{
+	glDeleteProgram(cloudShaderProgram);
+}
 
 void Cloud::Update()
 {

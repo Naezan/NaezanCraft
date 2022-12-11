@@ -25,30 +25,18 @@ const std::array<glm::u8vec3, 2> ChunkMesh::indices
 ChunkMesh::ChunkMesh(std::weak_ptr<Chunk> chunk)
 {
 	parentChunk = chunk;
-	//TO DO too much
+
 	meshVertices.reserve(CHUNK_SIZE * 6);//한면당4개의점 * chunkSize 1024 -> 2304 576 (256 + 320)
-	meshIndices.resize(CHUNK_SIZE * 6);//1536 -> 3000?
-
-	CreateVertexBuffer(static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, pos),
-	static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord), GL_UNSIGNED_BYTE, GL_FLOAT);
-
-	for (int i = 0; i < CHUNK_SIZE; ++i)
-	{
-		meshIndices[i * 6 + 0] = indices[0].x + 4 * i;
-		meshIndices[i * 6 + 1] = indices[0].y + 4 * i;
-		meshIndices[i * 6 + 2] = indices[0].z + 4 * i;
-		meshIndices[i * 6 + 3] = indices[1].x + 4 * i;
-		meshIndices[i * 6 + 4] = indices[1].y + 4 * i;
-		meshIndices[i * 6 + 5] = indices[1].z + 4 * i;
-	}
-
-	vertexArray->Bind();
-	CreateIndexBuffer();
 }
 
 ChunkMesh::~ChunkMesh()
 {
-	DeleteMesh();
+	parentChunk.reset();
+	LeftChunk.reset();
+	RightChunk.reset();
+	FrontChunk.reset();
+	BackChunk.reset();
+
 	meshIndices.clear();
 	meshVertices.clear();
 }
@@ -59,19 +47,19 @@ void ChunkMesh::CreateMesh()
 	//GetSideChunk
 	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk.lock()->position.x - 1), static_cast<int>(parentChunk.lock()->position.z)), LeftChunk))
 	{
-		LeftChunk.lock() = nullptr;
+		//LeftChunk.lock() = nullptr;
 	}
 	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk.lock()->position.x + 1), static_cast<int>(parentChunk.lock()->position.z)), RightChunk))
 	{
-		RightChunk.lock() = nullptr;
+		//RightChunk.lock() = nullptr;
 	}
 	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk.lock()->position.x), static_cast<int>(parentChunk.lock()->position.z - 1)), BackChunk))
 	{
-		BackChunk.lock() = nullptr;
+		//BackChunk.lock() = nullptr;
 	}
 	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk.lock()->position.x), static_cast<int>(parentChunk.lock()->position.z + 1)), FrontChunk))
 	{
-		FrontChunk.lock() = nullptr;
+		//FrontChunk.lock() = nullptr;
 	}
 
 	for (int x = 0; x < CHUNK_X; ++x)
@@ -94,7 +82,23 @@ void ChunkMesh::CreateMesh()
 	//SetVertexBuffer && texCoord
 	if (!meshVertices.empty())
 	{
+		CreateVertexBuffer(static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, pos),
+			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord), GL_UNSIGNED_BYTE, GL_FLOAT);
 		SetVertexBufferData(meshVertices.size() * sizeof(VertTexCoord), &meshVertices.front());
+		
+		meshIndices.resize(CHUNK_SIZE * 6);
+		for (int i = 0; i < CHUNK_SIZE; ++i)
+		{
+			meshIndices[i * 6 + 0] = indices[0].x + 4 * i;
+			meshIndices[i * 6 + 1] = indices[0].y + 4 * i;
+			meshIndices[i * 6 + 2] = indices[0].z + 4 * i;
+			meshIndices[i * 6 + 3] = indices[1].x + 4 * i;
+			meshIndices[i * 6 + 4] = indices[1].y + 4 * i;
+			meshIndices[i * 6 + 5] = indices[1].z + 4 * i;
+		}
+
+		CreateIndexBuffer();
+		UnbindAll();
 	}
 }
 
@@ -227,18 +231,7 @@ void ChunkMesh::AddFace(const glm::vec3& pos, const BlockType& Blocktype, const 
 	}
 }
 
-void ChunkMesh::DeleteMesh()
-{
-	Mesh::DeleteMesh();
-
-	parentChunk.reset();
-	LeftChunk.reset();
-	RightChunk.reset();
-	FrontChunk.reset();
-	BackChunk.reset();
-}
-
-glm::vec2& ChunkMesh::GetTexCoord(BlockType& type)
+glm::vec2 ChunkMesh::GetTexCoord(BlockType& type)
 {
 	// TODO: insert return statement here
 	auto temp = glm::vec2(13, 2);
