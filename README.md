@@ -63,4 +63,4 @@ MineCraft Copy Naezan's Engine
 
 - BUG
   - 
-    - [ ] 16 * 16 Chunk is 15 * 15 Chunk
+    - [x] 16 * 16 Chunk is 15 * 15 Chunk

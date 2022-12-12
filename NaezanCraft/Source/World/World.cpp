@@ -80,7 +80,7 @@ void World::Render()
 		}
 	}
 
-	//std::cout << "ChunkCount : " << ChunkCount << std::endl;
+	std::cout << "ChunkCount : " << ChunkCount << std::endl;
 
 	//last erase unvisible chunk
 	for (auto key : deletableKey)

@@ -51,7 +51,7 @@ void Renderer::RenderChunk(std::weak_ptr<Chunk> chunk)
 	glUniformMatrix4fv(viewProjectionLoc, 1, GL_FALSE, glm::value_ptr(ViewProjectionMatrix));
 
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(chunk.lock()->position.x * (CHUNK_X - 1), chunk.lock()->position.y * (CHUNK_Y - 1), chunk.lock()->position.z * (CHUNK_Z - 1)));
+	model = glm::translate(model, glm::vec3(chunk.lock()->position.x * (CHUNK_X), chunk.lock()->position.y * (CHUNK_Y), chunk.lock()->position.z * (CHUNK_Z)));
 	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 	//model = glm::rotate(model, glm::radians(0.f), glm::vec3(0.0f, 0.0f, 0.0f));
 	uint32_t modelLoc = glGetUniformLocation(shaderProgram, "model");
