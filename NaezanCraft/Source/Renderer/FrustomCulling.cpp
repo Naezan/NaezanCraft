@@ -5,10 +5,10 @@
 
 void Frustum::UpdateFrustum(const glm::mat4& vp)
 {
-	Faces[Face::TOP].normal.x = vp[0][3] - vp[0][1];
+	Faces[Face::TOP].normal.x = vp[0][3] - vp[0][1];//x scale(xdir) - someX pos?
 	Faces[Face::TOP].normal.y = vp[1][3] - vp[1][1];
 	Faces[Face::TOP].normal.z = vp[2][3] - vp[2][1];
-	Faces[Face::TOP].distance = vp[3][3] - vp[3][1];
+	Faces[Face::TOP].distance = vp[3][3] - vp[3][1];//i think this has dot product value
 
 	Faces[Face::BOTTOM].normal.x = vp[0][3] + vp[0][1];
 	Faces[Face::BOTTOM].normal.y = vp[1][3] + vp[1][1];
@@ -52,6 +52,7 @@ int Frustum::AABB(AABox& box)
 {
 	for (auto& face : Faces)
 	{
+		//큐브 위치 조정및 거리 계산 비교
 		if (face.GetDistanceToPlane(box.GetVertexP(face.normal)) < 0)
 			return OUTSIDE;
 		else if (face.GetDistanceToPlane(box.GetVertexN(face.normal)) < 0)

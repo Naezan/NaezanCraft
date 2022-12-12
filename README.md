@@ -30,7 +30,8 @@ MineCraft Copy Naezan's Engine
     - [x] ~~Create Rectangle~~
     - [x] ~~Create RenderBuffer & RenderShader~~
     - [x] ~~Create Camera & Player~~
-    - [ ] 프러스텀컬링(오컬루전 컬링) + 옥트리
+    - [x] ~~프러스텀컬링(AABB)~~
+    - [ ] 오컬루전 컬링 + 옥트리
     - [x] ~~Chunk Object Rendering~~
     - [ ] SkyBox
         * ~~Sun & Moon~~
@@ -45,13 +46,13 @@ MineCraft Copy Naezan's Engine
         * 라이트컬링
         * 레이 트레이싱
         * dot
-    - [ ] ECS
-    - [ ] Object Pool
+    - [?] ECS
+    - [ ] Object Pool(*다른 사이드 프로젝트로 할까 생각중*)
     - [ ] Collision
         * 레이케스트
-        * aabb
+        * AABB
         * 쿼드 트리 -> 옥트리
-    - [ ] AI(Too Much, if i can, i do)
+    - [?] AI(Too Much, if i can, i do)
         * A* or JPS
         * 브레젠험
         * FSM(상태머신)
