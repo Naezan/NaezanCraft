@@ -11,3 +11,5 @@ constexpr int SPRITE_WIDTH = 16;
 constexpr int SPRITE_HEIGHT = 16;
 
 constexpr float SKY_SIZE = 500;
+
+constexpr int WATER_HEIGHT = 70;
