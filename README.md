@@ -10,10 +10,11 @@ MineCraft Copy Naezan's Engine
 
     - Build (Find the folder where "CMakeList.txt" exists)
   ```shell
-  mkdir BuildDir
-  cd BuildDir
+  mkdir WhatYouWantBuildDirectory
+  cd WhatYouWantBuildDirectory
   cmake ..
   cmake --build .
+  #Only Debug is possible, later add Release Build, maybe?
   ```
 
     - git command
@@ -31,7 +32,7 @@ MineCraft Copy Naezan's Engine
     - [x] ~~Create RenderBuffer & RenderShader~~
     - [x] ~~Create Camera & Player~~
     - [x] ~~프러스텀컬링(AABB)~~
-    - [ ] 오컬루전 컬링 + 옥트리
+    - [ ] 오컬루전 컬링 + 옥트리(조금 더 추가적인 연산을 필요로 하기에 적절하게 써야함)
     - [x] ~~Chunk Object Rendering~~
     - [ ] SkyBox
         * ~~Sun & Moon~~
@@ -41,16 +42,19 @@ MineCraft Copy Naezan's Engine
         * 청크 랜덤 블록 렌더링
         * Instancing
         * 세이브 로드 청크, 월드(SaveWorld, LoadWorld, SaveChunk, LoadChunk)
-        * BSP?
+        * World Objects(like tree, catus etc..)
+        * *BSP(Maybe Cave? or Town? but i am not implement cave and town)*
+        * *Region Weather System(later if possible)*
     - [ ] Lighting
         * 라이트컬링
         * 레이 트레이싱
         * dot
     - [?] ECS
-    - [ ] Object Pool(*다른 사이드 프로젝트로 할까 생각중*)
+    - [?] Object Pool(*다른 사이드 프로젝트로 할까 생각중*)
     - [ ] Collision
         * 레이케스트
         * AABB
+        * delete and emplace Block
         * 쿼드 트리 -> 옥트리
     - [?] AI(Too Much, if i can, i do)
         * A* or JPS
