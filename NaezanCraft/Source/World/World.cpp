@@ -4,11 +4,13 @@
 #include "Camera.h"
 #include "Chunk.h"
 #include "../Renderer/Renderer.h"
+#include "../World/Generator/WorldGenerator.h"
 
 World::World()
 {
 	renderer = std::make_unique<Renderer>();
 	scene = std::make_unique<Scene>();
+	worldGenerator = std::make_unique<WorldGenerator>();
 
 	playerPosition = scene->GetPlayerPosition();
 
@@ -20,6 +22,7 @@ World::World()
 		for (int z = static_cast<int>(playerPosition.z / CHUNK_Z) - renderDistance; z <= static_cast<int>(playerPosition.z / CHUNK_Z) + renderDistance; ++z)
 		{
 			worldChunks[std::pair<int, int>(x, z)] = std::make_shared<Chunk>(glm::vec3(x, 0.f, z));
+			worldChunks[std::pair<int, int>(x, z)]->GenerateTerrain(worldGenerator);
 		}
 	}
 }
@@ -41,6 +44,7 @@ void World::Update()
 			if (!IsChunkCreatedByPos(x, z))
 			{
 				worldChunks[std::pair<int, int>(x, z)] = std::make_shared<Chunk>(glm::vec3(x, 0.f, z));
+				worldChunks[std::pair<int, int>(x, z)]->GenerateTerrain(worldGenerator);
 			}
 		}
 	}
@@ -80,7 +84,7 @@ void World::Render()
 		}
 	}
 
-	std::cout << "ChunkCount : " << ChunkCount << std::endl;
+	//std::cout << "ChunkCount : " << ChunkCount << std::endl;
 
 	//last erase unvisible chunk
 	for (auto key : deletableKey)

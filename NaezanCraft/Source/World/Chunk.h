@@ -5,6 +5,7 @@
 
 using array_3d = std::array<std::array<std::array<Block, CHUNK_Z>, CHUNK_Y>, CHUNK_X>;
 class ChunkMesh;
+class WorldGenerator;
 
 enum class ChunkLoadState
 {
@@ -22,6 +23,7 @@ public:
 	Block& GetBlock(const glm::vec3& blockPos);
 
 	void CreateChunkMesh();
+	void GenerateTerrain(std::unique_ptr<WorldGenerator>& worldGenerator);
 
 public:
 	//need to use heap memory? but pointer is heavy? 65,536 * 1 byte?

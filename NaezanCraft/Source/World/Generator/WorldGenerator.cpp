@@ -6,6 +6,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "../../PerlinNoise.h"
+
 WorldGenerator::WorldGenerator()
 {
 	//setting noise
@@ -34,6 +36,7 @@ void WorldGenerator::SetHeightMap(std::weak_ptr<Chunk> chunk)
 	{
 		for (int z = 0; z < CHUNK_Z; ++z)
 		{
+			//GetBiome->GetNoiseArea();
 			int h = GetBlockHeight(x, z);
 			heightMap[x][z] = h;
 		}
@@ -42,9 +45,13 @@ void WorldGenerator::SetHeightMap(std::weak_ptr<Chunk> chunk)
 
 int WorldGenerator::GetBlockHeight(int x, int z)
 {
-	//TO DO
-	//GetBiome->GetNoiseArea();
-	return 0.0f;
+	const siv::PerlinNoise::seed_type seed = 123456u;
+
+	const siv::PerlinNoise perlin{ seed };
+
+	double noise = perlin.octave2D_01((x * 0.01), (z * 0.01), 4);
+
+	return noise * 50 + 40;
 }
 
 void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)

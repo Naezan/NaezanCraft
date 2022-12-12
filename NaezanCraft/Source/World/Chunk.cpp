@@ -2,6 +2,7 @@
 #include "Chunk.h"
 #include "ChunkMesh.h"
 #include "../Renderer/Renderer.h"
+#include "../World/Generator/WorldGenerator.h"
 
 Chunk::Chunk(const glm::vec3& pos) :
 	position(pos), chunkLoadState(ChunkLoadState::UnGenerated),
@@ -31,4 +32,9 @@ void Chunk::CreateChunkMesh()
 
 	chunkMesh = std::make_unique<ChunkMesh>(shared_from_this());
 	chunkMesh->CreateMesh();
+}
+
+void Chunk::GenerateTerrain(std::unique_ptr<WorldGenerator>& worldGenerator)
+{
+	worldGenerator->GenerateTerrain(shared_from_this());
 }

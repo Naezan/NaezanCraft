@@ -7,6 +7,7 @@
 class Renderer;
 class Scene;
 class Chunk;
+class WorldGenerator;
 
 class World
 {
@@ -49,4 +50,6 @@ private:
 
 	const int renderDistance = 10;
 	glm::vec3 playerPosition;
+
+	std::unique_ptr<WorldGenerator> worldGenerator;
 };
