@@ -43,13 +43,13 @@ add_subdirectory(NaezanCraft/ThirdParty/imgui EXCLUDE_FROM_ALL)
 # glm (do not build glm)
 add_subdirectory(NaezanCraft/ThirdParty/glm EXCLUDE_FROM_ALL)
 
-# FastNoise
+# FastNoise2
 add_subdirectory(NaezanCraft/ThirdParty/FastNoise2 EXCLUDE_FROM_ALL)
 
 # linking
 target_link_libraries(NaezanCraft PRIVATE glfw glad imgui glm)
 target_link_libraries(imgui PRIVATE glfw)
-target_link_libraries(NaezanCraft PRIVATE FastNoise2)
+target_link_libraries(NaezanCraft PRIVATE FastNoise)
 
 # set_target_properties(NaezanCraft PROPERTIES RUNTIME_LIBRARY_DIRECTORY ${OUTPUT_DIR})
 

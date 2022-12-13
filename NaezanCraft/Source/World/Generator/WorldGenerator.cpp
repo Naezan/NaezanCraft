@@ -6,6 +6,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <FastNoise/FastNoise.h>
+
 WorldGenerator::WorldGenerator()
 {
 	//setting noise
@@ -43,7 +45,25 @@ void WorldGenerator::SetHeightMap(std::weak_ptr<Chunk> chunk)
 
 int WorldGenerator::GetBlockHeight(int x, int z)
 {
-	//TODO simd noise
+	auto perlin = FastNoise::New<FastNoise::Perlin>();
+	auto fractal = FastNoise::New<FastNoise::FractalFBm>();
+
+	fractal->SetSource(perlin);
+	fractal->SetOctaveCount(8);
+
+	std::vector<float> noise(16 * 16);
+
+	fractal->GenUniformGrid2D(noise.data(), 0, 0, 16, 16, 0.02f, 1337);
+
+	int index = 0;
+
+	for (int y = 0; y < 16; y++)
+	{
+		for (int x = 0; x < 16; x++)
+		{
+			std::cout << "x " << x << "\ty " << y << "\t: " << noise[index++] << std::endl;
+		}
+	}
 	return 0;
 }
 
