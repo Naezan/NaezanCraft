@@ -32,7 +32,7 @@ public:
 	//one chunk has 65.536kbyte? chunk is heavy
 	//100 chunks has 6.5536mbyte.
 	array_3d chunkBlocks;
-	const glm::vec3 position;
+	glm::vec3 position;
 	ChunkLoadState chunkLoadState;
 	std::unique_ptr<ChunkMesh> chunkMesh;
 

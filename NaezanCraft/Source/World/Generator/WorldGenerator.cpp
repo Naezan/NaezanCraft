@@ -21,7 +21,6 @@ void WorldGenerator::GenerateTerrain(std::weak_ptr<Chunk> chunk)
 	const glm::vec3& chunkPos = chunk.lock()->position;
 
 	SetHeightMap(chunk);
-
 	//전체 블럭 최대 높이 찾기
 	int maxHeight = 0;
 	for (int i = 0; i < CHUNK_X; ++i)
@@ -33,7 +32,10 @@ void WorldGenerator::GenerateTerrain(std::weak_ptr<Chunk> chunk)
 
 void WorldGenerator::SetHeightMap(std::weak_ptr<Chunk> chunk)
 {
-	auto& pos = chunk.lock()->position;
+	//TODO위치를 좀 더 확실하게 다른걸로
+	auto pos = chunk.lock()->position;
+	pos.x *= CHUNK_X;
+	pos.z *= CHUNK_Z;
 
 	for (int x = 0; x < CHUNK_X; ++x)
 	{
@@ -51,8 +53,7 @@ void WorldGenerator::SetHeightMap(std::weak_ptr<Chunk> chunk)
 int WorldGenerator::GetBlockHeight(float x, float z)
 {
 	float noise = (fastNoise.GetNoise(x, z) + 1.f) / 2.f;
-	//std::cout << noise * 45 + 45 << std::endl;
-	return static_cast<int>(noise * 45 + 45);
+	return static_cast<int>(noise * 50 + 50);
 }
 
 void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
