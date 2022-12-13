@@ -10,3 +10,6 @@
 [submodule "NaezanCraft/ThirdParty/glm"]
 	path = NaezanCraft/ThirdParty/glm
 	url = https://github.com/g-truc/glm
+[submodule "NaezanCraft/ThirdParty/FastNoise2"]
+	path = NaezanCraft/ThirdParty/FastNoise2
+	url = https://github.com/Auburn/FastNoise2
