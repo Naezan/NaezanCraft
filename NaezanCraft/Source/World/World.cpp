@@ -6,6 +6,8 @@
 #include "../Renderer/Renderer.h"
 #include "../World/Generator/WorldGenerator.h"
 
+std::unordered_map<BlockType, std::pair<int, int>> World::BlockCoordData;
+
 World::World()
 {
 	renderer = std::make_unique<Renderer>();
@@ -13,6 +15,8 @@ World::World()
 	worldGenerator = std::make_unique<WorldGenerator>();
 
 	playerPosition = scene->GetPlayerPosition();
+
+	SetBlockDatas();
 
 	//CreateChunk memory
 	//TO DO 16*16청크가 15*15청크로 바뀌면서 메모리 릭이 생기는 느낌
@@ -30,6 +34,20 @@ World::World()
 World::~World()
 {
 	Shutdown();
+}
+
+void World::SetBlockDatas()
+{
+	BlockCoordData[Dirt] = std::make_pair(13, 2);
+	BlockCoordData[Sand] = std::make_pair(22, 13);
+	BlockCoordData[Stone] = std::make_pair(23, 15);
+	//BlockCoordData[Grass] = std::make_pair(10, 10);
+	BlockCoordData[Water] = std::make_pair(4, 2);
+	BlockCoordData[Lava] = std::make_pair(4, 0);
+	BlockCoordData[Iron] = std::make_pair(6, 15);
+	BlockCoordData[Gold] = std::make_pair(4, 13);
+	BlockCoordData[Diamond] = std::make_pair(13, 0);
+	BlockCoordData[Bedrock] = std::make_pair(7, 4);
 }
 
 void World::Update()

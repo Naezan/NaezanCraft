@@ -9,9 +9,9 @@
 WorldGenerator::WorldGenerator() : gen(rd())
 {
 	fastNoise.SetFrequency(.02f);
-	fastNoise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+	fastNoise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2S);
 	fastNoise.SetFractalType(FastNoiseLite::FractalType_FBm);
-	fastNoise.SetFractalOctaves(8);
+	fastNoise.SetFractalOctaves(4);
 }
 
 WorldGenerator::~WorldGenerator() = default;
@@ -22,7 +22,7 @@ void WorldGenerator::GenerateTerrain(std::weak_ptr<Chunk> chunk)
 
 	SetHeightMap(chunk);
 	//전체 블럭 최대 높이 찾기
-	int maxHeight = 0;
+	int maxHeight = WATER_HEIGHT;
 	for (int i = 0; i < CHUNK_X; ++i)
 	{
 		maxHeight = std::max(maxHeight, *std::max_element(heightMap[i].begin(), heightMap[i].end()));
@@ -53,12 +53,12 @@ void WorldGenerator::SetHeightMap(std::weak_ptr<Chunk> chunk)
 int WorldGenerator::GetBlockHeight(float x, float z)
 {
 	float noise = (fastNoise.GetNoise(x, z) + 1.f) / 2.f;
-	return static_cast<int>(noise * 50 + 50);
+	return static_cast<int>(noise * 35.f + 43.f);
 }
 
 void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 {
-	for (int y = 0; y < maxHeight; ++y)
+	for (int y = 0; y <= maxHeight; ++y)
 	{
 		for (int x = 0; x < CHUNK_X; ++x)
 		{

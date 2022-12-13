@@ -39,7 +39,7 @@ MineCraft Copy Naezan's Engine
         * Cloud
     - [ ] Map Generator
         * ~~Render Chunk When Player Move~~
-        * 청크 랜덤 블록 렌더링
+        * ~~청크 랜덤 블록 렌더링~~
         * Instancing
         * 세이브 로드 청크, 월드(SaveWorld, LoadWorld, SaveChunk, LoadChunk)
         * World Objects(like tree, catus etc..)
@@ -48,7 +48,7 @@ MineCraft Copy Naezan's Engine
     - [ ] Lighting
         * 라이트컬링
         * 레이 트레이싱
-        * dot
+        * DotProduct
     - [?] ECS
     - [?] Object Pool(*다른 사이드 프로젝트로 할까 생각중*)
     - [ ] Collision
@@ -64,3 +64,4 @@ MineCraft Copy Naezan's Engine
 - BUG
   - 
     - [x] 16 * 16 Chunk is 15 * 15 Chunk
+    - [ ] 블록사이에 빈공간이 있다

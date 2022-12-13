@@ -233,7 +233,6 @@ void ChunkMesh::AddFace(const glm::vec3& pos, const BlockType& Blocktype, const 
 
 glm::vec2 ChunkMesh::GetTexCoord(BlockType& type)
 {
-	// TODO: insert return statement here
-	auto temp = glm::vec2(13, 0);
-	return temp;
+	std::pair<int, int> coord = World::BlockCoordData[type];
+	return glm::vec2(coord.first, coord.second);
 }

@@ -4,6 +4,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Block.h"
+
 class Renderer;
 class Scene;
 class Chunk;
@@ -15,6 +17,7 @@ public:
 	World();
 	~World();
 
+	void SetBlockDatas();
 	void Update();
 	void Render();
 	void Shutdown();
@@ -27,6 +30,9 @@ public:
 	bool GetChunkByPos(const std::pair<int, int>& key, std::weak_ptr<Chunk>& outChunk);
 	bool IsChunkCreatedByPos(int x, int y);
 	bool IsChunkCreatedByPos(const std::pair<int, int>& pos);
+
+public:
+	static std::unordered_map<BlockType, std::pair<int, int>> BlockCoordData;
 
 private:
 	std::unique_ptr<Renderer> renderer;
