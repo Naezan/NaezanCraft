@@ -48,7 +48,7 @@ private:
 	//need to chage map?
 	std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> worldChunks;
 
-	const int renderDistance = 10;
+	const int renderDistance = 5;
 	glm::vec3 playerPosition;
 
 	std::unique_ptr<WorldGenerator> worldGenerator;

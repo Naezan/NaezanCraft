@@ -6,11 +6,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <FastNoise/FastNoise.h>
-
-WorldGenerator::WorldGenerator()
+WorldGenerator::WorldGenerator() : gen(rd())
 {
-	//setting noise
+	fastNoise.SetFrequency(.02f);
+	fastNoise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+	fastNoise.SetFractalType(FastNoiseLite::FractalType_FBm);
+	fastNoise.SetFractalOctaves(8);
 }
 
 WorldGenerator::~WorldGenerator() = default;
@@ -32,29 +33,26 @@ void WorldGenerator::GenerateTerrain(std::weak_ptr<Chunk> chunk)
 
 void WorldGenerator::SetHeightMap(std::weak_ptr<Chunk> chunk)
 {
-	auto perlin = FastNoise::New<FastNoise::Perlin>();
-	auto fractal = FastNoise::New<FastNoise::FractalFBm>();
-	fractal->SetSource(perlin);
-	fractal->SetOctaveCount(8);
+	auto& pos = chunk.lock()->position;
 
-	std::vector<float> noise(16 * 16);
-	fractal->GenUniformGrid2D(noise.data(), 0, 0, 16, 16, 0.02f, 1337);
-
-	int index = 0;
 	for (int x = 0; x < CHUNK_X; ++x)
 	{
 		for (int z = 0; z < CHUNK_Z; ++z)
 		{
 			//GetBiome->GetNoiseArea();
-			int h = noise[index++] * 50 + 40;
+			int h = GetBlockHeight(pos.x + static_cast<float>(x), pos.z + static_cast<float>(z));
+			if (h > 128)
+				h = 128;
 			heightMap[x][z] = h;
 		}
 	}
 }
 
-int WorldGenerator::GetBlockHeight(int x, int z)
+int WorldGenerator::GetBlockHeight(float x, float z)
 {
-	return 0;
+	float noise = (fastNoise.GetNoise(x, z) + 1.f) / 2.f;
+	//std::cout << noise * 45 + 45 << std::endl;
+	return static_cast<int>(noise * 45 + 45);
 }
 
 void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
@@ -68,11 +66,16 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 				//SetBlockType
 				int h = heightMap[x][z];
 				//현재 블록 위치위의 빈자리
+				if (chunk.lock()->GetBlock(x, y, z) == Block())
+				{
+					continue;
+				}
 				if (y > h)
 				{
 					if (y <= WATER_HEIGHT)
 					{
 						//Water
+						chunk.lock()->SetBlock(x, y, z, BlockType::Water);
 					}
 				}
 				//경계면
@@ -81,6 +84,8 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 					if (y >= WATER_HEIGHT)
 					{
 						//Defualt set block by biome, stone(mountain) or dirt(forest) or sand(desert)
+						//TODO GetBiome(x, z).GetSurfaceBlockType();
+						chunk.lock()->SetBlock(x, y, z, BlockType::Dirt);
 
 						//TODO Flower, Tree, Catus, Grass
 					}
@@ -88,17 +93,21 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 					{
 						//RandomBaseMakeUnderWaterCluster(Mountain, Forest, Desert, Ocean) -> Circle?
 						//Defualt set block by biome, stone(mountain) or dirt(forest) or sand(desert)
+						//TODO GetBiome(x, z).GetInWaterBlockType();
+						chunk.lock()->SetBlock(x, y, z, BlockType::Sand);
 					}
 				}
 				//블록최대 높이 아래3칸
 				else if (y >= h - 3)
 				{
 					//set block by biome, stone(mountain) or dirt(forest) or sand(desert)
+					//TODO GetBiome(x, z).GetUnderGroundBlockType();
+					chunk.lock()->SetBlock(x, y, z, BlockType::Stone);
 				}
 				//맨바닥
 				else if (y == 0)
 				{
-					//bedrock
+					chunk.lock()->SetBlock(x, y, z, BlockType::Bedrock);
 				}
 				//맨바닥3칸위
 				else if (y <= 3)
@@ -106,17 +115,34 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 					//Stone or bedrock
 					if (y == 1)
 					{
-						//bedrock70? rock30?
+						std::uniform_int_distribution<int> dis(0, 3);
+						if (dis(gen) < 3)
+							chunk.lock()->SetBlock(x, y, z, BlockType::Bedrock);
+						else
+							chunk.lock()->SetBlock(x, y, z, BlockType::Stone);
 					}
 					else if (y == 2)
 					{
-						//bedrock30? stone70?
+						std::uniform_int_distribution<int> dis(0, 2);
+						if (dis(gen) < 2)
+							chunk.lock()->SetBlock(x, y, z, BlockType::Bedrock);
+						else
+							chunk.lock()->SetBlock(x, y, z, BlockType::Stone);
+					}
+					else
+					{
+						std::uniform_int_distribution<int> dis(0, 1);
+						if (dis(gen) < 1)
+							chunk.lock()->SetBlock(x, y, z, BlockType::Bedrock);
+						else
+							chunk.lock()->SetBlock(x, y, z, BlockType::Stone);
 					}
 				}
 				//나머지
 				else
 				{
 					//stone
+					chunk.lock()->SetBlock(x, y, z, BlockType::Stone);
 				}
 			}
 		}

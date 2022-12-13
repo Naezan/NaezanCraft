@@ -16,13 +16,23 @@ enum BlockType : uint8_t
 	Gold,
 	Diamond,
 	Bedrock,
-	Air
+	Air,
+	None
 };
 
 struct Block
 {
-	Block(const BlockType& type = BlockType::Air) : blockType(type) {}
-	BlockType blockType = BlockType::Air;
+	Block(const BlockType& type = BlockType::None) : blockType(type) {}
+	BlockType blockType;
 
 	inline bool IsTransparent() { return blockType == BlockType::Air; }
+
+	bool operator==(Block rv) const
+	{
+		return this->blockType == rv.blockType;
+	}
+	bool operator!=(Block rv) const
+	{
+		return !(*this == rv);
+	}
 };

@@ -11,7 +11,7 @@ const std::array<glm::vec3, 4> ChunkMesh::vertices[]
 {
 	{ glm::vec3(1.f, 1.f, 0.f),		glm::vec3(0.f, 1.f, 0.f),	glm::vec3(0.f, 1.f, 1.f),	glm::vec3(1.f, 1.f, 1.f) },
 	{ glm::vec3(1.f, 0.f,  1.f),	glm::vec3(0.f, 0.f,  1.f),	glm::vec3(0.f, 0.f, 0.f),	glm::vec3(1.f, 0.f, 0.f) },
-	{ glm::vec3(1.f, 0.f,  1.f),	glm::vec3(1.f, 0.f,  1.f),	glm::vec3(1.f,  1.f,  1.f),	glm::vec3(0.f,  1.f,  1.f) },
+	{ glm::vec3(0.f, 0.f,  1.f),	glm::vec3(1.f, 0.f,  1.f),	glm::vec3(1.f,  1.f,  1.f),	glm::vec3(0.f,  1.f,  1.f) },
 	{ glm::vec3(1.f, 0.f, 0.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec3(0.f,  1.f, 0.f),	glm::vec3(1.f,  1.f, 0.f) },
 	{ glm::vec3(1.f, 0.f,  1.f),	glm::vec3(1.f, 0.f, 0.f),	glm::vec3(1.f,  1.f, 0.f),	glm::vec3(1.f,  1.f,  1.f) },
 	{ glm::vec3(0.f, 0.f, 0.f),		glm::vec3(0.f, 0.f,  1.f),	glm::vec3(0.f,  1.f,  1.f),	glm::vec3(0.f,  1.f, 0.f) }
@@ -234,6 +234,6 @@ void ChunkMesh::AddFace(const glm::vec3& pos, const BlockType& Blocktype, const 
 glm::vec2 ChunkMesh::GetTexCoord(BlockType& type)
 {
 	// TODO: insert return statement here
-	auto temp = glm::vec2(13, 2);
+	auto temp = glm::vec2(13, 0);
 	return temp;
 }
