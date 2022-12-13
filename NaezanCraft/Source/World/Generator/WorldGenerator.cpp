@@ -32,12 +32,21 @@ void WorldGenerator::GenerateTerrain(std::weak_ptr<Chunk> chunk)
 
 void WorldGenerator::SetHeightMap(std::weak_ptr<Chunk> chunk)
 {
+	auto perlin = FastNoise::New<FastNoise::Perlin>();
+	auto fractal = FastNoise::New<FastNoise::FractalFBm>();
+	fractal->SetSource(perlin);
+	fractal->SetOctaveCount(8);
+
+	std::vector<float> noise(16 * 16);
+	fractal->GenUniformGrid2D(noise.data(), 0, 0, 16, 16, 0.02f, 1337);
+
+	int index = 0;
 	for (int x = 0; x < CHUNK_X; ++x)
 	{
 		for (int z = 0; z < CHUNK_Z; ++z)
 		{
 			//GetBiome->GetNoiseArea();
-			int h = GetBlockHeight(x, z);
+			int h = noise[index++] * 50 + 40;
 			heightMap[x][z] = h;
 		}
 	}
@@ -45,25 +54,6 @@ void WorldGenerator::SetHeightMap(std::weak_ptr<Chunk> chunk)
 
 int WorldGenerator::GetBlockHeight(int x, int z)
 {
-	auto perlin = FastNoise::New<FastNoise::Perlin>();
-	auto fractal = FastNoise::New<FastNoise::FractalFBm>();
-
-	fractal->SetSource(perlin);
-	fractal->SetOctaveCount(8);
-
-	std::vector<float> noise(16 * 16);
-
-	fractal->GenUniformGrid2D(noise.data(), 0, 0, 16, 16, 0.02f, 1337);
-
-	int index = 0;
-
-	for (int y = 0; y < 16; y++)
-	{
-		for (int x = 0; x < 16; x++)
-		{
-			std::cout << "x " << x << "\ty " << y << "\t: " << noise[index++] << std::endl;
-		}
-	}
 	return 0;
 }
 

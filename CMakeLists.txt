@@ -17,6 +17,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(OUTPUT_DIR ${CMAKE_CURRENT_LIST_DIR}/Binaries/Debug)
 
 # set_target_properties(Editor PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set(FASTNOISE_OPTION ON/OFF CACHE BOOL "Description of option" FORCE)
 
 # engine
 file(GLOB_RECURSE SRC_ENGINE NaezanCraft/Source/*.cpp NaezanCraft/Source/*.h)
@@ -44,12 +45,12 @@ add_subdirectory(NaezanCraft/ThirdParty/imgui EXCLUDE_FROM_ALL)
 add_subdirectory(NaezanCraft/ThirdParty/glm EXCLUDE_FROM_ALL)
 
 # FastNoise2
-add_subdirectory(NaezanCraft/ThirdParty/FastNoise2 EXCLUDE_FROM_ALL)
+add_subdirectory(NaezanCraft/ThirdParty/FastNoise2)
 
 # linking
 target_link_libraries(NaezanCraft PRIVATE glfw glad imgui glm)
 target_link_libraries(imgui PRIVATE glfw)
-target_link_libraries(NaezanCraft PRIVATE FastNoise)
+target_link_libraries(NaezanCraft PUBLIC FastNoise)
 
 # set_target_properties(NaezanCraft PROPERTIES RUNTIME_LIBRARY_DIRECTORY ${OUTPUT_DIR})
 
