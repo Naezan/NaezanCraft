@@ -35,12 +35,16 @@ Block& Chunk::GetBlock(int x, int y, int z)
 	return chunkBlocks[x][y][z];
 }
 
+void Chunk::SetupChunkMeshNeighbor()
+{
+	chunkMesh->SetupChunkNeighbor();
+}
+
 void Chunk::CreateChunkMesh()
 {
 	if (chunkLoadState == ChunkLoadState::UnGenerated)
 		chunkLoadState = ChunkLoadState::Generated;
 
-	chunkMesh = std::make_unique<ChunkMesh>(shared_from_this());
 	chunkMesh->CreateMesh();
 }
 

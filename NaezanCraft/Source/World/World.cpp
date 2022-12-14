@@ -3,6 +3,7 @@
 #include "Scene.h"
 #include "Camera.h"
 #include "Chunk.h"
+#include "ChunkMesh.h"
 #include "../Renderer/Renderer.h"
 #include "../World/Generator/WorldGenerator.h"
 
@@ -25,7 +26,8 @@ World::World()
 	{
 		for (int z = static_cast<int>(playerPosition.z / CHUNK_Z) - renderDistance; z <= static_cast<int>(playerPosition.z / CHUNK_Z) + renderDistance; ++z)
 		{
-			worldChunks[std::pair<int, int>(x, z)] = std::make_shared<Chunk>(glm::vec3(x, 0.f, z));
+			worldChunks[std::pair<int, int>(x, z)] = std::make_shared<Chunk>(glm::vec3(x, 0, z));
+			worldChunks[std::pair<int, int>(x, z)]->chunkMesh = std::make_unique<ChunkMesh>(worldChunks[std::pair<int, int>(x, z)]);
 			worldChunks[std::pair<int, int>(x, z)]->GenerateTerrain(worldGenerator);
 		}
 	}
@@ -61,7 +63,8 @@ void World::Update()
 		{
 			if (!IsChunkCreatedByPos(x, z))
 			{
-				worldChunks[std::pair<int, int>(x, z)] = std::make_shared<Chunk>(glm::vec3(x, 0.f, z));
+				worldChunks[std::pair<int, int>(x, z)] = std::make_shared<Chunk>(glm::vec3(x, 0, z));
+				worldChunks[std::pair<int, int>(x, z)]->chunkMesh = std::make_unique<ChunkMesh>(worldChunks[std::pair<int, int>(x, z)]);
 				worldChunks[std::pair<int, int>(x, z)]->GenerateTerrain(worldGenerator);
 			}
 		}

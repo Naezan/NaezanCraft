@@ -7,14 +7,14 @@
 #include "../Renderer/VertexArray.h"
 #include "../Renderer/Buffer.h"
 
-const std::array<glm::vec3, 4> ChunkMesh::vertices[]
+const std::array<glm::u8vec3, 4> ChunkMesh::vertices[]
 {
-	{ glm::vec3(1.f, 1.f, 0.f),		glm::vec3(0.f, 1.f, 0.f),	glm::vec3(0.f, 1.f, 1.f),	glm::vec3(1.f, 1.f, 1.f) },
-	{ glm::vec3(1.f, 0.f,  1.f),	glm::vec3(0.f, 0.f,  1.f),	glm::vec3(0.f, 0.f, 0.f),	glm::vec3(1.f, 0.f, 0.f) },
-	{ glm::vec3(0.f, 0.f,  1.f),	glm::vec3(1.f, 0.f,  1.f),	glm::vec3(1.f,  1.f,  1.f),	glm::vec3(0.f,  1.f,  1.f) },
-	{ glm::vec3(1.f, 0.f, 0.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec3(0.f,  1.f, 0.f),	glm::vec3(1.f,  1.f, 0.f) },
-	{ glm::vec3(1.f, 0.f,  1.f),	glm::vec3(1.f, 0.f, 0.f),	glm::vec3(1.f,  1.f, 0.f),	glm::vec3(1.f,  1.f,  1.f) },
-	{ glm::vec3(0.f, 0.f, 0.f),		glm::vec3(0.f, 0.f,  1.f),	glm::vec3(0.f,  1.f,  1.f),	glm::vec3(0.f,  1.f, 0.f) }
+	{ glm::u8vec3(1.f, 1.f, 0.f),	glm::u8vec3(0.f, 1.f, 0.f),	glm::u8vec3(0.f, 1.f, 1.f),	glm::u8vec3(1.f, 1.f, 1.f) },
+	{ glm::u8vec3(1.f, 0.f, 1.f),	glm::u8vec3(0.f, 0.f, 1.f),	glm::u8vec3(0.f, 0.f, 0.f),	glm::u8vec3(1.f, 0.f, 0.f) },
+	{ glm::u8vec3(0.f, 0.f, 1.f),	glm::u8vec3(1.f, 0.f, 1.f),	glm::u8vec3(1.f, 1.f, 1.f),	glm::u8vec3(0.f, 1.f, 1.f) },
+	{ glm::u8vec3(1.f, 0.f, 0.f),	glm::u8vec3(0.f, 0.f, 0.f),	glm::u8vec3(0.f, 1.f, 0.f),	glm::u8vec3(1.f, 1.f, 0.f) },
+	{ glm::u8vec3(1.f, 0.f, 1.f),	glm::u8vec3(1.f, 0.f, 0.f),	glm::u8vec3(1.f, 1.f, 0.f),	glm::u8vec3(1.f, 1.f, 1.f) },
+	{ glm::u8vec3(0.f, 0.f, 0.f),	glm::u8vec3(0.f, 0.f, 1.f),	glm::u8vec3(0.f, 1.f, 1.f),	glm::u8vec3(0.f, 1.f, 0.f) }
 };
 
 const std::array<glm::u8vec3, 2> ChunkMesh::indices
@@ -41,26 +41,40 @@ ChunkMesh::~ChunkMesh()
 	meshVertices.clear();
 }
 
+void ChunkMesh::SetupChunkNeighbor()
+{
+	//자신의 상태편 청크들은 셋팅이 안되어 있을 수 있지 않나?
+	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk.lock()->position.x - 1), static_cast<int>(parentChunk.lock()->position.z)), LeftChunk))
+	{
+		LeftChunk.lock()->chunkMesh->RightChunk = LeftChunk;
+	}
+	else
+		LeftChunk = std::weak_ptr<Chunk>();
+	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk.lock()->position.x + 1), static_cast<int>(parentChunk.lock()->position.z)), RightChunk))
+	{
+		RightChunk.lock()->chunkMesh->LeftChunk = RightChunk;
+	}
+	else
+		RightChunk = std::weak_ptr<Chunk>();
+	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk.lock()->position.x), static_cast<int>(parentChunk.lock()->position.z - 1)), BackChunk))
+	{
+		BackChunk.lock()->chunkMesh->FrontChunk = BackChunk;
+	}
+	else
+		BackChunk = std::weak_ptr<Chunk>();
+	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk.lock()->position.x), static_cast<int>(parentChunk.lock()->position.z + 1)), FrontChunk))
+	{
+		FrontChunk.lock()->chunkMesh->BackChunk = FrontChunk;
+	}
+	else
+		FrontChunk = std::weak_ptr<Chunk>();
+}
+
 void ChunkMesh::CreateMesh()
 {
 	meshVertices.clear();//size to zero
-	//GetSideChunk
-	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk.lock()->position.x - 1), static_cast<int>(parentChunk.lock()->position.z)), LeftChunk))
-	{
-		//LeftChunk.lock() = nullptr;
-	}
-	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk.lock()->position.x + 1), static_cast<int>(parentChunk.lock()->position.z)), RightChunk))
-	{
-		//RightChunk.lock() = nullptr;
-	}
-	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk.lock()->position.x), static_cast<int>(parentChunk.lock()->position.z - 1)), BackChunk))
-	{
-		//BackChunk.lock() = nullptr;
-	}
-	if (!GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(parentChunk.lock()->position.x), static_cast<int>(parentChunk.lock()->position.z + 1)), FrontChunk))
-	{
-		//FrontChunk.lock() = nullptr;
-	}
+
+	SetupChunkNeighbor();
 
 	for (int x = 0; x < CHUNK_X; ++x)
 	{
@@ -74,7 +88,7 @@ void ChunkMesh::CreateMesh()
 
 				//GetBlockTypeAndGetTexCoord
 				auto texcord = GetTexCoord(block.blockType);
-				AddFaces(glm::vec3(x, y, z), block.blockType, texcord);
+				AddFaces(glm::uvec3(x, y, z), block.blockType, texcord);
 			}
 		}
 	}
@@ -102,7 +116,7 @@ void ChunkMesh::CreateMesh()
 	}
 }
 
-void ChunkMesh::AddFaces(const glm::vec3& pos, BlockType& type, const glm::vec2& texcoord)
+void ChunkMesh::AddFaces(const glm::u8vec3& pos, BlockType& type, const glm::vec2& texcoord)
 {
 	//Z Back
 	if (pos.z > 0)
@@ -110,7 +124,7 @@ void ChunkMesh::AddFaces(const glm::vec3& pos, BlockType& type, const glm::vec2&
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, pos.z - 1)).IsTransparent())
 			AddFace(pos, type, FaceType::Back, texcoord);
 	}
-	else if (BackChunk.lock() == nullptr || BackChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, CHUNK_Z - 1)).IsTransparent())
+	else if (IsEmptyChunk(BackChunk) || BackChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, CHUNK_Z - 1)).IsTransparent())
 	{
 		//face2개 추가?
 		AddFace(pos, type, FaceType::Back, texcoord);
@@ -122,7 +136,7 @@ void ChunkMesh::AddFaces(const glm::vec3& pos, BlockType& type, const glm::vec2&
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, pos.z + 1)).IsTransparent())
 			AddFace(pos, type, FaceType::Front, texcoord);
 	}
-	else if (FrontChunk.lock() == nullptr || FrontChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, 0)).IsTransparent())
+	else if (IsEmptyChunk(FrontChunk) || FrontChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, 0)).IsTransparent())
 	{
 		AddFace(pos, type, FaceType::Front, texcoord);
 	}
@@ -159,7 +173,7 @@ void ChunkMesh::AddFaces(const glm::vec3& pos, BlockType& type, const glm::vec2&
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x - 1, pos.y, pos.z)).IsTransparent())
 			AddFace(pos, type, FaceType::Left, texcoord);
 	}
-	else if (LeftChunk.lock() == nullptr || LeftChunk.lock()->GetBlock(glm::vec3(CHUNK_X - 1, pos.y, pos.z)).IsTransparent())
+	else if (IsEmptyChunk(LeftChunk) || LeftChunk.lock()->GetBlock(glm::vec3(CHUNK_X - 1, pos.y, pos.z)).IsTransparent())
 	{
 		//만약 이전 청크의 마지막이 없다면 0번째위치 왼쪽면의 정보를 추가해준다
 		AddFace(pos, type, FaceType::Left, texcoord);
@@ -172,14 +186,14 @@ void ChunkMesh::AddFaces(const glm::vec3& pos, BlockType& type, const glm::vec2&
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x + 1, pos.y, pos.z)).IsTransparent())
 			AddFace(pos, type, FaceType::Right, texcoord);
 	}
-	else if (RightChunk.lock() == nullptr || RightChunk.lock()->GetBlock(glm::vec3(0, pos.y, pos.z)).IsTransparent())
+	else if (IsEmptyChunk(RightChunk) || RightChunk.lock()->GetBlock(glm::vec3(0, pos.y, pos.z)).IsTransparent())
 	{
 		//만약 다음 청크의 0번째가 없다면 CHUNK_X - 1위치 으론쪽면의 정보를 추가해준다
 		AddFace(pos, type, FaceType::Right, texcoord);
 	}
 }
 
-void ChunkMesh::AddFace(const glm::vec3& pos, const BlockType& Blocktype, const FaceType& faceType, const glm::vec2& texcoord)
+void ChunkMesh::AddFace(const glm::u8vec3& pos, const BlockType& Blocktype, const FaceType& faceType, const glm::vec2& texcoord)
 {
 	const std::array<glm::vec2, 4> texcoords{
 		glm::vec2((SPRITE_WIDTH * texcoord.x) / ATLAS_WIDTH, (SPRITE_HEIGHT * (texcoord.y + 1.f)) / ATLAS_HEIGHT),
@@ -235,4 +249,9 @@ glm::vec2 ChunkMesh::GetTexCoord(BlockType& type)
 {
 	std::pair<int, int> coord = World::BlockCoordData[type];
 	return glm::vec2(coord.first, coord.second);
+}
+
+bool ChunkMesh::IsEmptyChunk(std::weak_ptr<Chunk> const& chunk)
+{
+	return !chunk.owner_before(std::weak_ptr<Chunk>()) && !std::weak_ptr<Chunk>().owner_before(chunk);
 }

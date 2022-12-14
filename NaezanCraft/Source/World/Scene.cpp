@@ -7,7 +7,7 @@
 Scene::Scene()
 {
 	//TO DO player position setting
-	player = Actor::CreateUnique<Player>(glm::vec3(50.f, 25.f, 50.f), glm::vec3(20.f, 20.f, 20.f));
+	player = Actor::CreateUnique<Player>(glm::vec3(50.f, 80.f, 50.f), glm::vec3(20.f, 20.f, 20.f));
 	playerCamera = player->GetCamera();
 	sky = std::make_unique<SkyBox>();
 }

@@ -24,6 +24,7 @@ public:
 	Block& GetBlock(const glm::vec3& blockPos);
 	Block& GetBlock(int x, int y, int z);
 
+	void SetupChunkMeshNeighbor();
 	void CreateChunkMesh();
 	void GenerateTerrain(std::unique_ptr<WorldGenerator>& worldGenerator);
 
