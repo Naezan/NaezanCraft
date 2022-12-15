@@ -57,7 +57,10 @@ void Mesh::UnBindVertexArray()
 
 void Mesh::UnbindAll()
 {
-	vertexArray->UnBind();
-	vertexBuffer->UnBind();
-	indexBuffer->UnBind();
+	if (vertexArray != nullptr)
+		vertexArray->UnBind();
+	if (vertexBuffer != nullptr)
+		vertexBuffer->UnBind();
+	if (indexBuffer != nullptr)
+		indexBuffer->UnBind();
 }

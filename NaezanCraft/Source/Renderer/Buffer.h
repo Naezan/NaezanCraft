@@ -16,6 +16,7 @@ protected:
 class VertexBuffer : public Buffer
 {
 public:
+	//This is for SkyBox
 	VertexBuffer(int vertexStride, const void* vertexPointer);
 	VertexBuffer(int vertexStride, const void* vertexPointer, int texcoordStride, const void* texcoordPointer, unsigned int posType, unsigned int texType);
 	~VertexBuffer();

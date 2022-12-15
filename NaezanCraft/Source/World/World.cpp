@@ -20,14 +20,12 @@ World::World()
 	SetBlockDatas();
 
 	//CreateChunk memory
-	//TO DO 16*16청크가 15*15청크로 바뀌면서 메모리 릭이 생기는 느낌
-	worldChunks.reserve(LOOK_CHUNK_SIZE * LOOK_CHUNK_SIZE);
+	//worldChunks.reserve(LOOK_CHUNK_SIZE * LOOK_CHUNK_SIZE);
 	for (int x = static_cast<int>(playerPosition.x / CHUNK_X) - renderDistance; x <= static_cast<int>(playerPosition.x / CHUNK_X) + renderDistance; ++x)
 	{
 		for (int z = static_cast<int>(playerPosition.z / CHUNK_Z) - renderDistance; z <= static_cast<int>(playerPosition.z / CHUNK_Z) + renderDistance; ++z)
 		{
 			worldChunks[std::pair<int, int>(x, z)] = std::make_shared<Chunk>(glm::vec3(x, 0, z));
-			worldChunks[std::pair<int, int>(x, z)]->chunkMesh = std::make_unique<ChunkMesh>(worldChunks[std::pair<int, int>(x, z)]);
 			worldChunks[std::pair<int, int>(x, z)]->GenerateTerrain(worldGenerator);
 		}
 	}
@@ -57,6 +55,7 @@ void World::Update()
 	scene->Update();
 
 	playerPosition = scene->GetPlayerPosition();
+
 	for (int x = static_cast<int>(playerPosition.x / CHUNK_X) - renderDistance; x <= static_cast<int>(playerPosition.x / CHUNK_X) + renderDistance; ++x)
 	{
 		for (int z = static_cast<int>(playerPosition.z / CHUNK_Z) - renderDistance; z <= static_cast<int>(playerPosition.z / CHUNK_Z) + renderDistance; ++z)
@@ -64,7 +63,6 @@ void World::Update()
 			if (!IsChunkCreatedByPos(x, z))
 			{
 				worldChunks[std::pair<int, int>(x, z)] = std::make_shared<Chunk>(glm::vec3(x, 0, z));
-				worldChunks[std::pair<int, int>(x, z)]->chunkMesh = std::make_unique<ChunkMesh>(worldChunks[std::pair<int, int>(x, z)]);
 				worldChunks[std::pair<int, int>(x, z)]->GenerateTerrain(worldGenerator);
 			}
 		}
@@ -83,6 +81,7 @@ void World::Render()
 	{
 		if (chunk.second->chunkLoadState == ChunkLoadState::UnGenerated)
 		{
+			chunk.second->SetupChunkNeighbor();
 			chunk.second->CreateChunkMesh();
 		}
 
@@ -130,6 +129,7 @@ bool World::GetChunkByPos(const std::pair<int, int>& key, std::weak_ptr<Chunk>& 
 	}
 
 	outChunk = worldChunks.at(key);
+	
 	return true;
 }
 

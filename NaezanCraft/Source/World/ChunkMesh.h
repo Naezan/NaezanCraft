@@ -17,21 +17,20 @@ class IndexBuffer;
 struct VertTexCoord
 {
 	glm::u8vec3 pos;
-	glm::vec2 texcoord;
+	glm::u16vec2 texcoord;
 };
 
 class ChunkMesh : public Mesh
 {
 public:
-	ChunkMesh(std::weak_ptr<Chunk> chunk);
+	ChunkMesh(std::shared_ptr<Chunk>&& chunk);
 	~ChunkMesh();
 
-	void SetupChunkNeighbor();
 	void CreateMesh();
-	void AddFaces(const glm::u8vec3& pos, BlockType& type, const glm::vec2& texcoord);
-	void AddFace(const glm::u8vec3& pos, const BlockType& Blocktype, const FaceType& faceType, const glm::vec2& texcoord);
+	void AddFaces(const glm::u8vec3& pos, BlockType& type, const glm::u16vec2& texcoord);
+	void AddFace(const glm::u8vec3& pos, const BlockType& Blocktype, const FaceType& faceType, const glm::u16vec2& texcoord);
 
-	glm::vec2 GetTexCoord(BlockType& type);
+	glm::u16vec2 GetTexCoord(BlockType& type);
 
 	bool IsEmptyChunk(std::weak_ptr<Chunk> const& chunk);
 
@@ -42,9 +41,4 @@ private:
 	std::vector<VertTexCoord> meshVertices;
 
 	std::weak_ptr<Chunk> parentChunk;
-	//Neighbor chunk
-	std::weak_ptr<Chunk> LeftChunk;
-	std::weak_ptr<Chunk> RightChunk;
-	std::weak_ptr<Chunk> FrontChunk;
-	std::weak_ptr<Chunk> BackChunk;
 };

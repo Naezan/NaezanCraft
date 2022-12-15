@@ -1,19 +1,26 @@
 #include "../pch.h"
 #include "Chunk.h"
 #include "ChunkMesh.h"
+#include "../Application.h"
 #include "../Renderer/Renderer.h"
 #include "../World/Generator/WorldGenerator.h"
 
 Chunk::Chunk(const glm::vec3& pos) :
 	position(pos), chunkLoadState(ChunkLoadState::UnGenerated),
-	chunkBox(glm::vec3(pos.x * CHUNK_X, pos.y * CHUNK_Y, pos.z * CHUNK_Z), CHUNK_X, CHUNK_Y, CHUNK_Z)
+	chunkBox(glm::vec3(pos.x* CHUNK_X, pos.y* CHUNK_Y, pos.z* CHUNK_Z), CHUNK_X, CHUNK_Y, CHUNK_Z)
 {
 	//TO DO change blocktype
 	//memset(&chunkBlocks[0][0][0], BlockType::Diamond, CHUNK_X * CHUNK_Y * CHUNK_Z * sizeof(Block));
 	std::fill(&chunkBlocks[0][0][0], &chunkBlocks[0][0][0] + CHUNK_X * CHUNK_Y * CHUNK_Z, BlockType::Air);
 }
 
-Chunk::~Chunk() = default;
+Chunk::~Chunk()
+{
+	LeftChunk.reset();
+	RightChunk.reset();
+	FrontChunk.reset();
+	BackChunk.reset();
+}
 
 void Chunk::SetBlock(const glm::vec3& blockPos, BlockType type)
 {
@@ -35,9 +42,24 @@ Block& Chunk::GetBlock(int x, int y, int z)
 	return chunkBlocks[x][y][z];
 }
 
-void Chunk::SetupChunkMeshNeighbor()
+void Chunk::SetupChunkNeighbor()
 {
-	chunkMesh->SetupChunkNeighbor();
+	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(position.x - 1), static_cast<int>(position.z)), LeftChunk))
+	{
+		LeftChunk.lock()->RightChunk = shared_from_this();
+	}
+	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(position.x + 1), static_cast<int>(position.z)), RightChunk))
+	{
+		RightChunk.lock()->LeftChunk = shared_from_this();
+	}
+	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(position.x), static_cast<int>(position.z - 1)), BackChunk))
+	{
+		BackChunk.lock()->FrontChunk = shared_from_this();
+	}
+	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(position.x), static_cast<int>(position.z + 1)), FrontChunk))
+	{
+		FrontChunk.lock()->BackChunk = shared_from_this();
+	}
 }
 
 void Chunk::CreateChunkMesh()
@@ -45,6 +67,7 @@ void Chunk::CreateChunkMesh()
 	if (chunkLoadState == ChunkLoadState::UnGenerated)
 		chunkLoadState = ChunkLoadState::Generated;
 
+	chunkMesh = std::make_unique<ChunkMesh>(shared_from_this());
 	chunkMesh->CreateMesh();
 }
 

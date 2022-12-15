@@ -40,7 +40,7 @@ MineCraft Copy Naezan's Engine
     - [ ] Map Generator
         * ~~Render Chunk When Player Move~~
         * ~~청크 랜덤 블록 렌더링~~
-        * Instancing
+        * Instancing(메모리관리 후 진행)
         * 세이브 로드 청크, 월드(SaveWorld, LoadWorld, SaveChunk, LoadChunk)
         * World Objects(like tree, catus etc..)
         * *BSP(Maybe Cave? or Town? but i am not implement cave and town)*
@@ -64,4 +64,4 @@ MineCraft Copy Naezan's Engine
 - BUG
   - 
     - [x] 16 * 16 Chunk is 15 * 15 Chunk
-    - [ ] 블록사이에 빈공간이 있다
+    - [ ] 새로운 청크가 생성될때 기존의 청크의 벽면이 로드된 상태

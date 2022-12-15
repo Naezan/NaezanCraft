@@ -10,5 +10,5 @@ uniform sampler2D cubeTexture;
 
 void main()
 {
-	color = texture(cubeTexture, TexCoord);
+	color = texelFetch(cubeTexture, ivec2(TexCoord.xy), 0);
 }

@@ -24,7 +24,7 @@ public:
 	Block& GetBlock(const glm::vec3& blockPos);
 	Block& GetBlock(int x, int y, int z);
 
-	void SetupChunkMeshNeighbor();
+	void SetupChunkNeighbor();
 	void CreateChunkMesh();
 	void GenerateTerrain(std::unique_ptr<WorldGenerator>& worldGenerator);
 
@@ -39,5 +39,8 @@ public:
 
 	AABox chunkBox;
 
-protected:
+	std::weak_ptr<Chunk> LeftChunk;
+	std::weak_ptr<Chunk> RightChunk;
+	std::weak_ptr<Chunk> FrontChunk;
+	std::weak_ptr<Chunk> BackChunk;
 };
