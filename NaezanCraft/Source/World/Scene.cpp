@@ -4,6 +4,9 @@
 #include "Camera.h"
 #include "../World/Environment/SkyBox.h"
 
+float worldTime = 0.f;
+float sunIntensity = 1.f;
+
 Scene::Scene()
 {
 	//TO DO player position setting

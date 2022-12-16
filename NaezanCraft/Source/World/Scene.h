@@ -8,6 +8,9 @@ class Player;
 class Camera;
 class SkyBox;
 
+extern float worldTime;
+extern float sunIntensity;
+
 class Scene
 {
 public:

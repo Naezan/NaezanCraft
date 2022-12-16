@@ -47,9 +47,9 @@ MineCraft Copy Naezan's Engine
         * *Region Weather System(later if possible)*
     - [ ] Lighting
         * Ambient Occlusion(+라이트컬링)
-        * Sun Light
-        * Object Light(SideFaceLighting)
-        * 레이 트레이싱
+        * ~~Sun Light~~
+        * Object Light(SideFaceLighting) like Cave Lighting
+        * *레이 트레이싱*
         * *DotProduct*
     - [?] ECS
     - [?] Object Pool(*다른 사이드 프로젝트로 할까 생각중*)

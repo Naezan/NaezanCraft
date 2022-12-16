@@ -1,11 +1,8 @@
 #version 330
 
 in vec3 passColor;
-out vec4 outColour;
+out vec4 outColor;
 
 void main(){
-    vec4 colour = vec4(passColor, 1.0f);
-    
-    outColour = colour;
-    if (outColour.a == 0) discard;
+    outColor = vec4(passColor, 1.0f);
 }

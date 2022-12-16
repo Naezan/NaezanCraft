@@ -103,6 +103,5 @@ vec3 getColor(float time, vec4 vertex){
 
 void main(){
 	gl_Position = projectionview * model * vec4(inVertexPosition.xyz, 1.0);
-	//passColor = getColor(dayTime, inVertexPosition);
 	passColor = getColor(dayTime, inVertexPosition) * light;
 }

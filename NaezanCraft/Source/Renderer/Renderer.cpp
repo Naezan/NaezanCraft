@@ -1,5 +1,6 @@
 #include "../pch.h"
 #include "Renderer.h"
+#include "../World/Scene.h"
 #include "../World/Camera.h"
 #include "../World/Chunk.h"
 #include "../World/ChunkMesh.h"
@@ -31,6 +32,7 @@ Renderer::Renderer()
 	{
 		shader.second->LinkComplete(shaderProgram);
 	}
+	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
 }
 
 void Renderer::BeginRender(const glm::mat4& matrix)
@@ -53,6 +55,7 @@ void Renderer::RenderChunk(std::weak_ptr<Chunk> chunk)
 	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
 
 	glUniform4f(glGetUniformLocation(shaderProgram, "ambientLight"), 0.4f, 0.4f, 0.4f, 1.0f);
+	glUniform1f(glGetUniformLocation(shaderProgram, "lightIntensity"), sunIntensity);
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionview"), 1, GL_FALSE, glm::value_ptr(ViewProjectionMatrix));
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(chunk.lock()->position.x * (CHUNK_X), chunk.lock()->position.y * (CHUNK_Y), chunk.lock()->position.z * (CHUNK_Z)));
