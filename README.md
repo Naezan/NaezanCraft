@@ -46,9 +46,11 @@ MineCraft Copy Naezan's Engine
         * *BSP(Maybe Cave? or Town? but i am not implement cave and town)*
         * *Region Weather System(later if possible)*
     - [ ] Lighting
-        * 라이트컬링
+        * Ambient Occlusion(+라이트컬링)
+        * Sun Light
+        * Object Light(SideFaceLighting)
         * 레이 트레이싱
-        * DotProduct
+        * *DotProduct*
     - [?] ECS
     - [?] Object Pool(*다른 사이드 프로젝트로 할까 생각중*)
     - [ ] Collision

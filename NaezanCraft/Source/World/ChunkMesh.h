@@ -18,6 +18,7 @@ struct VertTexCoord
 {
 	glm::u8vec3 pos;
 	glm::u16vec2 texcoord;
+	uint8_t facelight;
 };
 
 class ChunkMesh : public Mesh
@@ -37,6 +38,7 @@ public:
 private:
 	static const std::array<glm::u8vec3, 4> vertices[];
 	static const std::array<glm::u8vec3, 2> indices;
+	static const std::array<uint8_t, 6> faceslight;
 	//청크 하나의 모든 점이 여기에 저장된다. 65,536 보다 큰 수의 점들이 저장된다.
 	std::vector<VertTexCoord> meshVertices;
 

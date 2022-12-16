@@ -16,7 +16,13 @@ public:
 
 	inline size_t GetIndicesCount() { return indicesCount; }
 
-	virtual void CreateVertexBuffer(int vertexStride, const void* vertexPointer, int texcoordStride, const void* texcoordPointer, unsigned int posType, unsigned int texType);
+	void CreateVertexBuffer(int vertexStride, const void* vertexPointer,
+		int texcoordStride, const void* texcoordPointer,
+		int lightStride, const void* lightPointer,
+		unsigned int posType, unsigned int texType, unsigned int lightType);
+	void CreateVertexBuffer(int vertexStride, const void* vertexPointer,
+		int texcoordStride, const void* texcoordPointer,
+		unsigned int posType, unsigned int texType);
 	virtual void CreateIndexBuffer();
 	virtual void SetVertexBufferData(size_t size, const void* data);
 	virtual void SetIndexBufferVector(std::vector<unsigned int>& indexData);

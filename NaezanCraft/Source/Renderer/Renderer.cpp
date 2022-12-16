@@ -13,7 +13,6 @@ Renderer::Renderer()
 {
 	//텍스쳐 Atlas
 	TextureManager::AddTexture("CubeAtlas", "../Assets/Textures/Atlas.png");
-	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
 
 	//쉐이더
 	renderShaders.emplace(ShaderType::VERTEX, Shader::CreateShader<ShaderType::VERTEX>("../Assets/Shaders/CubeVert.vs"));
@@ -43,21 +42,25 @@ void Renderer::BeginRender(const glm::mat4& matrix)
 void Renderer::RenderChunk(std::weak_ptr<Chunk> chunk)
 {
 	glDisable(GL_BLEND);
-	glEnable(GL_CULL_FACE);
+	glDisable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glCullFace(GL_FRONT);
+	glFrontFace(GL_CCW);
 	glUseProgram(shaderProgram);
 
-	uint32_t viewProjectionLoc = glGetUniformLocation(shaderProgram, "projectionview");
-	glUniformMatrix4fv(viewProjectionLoc, 1, GL_FALSE, glm::value_ptr(ViewProjectionMatrix));
+	TextureManager::BindTexture("CubeAtlas");
+	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
 
+	glUniform4f(glGetUniformLocation(shaderProgram, "ambientLight"), 0.4f, 0.4f, 0.4f, 1.0f);
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionview"), 1, GL_FALSE, glm::value_ptr(ViewProjectionMatrix));
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(chunk.lock()->position.x * (CHUNK_X), chunk.lock()->position.y * (CHUNK_Y), chunk.lock()->position.z * (CHUNK_Z)));
 	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 	//model = glm::rotate(model, glm::radians(0.f), glm::vec3(0.0f, 0.0f, 0.0f));
-	uint32_t modelLoc = glGetUniformLocation(shaderProgram, "model");
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+
 	chunk.lock()->chunkMesh->BindVertexArray();
-	TextureManager::BindTexture("CubeAtlas");
 	glDrawElements(GL_TRIANGLES, chunk.lock()->chunkMesh->GetIndicesCount(), GL_UNSIGNED_INT, 0);
 	chunk.lock()->chunkMesh->UnBindVertexArray();
 }

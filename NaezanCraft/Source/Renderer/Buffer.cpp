@@ -25,6 +25,21 @@ VertexBuffer::VertexBuffer(int vertexStride, const void* vertexPointer, int texc
 {
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 
+	glVertexAttribPointer(0, 3, posType, GL_FALSE, vertexStride, vertexPointer);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 2, texType, GL_FALSE, texcoordStride, texcoordPointer);
+	glEnableVertexAttribArray(1);
+}
+
+VertexBuffer::VertexBuffer(
+int vertexStride, const void* vertexPointer, 
+int texcoordStride, const void* texcoordPointer, 
+int lightStride, const void* lightPointer, 
+unsigned int posType, unsigned int texType, unsigned int lightType)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
+
 	//index, size(vec3 개수), type(점 하나의 타입, 크기), normalized(정규화 여부), stride(건너뛸 거리), pointer(상대적 시작 위치, 거리?)
 	//position(u8vec3)
 	glVertexAttribPointer(0, 3, posType, GL_FALSE, vertexStride, vertexPointer);
@@ -33,6 +48,10 @@ VertexBuffer::VertexBuffer(int vertexStride, const void* vertexPointer, int texc
 	//texture(vec2)
 	glVertexAttribPointer(1, 2, texType, GL_FALSE, texcoordStride, texcoordPointer);
 	glEnableVertexAttribArray(1);
+
+	//texture(uint8_t)
+	glVertexAttribPointer(2, 1, lightType, GL_FALSE, lightStride, lightPointer);
+	glEnableVertexAttribArray(2);
 }
 
 VertexBuffer::~VertexBuffer()

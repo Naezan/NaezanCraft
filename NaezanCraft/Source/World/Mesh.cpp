@@ -20,11 +20,24 @@ Mesh::~Mesh()
 	indexBuffer.reset();
 }
 
+void Mesh::CreateVertexBuffer(int vertexStride, const void* vertexPointer,
+	int texcoordStride, const void* texcoordPointer,
+	int lightStride, const void* lightPointer,
+	unsigned int posType, unsigned int texType, unsigned int lightType)
+{
+	vertexBuffer = std::make_unique<VertexBuffer>(
+		static_cast<int>(vertexStride), vertexPointer,
+		static_cast<int>(texcoordStride), texcoordPointer,
+		static_cast<int>(lightStride), lightPointer,
+		posType, texType, lightType);
+}
+
 void Mesh::CreateVertexBuffer(int vertexStride, const void* vertexPointer, int texcoordStride, const void* texcoordPointer, unsigned int posType, unsigned int texType)
 {
 	vertexBuffer = std::make_unique<VertexBuffer>(
 		static_cast<int>(vertexStride), vertexPointer,
-		static_cast<int>(texcoordStride), texcoordPointer, posType, texType);
+		static_cast<int>(texcoordStride), texcoordPointer,
+		posType, texType);
 }
 
 void Mesh::CreateIndexBuffer()

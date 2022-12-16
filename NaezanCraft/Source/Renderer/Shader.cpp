@@ -64,6 +64,11 @@ void Shader::SetFloat(const std::string& name, float value) const
 	glUniform1f(glGetUniformLocation(shaderID, name.c_str()), value);
 }
 
+void Shader::SetVec4(const std::string& name, glm::vec4 vec4) const
+{
+	glUniform4f(glGetUniformLocation(shaderID, name.c_str()), vec4.x, vec4.y, vec4.z, vec4.w);
+}
+
 inline const unsigned int Shader::GetGLShader(ShaderType shadertype)
 {
 	switch (shadertype)

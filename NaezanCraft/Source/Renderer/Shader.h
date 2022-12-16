@@ -23,6 +23,7 @@ public:
 	void SetBool(const std::string& name, bool value) const;
 	void SetInt(const std::string& name, int value) const;
 	void SetFloat(const std::string& name, float value) const;
+	void SetVec4(const std::string& name, glm::vec4 vec4) const;
 
 	const inline uint32_t GetShaderID() const { return shaderID; }
 	const inline ShaderType GetShaderType() const { return shaderType; }
