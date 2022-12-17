@@ -22,11 +22,6 @@ const std::array<glm::u8vec3, 2> ChunkMesh::indices
 	glm::u8vec3(0, 1, 2) , glm::u8vec3(2, 3, 0)
 };
 
-const std::array<uint8_t, 6> ChunkMesh::faceslight
-{
-	10, 3, 6, 7, 7, 6
-};
-
 ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>&& chunk)
 {
 	parentChunk = chunk;
@@ -68,7 +63,7 @@ void ChunkMesh::CreateMesh()
 	{
 		CreateVertexBuffer(static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, pos),
 			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord),
-			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, facelight),
+			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, lightlevel),
 			GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, GL_UNSIGNED_BYTE);
 
 		SetVertexBufferData(meshVertices.size() * sizeof(VertTexCoord), &meshVertices.front());
@@ -100,7 +95,6 @@ void ChunkMesh::AddFaces(const glm::u8vec3& pos, BlockType& type, const glm::u16
 	}
 	else if (IsEmptyChunk(parentChunk.lock()->BackChunk) || parentChunk.lock()->BackChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, CHUNK_Z - 1)).IsTransparent())
 	{
-		//face2°³ Ãß°¡?
 		AddFace(pos, type, FaceType::Back, texcoord);
 	}
 
@@ -179,40 +173,40 @@ void ChunkMesh::AddFace(const glm::u8vec3& pos, const BlockType& Blocktype, cons
 	switch (faceType)
 	{
 	case Top:
-		meshVertices.push_back({ pos + vertices[Top][0],texcoords[0],faceslight[Top] });
-		meshVertices.push_back({ pos + vertices[Top][1],texcoords[1],faceslight[Top] });
-		meshVertices.push_back({ pos + vertices[Top][2],texcoords[2],faceslight[Top] });
-		meshVertices.push_back({ pos + vertices[Top][3],texcoords[3],faceslight[Top] });
+		meshVertices.push_back({ pos + vertices[Top][0],texcoords[0],15 });
+		meshVertices.push_back({ pos + vertices[Top][1],texcoords[1],15 });
+		meshVertices.push_back({ pos + vertices[Top][2],texcoords[2],15 });
+		meshVertices.push_back({ pos + vertices[Top][3],texcoords[3],15 });
 		break;
 	case Bottom:
-		meshVertices.push_back({ pos + vertices[Bottom][0],texcoords[0],faceslight[Bottom] });
-		meshVertices.push_back({ pos + vertices[Bottom][1],texcoords[1],faceslight[Bottom] });
-		meshVertices.push_back({ pos + vertices[Bottom][2],texcoords[2],faceslight[Bottom] });
-		meshVertices.push_back({ pos + vertices[Bottom][3],texcoords[3],faceslight[Bottom] });
+		meshVertices.push_back({ pos + vertices[Bottom][0],texcoords[0],15 });
+		meshVertices.push_back({ pos + vertices[Bottom][1],texcoords[1],15 });
+		meshVertices.push_back({ pos + vertices[Bottom][2],texcoords[2],15 });
+		meshVertices.push_back({ pos + vertices[Bottom][3],texcoords[3],15 });
 		break;
 	case Front:
-		meshVertices.push_back({ pos + vertices[Front][0],texcoords[0],faceslight[Front] });
-		meshVertices.push_back({ pos + vertices[Front][1],texcoords[1],faceslight[Front] });
-		meshVertices.push_back({ pos + vertices[Front][2],texcoords[2],faceslight[Front] });
-		meshVertices.push_back({ pos + vertices[Front][3],texcoords[3],faceslight[Front] });
+		meshVertices.push_back({ pos + vertices[Front][0],texcoords[0],15 });
+		meshVertices.push_back({ pos + vertices[Front][1],texcoords[1],15 });
+		meshVertices.push_back({ pos + vertices[Front][2],texcoords[2],15 });
+		meshVertices.push_back({ pos + vertices[Front][3],texcoords[3],15 });
 		break;
 	case Back:
-		meshVertices.push_back({ pos + vertices[Back][0],texcoords[0],faceslight[Back] });
-		meshVertices.push_back({ pos + vertices[Back][1],texcoords[1],faceslight[Back] });
-		meshVertices.push_back({ pos + vertices[Back][2],texcoords[2],faceslight[Back] });
-		meshVertices.push_back({ pos + vertices[Back][3],texcoords[3],faceslight[Back] });
+		meshVertices.push_back({ pos + vertices[Back][0],texcoords[0],15 });
+		meshVertices.push_back({ pos + vertices[Back][1],texcoords[1],15 });
+		meshVertices.push_back({ pos + vertices[Back][2],texcoords[2],15 });
+		meshVertices.push_back({ pos + vertices[Back][3],texcoords[3],15 });
 		break;
 	case Right:
-		meshVertices.push_back({ pos + vertices[Right][0],texcoords[0],faceslight[Right] });
-		meshVertices.push_back({ pos + vertices[Right][1],texcoords[1],faceslight[Right] });
-		meshVertices.push_back({ pos + vertices[Right][2],texcoords[2],faceslight[Right] });
-		meshVertices.push_back({ pos + vertices[Right][3],texcoords[3],faceslight[Right] });
+		meshVertices.push_back({ pos + vertices[Right][0],texcoords[0],15 });
+		meshVertices.push_back({ pos + vertices[Right][1],texcoords[1],15 });
+		meshVertices.push_back({ pos + vertices[Right][2],texcoords[2],15 });
+		meshVertices.push_back({ pos + vertices[Right][3],texcoords[3],15 });
 		break;
 	case Left:
-		meshVertices.push_back({ pos + vertices[Left][0],texcoords[0],faceslight[Left] });
-		meshVertices.push_back({ pos + vertices[Left][1],texcoords[1],faceslight[Left] });
-		meshVertices.push_back({ pos + vertices[Left][2],texcoords[2],faceslight[Left] });
-		meshVertices.push_back({ pos + vertices[Left][3],texcoords[3],faceslight[Left] });
+		meshVertices.push_back({ pos + vertices[Left][0],texcoords[0],15 });
+		meshVertices.push_back({ pos + vertices[Left][1],texcoords[1],15 });
+		meshVertices.push_back({ pos + vertices[Left][2],texcoords[2],15 });
+		meshVertices.push_back({ pos + vertices[Left][3],texcoords[3],15 });
 		break;
 	}
 

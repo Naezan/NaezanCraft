@@ -8,10 +8,10 @@
 
 WorldGenerator::WorldGenerator() : gen(rd())
 {
-	fastNoise.SetFrequency(.02f);
-	fastNoise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2S);
+	fastNoise.SetFrequency(.01f);
+	fastNoise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
 	fastNoise.SetFractalType(FastNoiseLite::FractalType_FBm);
-	fastNoise.SetFractalOctaves(4);
+	fastNoise.SetFractalOctaves(7);
 }
 
 WorldGenerator::~WorldGenerator() = default;

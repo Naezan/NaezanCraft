@@ -82,6 +82,7 @@ void World::Render()
 		if (chunk.second->chunkLoadState == ChunkLoadState::UnGenerated)
 		{
 			chunk.second->SetupChunkNeighbor();
+			chunk.second->CreateLightMap();
 			chunk.second->CreateChunkMesh();
 		}
 

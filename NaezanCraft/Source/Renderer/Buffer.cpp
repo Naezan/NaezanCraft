@@ -45,7 +45,7 @@ unsigned int posType, unsigned int texType, unsigned int lightType)
 	glVertexAttribPointer(0, 3, posType, GL_FALSE, vertexStride, vertexPointer);
 	glEnableVertexAttribArray(0);
 
-	//texture(vec2)
+	//texture(16vec2)
 	glVertexAttribPointer(1, 2, texType, GL_FALSE, texcoordStride, texcoordPointer);
 	glEnableVertexAttribArray(1);
 
@@ -58,6 +58,7 @@ VertexBuffer::~VertexBuffer()
 {
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
 }
 
 void VertexBuffer::Bind()

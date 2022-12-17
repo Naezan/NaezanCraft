@@ -40,15 +40,16 @@ MineCraft Copy Naezan's Engine
     - [ ] Map Generator
         * ~~Render Chunk When Player Move~~
         * ~~청크 랜덤 블록 렌더링~~
-        * Instancing(메모리관리 후 진행)
         * 세이브 로드 청크, 월드(SaveWorld, LoadWorld, SaveChunk, LoadChunk)
         * World Objects(like tree, catus etc..)
+        * 그리디 메싱 + 비등방성문제
+        * *Instancing(메모리관리 후 검토)*
         * *BSP(Maybe Cave? or Town? but i am not implement cave and town)*
         * *Region Weather System(later if possible)*
     - [ ] Lighting
         * Ambient Occlusion(+라이트컬링)
         * ~~Sun Light~~
-        * Object Light(SideFaceLighting) like Cave Lighting
+        * Object Light(Flood fill Algorithm)
         * *레이 트레이싱*
         * *DotProduct*
     - [?] ECS

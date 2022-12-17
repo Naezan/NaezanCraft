@@ -54,7 +54,6 @@ void Renderer::RenderChunk(std::weak_ptr<Chunk> chunk)
 	TextureManager::BindTexture("CubeAtlas");
 	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
 
-	glUniform4f(glGetUniformLocation(shaderProgram, "ambientLight"), 0.4f, 0.4f, 0.4f, 1.0f);
 	glUniform1f(glGetUniformLocation(shaderProgram, "lightIntensity"), sunIntensity);
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionview"), 1, GL_FALSE, glm::value_ptr(ViewProjectionMatrix));
 	glm::mat4 model = glm::mat4(1.0f);

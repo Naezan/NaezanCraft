@@ -2,17 +2,15 @@
 
 // Input data
 in vec2 TexCoord;
-in float DirLight;
-//in vec4 LightColor;
+in float Light;
 
 // Ouput data
-out vec4 OutCubecolor;
+out vec4 Outcolor;
 
 uniform sampler2D cubeTexture;
 
 void main()
 {
-	OutCubecolor = texelFetch(cubeTexture, ivec2(TexCoord.xy), 0);
-	OutCubecolor = vec4(OutCubecolor.rgb * DirLight, OutCubecolor.a);
-	//color *= LightColor;
+	Outcolor = texelFetch(cubeTexture, ivec2(TexCoord.xy), 0);
+	Outcolor = vec4(Outcolor.rgb * Light, Outcolor.a);
 }
