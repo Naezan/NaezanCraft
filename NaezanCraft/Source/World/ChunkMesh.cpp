@@ -93,7 +93,7 @@ void ChunkMesh::AddFaces(const glm::u8vec3& pos, BlockType& type, const glm::u16
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, pos.z - 1)).IsTransparent())
 			AddFace(pos, type, FaceType::Back, texcoord);
 	}
-	else if (IsEmptyChunk(parentChunk.lock()->BackChunk) || parentChunk.lock()->BackChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, CHUNK_Z - 1)).IsTransparent())
+	else if (Chunk::IsEmptyChunk(parentChunk.lock()->BackChunk) || parentChunk.lock()->BackChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, CHUNK_Z - 1)).IsTransparent())
 	{
 		AddFace(pos, type, FaceType::Back, texcoord);
 	}
@@ -104,7 +104,7 @@ void ChunkMesh::AddFaces(const glm::u8vec3& pos, BlockType& type, const glm::u16
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, pos.z + 1)).IsTransparent())
 			AddFace(pos, type, FaceType::Front, texcoord);
 	}
-	else if (IsEmptyChunk(parentChunk.lock()->FrontChunk) || parentChunk.lock()->FrontChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, 0)).IsTransparent())
+	else if (Chunk::IsEmptyChunk(parentChunk.lock()->FrontChunk) || parentChunk.lock()->FrontChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, 0)).IsTransparent())
 	{
 		AddFace(pos, type, FaceType::Front, texcoord);
 	}
@@ -141,7 +141,7 @@ void ChunkMesh::AddFaces(const glm::u8vec3& pos, BlockType& type, const glm::u16
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x - 1, pos.y, pos.z)).IsTransparent())
 			AddFace(pos, type, FaceType::Left, texcoord);
 	}
-	else if (IsEmptyChunk(parentChunk.lock()->LeftChunk) || parentChunk.lock()->LeftChunk.lock()->GetBlock(glm::vec3(CHUNK_X - 1, pos.y, pos.z)).IsTransparent())
+	else if (Chunk::IsEmptyChunk(parentChunk.lock()->LeftChunk) || parentChunk.lock()->LeftChunk.lock()->GetBlock(glm::vec3(CHUNK_X - 1, pos.y, pos.z)).IsTransparent())
 	{
 		//만약 이전 청크의 마지막이 없다면 0번째위치 왼쪽면의 정보를 추가해준다
 		AddFace(pos, type, FaceType::Left, texcoord);
@@ -154,7 +154,7 @@ void ChunkMesh::AddFaces(const glm::u8vec3& pos, BlockType& type, const glm::u16
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x + 1, pos.y, pos.z)).IsTransparent())
 			AddFace(pos, type, FaceType::Right, texcoord);
 	}
-	else if (IsEmptyChunk(parentChunk.lock()->RightChunk) || parentChunk.lock()->RightChunk.lock()->GetBlock(glm::vec3(0, pos.y, pos.z)).IsTransparent())
+	else if (Chunk::IsEmptyChunk(parentChunk.lock()->RightChunk) || parentChunk.lock()->RightChunk.lock()->GetBlock(glm::vec3(0, pos.y, pos.z)).IsTransparent())
 	{
 		//만약 다음 청크의 0번째가 없다면 CHUNK_X - 1위치 으론쪽면의 정보를 추가해준다
 		AddFace(pos, type, FaceType::Right, texcoord);
@@ -170,56 +170,58 @@ void ChunkMesh::AddFace(const glm::u8vec3& pos, const BlockType& Blocktype, cons
 		glm::u16vec2(SPRITE_WIDTH * texcoord.x, SPRITE_HEIGHT * texcoord.y)
 	};
 
+	const std::array<unsigned char, 6> lightLevels{
+		parentChunk.lock()->GetLightLevel(pos.x, pos.y + 1, pos.z),
+		parentChunk.lock()->GetLightLevel(pos.x, pos.y - 1, pos.z),
+		parentChunk.lock()->GetLightLevel(pos.x, pos.y, pos.z + 1),
+		parentChunk.lock()->GetLightLevel(pos.x, pos.y, pos.z - 1),
+		parentChunk.lock()->GetLightLevel(pos.x + 1, pos.y, pos.z),
+		parentChunk.lock()->GetLightLevel(pos.x - 1, pos.y, pos.z)
+	};
+
 	switch (faceType)
 	{
 	case Top:
-		meshVertices.push_back({ pos + vertices[Top][0],texcoords[0],15 });
-		meshVertices.push_back({ pos + vertices[Top][1],texcoords[1],15 });
-		meshVertices.push_back({ pos + vertices[Top][2],texcoords[2],15 });
-		meshVertices.push_back({ pos + vertices[Top][3],texcoords[3],15 });
+		meshVertices.push_back({ pos + vertices[Top][0],texcoords[0],lightLevels[Top] });
+		meshVertices.push_back({ pos + vertices[Top][1],texcoords[1],lightLevels[Top] });
+		meshVertices.push_back({ pos + vertices[Top][2],texcoords[2],lightLevels[Top] });
+		meshVertices.push_back({ pos + vertices[Top][3],texcoords[3],lightLevels[Top] });
 		break;
 	case Bottom:
-		meshVertices.push_back({ pos + vertices[Bottom][0],texcoords[0],15 });
-		meshVertices.push_back({ pos + vertices[Bottom][1],texcoords[1],15 });
-		meshVertices.push_back({ pos + vertices[Bottom][2],texcoords[2],15 });
-		meshVertices.push_back({ pos + vertices[Bottom][3],texcoords[3],15 });
+		meshVertices.push_back({ pos + vertices[Bottom][0],texcoords[0],lightLevels[Bottom] });
+		meshVertices.push_back({ pos + vertices[Bottom][1],texcoords[1],lightLevels[Bottom] });
+		meshVertices.push_back({ pos + vertices[Bottom][2],texcoords[2],lightLevels[Bottom] });
+		meshVertices.push_back({ pos + vertices[Bottom][3],texcoords[3],lightLevels[Bottom] });
 		break;
 	case Front:
-		meshVertices.push_back({ pos + vertices[Front][0],texcoords[0],15 });
-		meshVertices.push_back({ pos + vertices[Front][1],texcoords[1],15 });
-		meshVertices.push_back({ pos + vertices[Front][2],texcoords[2],15 });
-		meshVertices.push_back({ pos + vertices[Front][3],texcoords[3],15 });
+		meshVertices.push_back({ pos + vertices[Front][0],texcoords[0],lightLevels[Front] });
+		meshVertices.push_back({ pos + vertices[Front][1],texcoords[1],lightLevels[Front] });
+		meshVertices.push_back({ pos + vertices[Front][2],texcoords[2],lightLevels[Front] });
+		meshVertices.push_back({ pos + vertices[Front][3],texcoords[3],lightLevels[Front] });
 		break;
 	case Back:
-		meshVertices.push_back({ pos + vertices[Back][0],texcoords[0],15 });
-		meshVertices.push_back({ pos + vertices[Back][1],texcoords[1],15 });
-		meshVertices.push_back({ pos + vertices[Back][2],texcoords[2],15 });
-		meshVertices.push_back({ pos + vertices[Back][3],texcoords[3],15 });
+		meshVertices.push_back({ pos + vertices[Back][0],texcoords[0],lightLevels[Back] });
+		meshVertices.push_back({ pos + vertices[Back][1],texcoords[1],lightLevels[Back] });
+		meshVertices.push_back({ pos + vertices[Back][2],texcoords[2],lightLevels[Back] });
+		meshVertices.push_back({ pos + vertices[Back][3],texcoords[3],lightLevels[Back] });
 		break;
 	case Right:
-		meshVertices.push_back({ pos + vertices[Right][0],texcoords[0],15 });
-		meshVertices.push_back({ pos + vertices[Right][1],texcoords[1],15 });
-		meshVertices.push_back({ pos + vertices[Right][2],texcoords[2],15 });
-		meshVertices.push_back({ pos + vertices[Right][3],texcoords[3],15 });
+		meshVertices.push_back({ pos + vertices[Right][0],texcoords[0],lightLevels[Right] });
+		meshVertices.push_back({ pos + vertices[Right][1],texcoords[1],lightLevels[Right] });
+		meshVertices.push_back({ pos + vertices[Right][2],texcoords[2],lightLevels[Right] });
+		meshVertices.push_back({ pos + vertices[Right][3],texcoords[3],lightLevels[Right] });
 		break;
 	case Left:
-		meshVertices.push_back({ pos + vertices[Left][0],texcoords[0],15 });
-		meshVertices.push_back({ pos + vertices[Left][1],texcoords[1],15 });
-		meshVertices.push_back({ pos + vertices[Left][2],texcoords[2],15 });
-		meshVertices.push_back({ pos + vertices[Left][3],texcoords[3],15 });
+		meshVertices.push_back({ pos + vertices[Left][0],texcoords[0],lightLevels[Left] });
+		meshVertices.push_back({ pos + vertices[Left][1],texcoords[1],lightLevels[Left] });
+		meshVertices.push_back({ pos + vertices[Left][2],texcoords[2],lightLevels[Left] });
+		meshVertices.push_back({ pos + vertices[Left][3],texcoords[3],lightLevels[Left] });
 		break;
 	}
-
-	int a = 5;
 }
 
 glm::u16vec2 ChunkMesh::GetTexCoord(BlockType& type)
 {
 	std::pair<int, int> coord = World::BlockCoordData[type];
 	return glm::u16vec2(coord.first, coord.second);
-}
-
-bool ChunkMesh::IsEmptyChunk(std::weak_ptr<Chunk> const& chunk)
-{
-	return !chunk.owner_before(std::weak_ptr<Chunk>()) && !std::weak_ptr<Chunk>().owner_before(chunk);
 }

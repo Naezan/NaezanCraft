@@ -18,7 +18,8 @@ const std::array<glm::vec3, 6> Chunk::nearFaces
 Chunk::Chunk(const glm::vec3& pos) :
 	position(pos), chunkLoadState(ChunkLoadState::UnGenerated),
 	chunkBox(glm::vec3(pos.x* CHUNK_X, pos.y* CHUNK_Y, pos.z* CHUNK_Z), CHUNK_X, CHUNK_Y, CHUNK_Z),
-	LightMap(CHUNK_X, std::vector<std::vector<unsigned int>>(CHUNK_Y, std::vector<unsigned int>(CHUNK_Z)))
+	LightMap(CHUNK_X, std::vector<std::vector<unsigned char>>(CHUNK_Y, std::vector<unsigned char>(CHUNK_Z))),
+	emptyBlock(BlockType::Air)
 {
 	//TO DO change blocktype
 	//memset(&chunkBlocks[0][0][0], BlockType::Diamond, CHUNK_X * CHUNK_Y * CHUNK_Z * sizeof(Block));
@@ -55,22 +56,205 @@ Block& Chunk::GetBlock(int x, int y, int z)
 
 Block& Chunk::GetWorldBlock(const glm::vec3& blockPos)
 {
-	// TODO: insert return statement here
+	int dx = blockPos.x - position.x;
+	int dy = blockPos.y;
+	int dz = blockPos.z - position.z;
+
+	if (dy >= CHUNK_Y)
+	{
+		return emptyBlock;
+	}
+
+	if (dx < 0)
+	{
+		if (!IsEmptyChunk(LeftChunk))
+			return LeftChunk.lock()->GetBlock(CHUNK_X - 1, dy, dz);
+		else return emptyBlock;
+	}
+	else if (dx >= CHUNK_X)
+	{
+		if (!IsEmptyChunk(RightChunk))
+			return RightChunk.lock()->GetBlock(0, dy, dz);
+		else return emptyBlock;
+	}
+	if (dz < 0)
+	{
+		if (!IsEmptyChunk(BackChunk))
+			return BackChunk.lock()->GetBlock(dx, dy, CHUNK_Z - 1);
+		else return emptyBlock;
+	}
+	else if (dz >= CHUNK_Z)
+	{
+		if (!IsEmptyChunk(FrontChunk))
+			return FrontChunk.lock()->GetBlock(dx, dy, 0);
+		else return emptyBlock;
+	}
+
+	return GetBlock(dx, dy, dz);
 }
 
-Block& Chunk::GetWorldBlock(int x, int y, int z)
+Block& Chunk::GetWorldBlock(int wx, int wy, int wz)
 {
 	// 범위밖이면 다른방향의 청크블록을 찾는다 만약에 그것도 없다면 디폴트 생성자 리턴
+	int dx = wx - position.x;
+	int dy = wy;
+	int dz = wz - position.z;
+
+	if (dy >= CHUNK_Y)
+	{
+		return emptyBlock;
+	}
+
+	if (dx < 0)
+	{
+		if (!IsEmptyChunk(LeftChunk))
+			return LeftChunk.lock()->GetBlock(CHUNK_X - 1, dy, dz);
+		else return emptyBlock;
+	}
+	else if (dx >= CHUNK_X)
+	{
+		if (!IsEmptyChunk(RightChunk))
+			return RightChunk.lock()->GetBlock(0, dy, dz);
+		else return emptyBlock;
+	}
+	if (dz < 0)
+	{
+		if (!IsEmptyChunk(BackChunk))
+			return BackChunk.lock()->GetBlock(dx, dy, CHUNK_Z - 1);
+		else return emptyBlock;
+	}
+	else if (dz >= CHUNK_Z)
+	{
+		if (!IsEmptyChunk(FrontChunk))
+			return FrontChunk.lock()->GetBlock(dx, dy, 0);
+		else return emptyBlock;
+	}
+
+	return GetBlock(dx, dy, dz);
 }
 
-int Chunk::GetWorldLightLevel(int x, int y, int z)
+void Chunk::SetLightLevel(int x, int y, int z, int level)
+{
+	LightMap[x][y][z] = level;
+}
+
+unsigned char Chunk::GetLightLevel(int x, int y, int z)
+{
+	//TODO 범위를 넘어가게 되면 다른방향 청크 검사
+	if (x < 0 || x >= CHUNK_X || y < 0 || y >= CHUNK_Y || z < 0 || z >= CHUNK_Z)
+	{
+		return 15;
+	}
+	/*if (y >= CHUNK_Y || y < 0)
+	{
+		return 15;
+	}
+
+	if (x < 0)
+	{
+		if (!IsEmptyChunk(LeftChunk))
+			return LeftChunk.lock()->GetLightLevel(CHUNK_X - 1, y, z);
+		else return 15;
+	}
+	else if (x >= CHUNK_X)
+	{
+		if (!IsEmptyChunk(RightChunk))
+			return RightChunk.lock()->GetLightLevel(0, y, z);
+		else return 15;
+	}
+	if (z < 0)
+	{
+		if (!IsEmptyChunk(BackChunk))
+			return BackChunk.lock()->GetLightLevel(x, y, CHUNK_Z - 1);
+		else return 15;
+	}
+	else if (z >= CHUNK_Z)
+	{
+		if (!IsEmptyChunk(FrontChunk))
+			return FrontChunk.lock()->GetLightLevel(x, y, 0);
+		else return 15;
+	}*/
+
+	return LightMap[x][y][z];
+}
+
+unsigned char Chunk::GetWorldLightLevel(int wx, int wy, int wz)
 {
 	// 범위밖이면 15를 리턴 그외의 경우엔 특정 청크 블록의 라이트맵의 값을 가져옴
-	return 0;
+	int dx = wx - position.x;
+	int dy = wy;
+	int dz = wz - position.z;
+
+	if (dy >= CHUNK_Y)
+	{
+		return 15;
+	}
+
+	if (dx < 0)
+	{
+		if (!IsEmptyChunk(LeftChunk))
+			return LeftChunk.lock()->GetLightLevel(CHUNK_X - 1, dy, dz);
+		else return 15;
+	}
+	else if (dx >= CHUNK_X)
+	{
+		if (!IsEmptyChunk(RightChunk))
+			return RightChunk.lock()->GetLightLevel(0, dy, dz);
+		else return 15;
+	}
+	if (dz < 0)
+	{
+		if (!IsEmptyChunk(BackChunk))
+			return BackChunk.lock()->GetLightLevel(dx, dy, CHUNK_Z - 1);
+		else return 15;
+	}
+	else if (dz >= CHUNK_Z)
+	{
+		if (!IsEmptyChunk(FrontChunk))
+			return FrontChunk.lock()->GetLightLevel(dx, dy, 0);
+		else return 15;
+	}
+
+	return GetLightLevel(dx, dy, dz);
 }
 
-void Chunk::SetWorldLightLevel(int x, int y, int z, int level)
+void Chunk::SetWorldLightLevel(int wx, int wy, int wz, int level)
 {
+	int dx = wx - position.x;
+	int dy = wy;
+	int dz = wz - position.z;
+
+	if (dy >= CHUNK_Y)
+	{
+		return;
+	}
+
+	if (dx < 0)
+	{
+		if (!IsEmptyChunk(LeftChunk))
+			LeftChunk.lock()->SetLightLevel(CHUNK_X - 1, dy, dz, level);
+		return;
+	}
+	else if (dx >= CHUNK_X)
+	{
+		if (!IsEmptyChunk(RightChunk))
+			RightChunk.lock()->SetLightLevel(0, dy, dz, level);
+		return;
+	}
+	if (dz < 0)
+	{
+		if (!IsEmptyChunk(BackChunk))
+			BackChunk.lock()->SetLightLevel(dx, dy, CHUNK_Z - 1, level);
+		return;
+	}
+	else if (dz >= CHUNK_Z)
+	{
+		if (!IsEmptyChunk(FrontChunk))
+			FrontChunk.lock()->SetLightLevel(dx, dy, 0, level);
+		return;
+	}
+
+	SetLightLevel(dx, dy, dz, level);
 }
 
 void Chunk::SetupChunkNeighbor()
@@ -125,11 +309,11 @@ void Chunk::CreateLightMap()
 	while (!blockPosQue.empty())
 	{
 		glm::ivec3 localPos = blockPosQue.front();
-		unsigned int lightLevel = LightMap[localPos.x][localPos.y][localPos.z];
-		glm::ivec3 worldPos = 
+		unsigned char lightLevel = LightMap[localPos.x][localPos.y][localPos.z];
+		glm::ivec3 worldPos =
 		{
 			localPos.x + position.x,
-			localPos.y + position.y, 
+			localPos.y,
 			localPos.z + position.z
 		};
 
@@ -146,6 +330,7 @@ void Chunk::CreateLightMap()
 			Block& block = GetWorldBlock(dx, dy, dz);
 			if (block.IsTransparent())
 			{
+				bool isChangeLight = false;
 				int maxHeight = GetBlockMaxHeight(localPos.x, localPos.z);
 				//상하 좌우 위아래가 투명인 경우
 				if (nearFaces[i].y == 0 || dy < maxHeight)
@@ -153,8 +338,8 @@ void Chunk::CreateLightMap()
 					//현재의 라이팅보다 한단계 낮은 빛 적용
 					if (GetWorldLightLevel(dx, dy, dz) < lightLevel - 1)
 					{
+						isChangeLight = true;
 						SetWorldLightLevel(dx, dy, dz, lightLevel - 1);
-						blockPosQue.emplace(dx - position.x, dy, dz - position.z);
 					}
 				}
 				//최대높이 이상의 블럭들
@@ -163,9 +348,17 @@ void Chunk::CreateLightMap()
 					//셋팅이 안되어 있다면 웬만해선 15로 설정
 					if (GetWorldLightLevel(dx, dy, dz) < lightLevel)
 					{
+						isChangeLight = true;
 						SetWorldLightLevel(dx, dy, dz, lightLevel);
-						blockPosQue.emplace(dx - position.x, dy, dz - position.z);
 					}
+				}
+
+				if (isChangeLight)
+				{
+					int localdx = dx - position.x;
+					int localdz = dz - position.z;
+					if (localdx >= 0 && localdx < CHUNK_X && localdz >= 0 && localdz < CHUNK_Z)
+						blockPosQue.emplace(dx - position.x, dy, dz - position.z);
 				}
 			}
 		}
@@ -178,4 +371,9 @@ int Chunk::GetBlockMaxHeight(int x, int z)
 		if (!GetBlock(x, y, z).IsTransparent()) return y;
 	}
 	return 0;
+}
+
+bool Chunk::IsEmptyChunk(std::weak_ptr<Chunk> const& chunk)
+{
+	return !chunk.owner_before(std::weak_ptr<Chunk>()) && !std::weak_ptr<Chunk>().owner_before(chunk);
 }

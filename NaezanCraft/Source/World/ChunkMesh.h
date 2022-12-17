@@ -33,8 +33,6 @@ public:
 
 	glm::u16vec2 GetTexCoord(BlockType& type);
 
-	bool IsEmptyChunk(std::weak_ptr<Chunk> const& chunk);
-
 private:
 	static const std::array<glm::u8vec3, 4> vertices[];
 	static const std::array<glm::u8vec3, 2> indices;

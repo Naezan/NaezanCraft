@@ -4,7 +4,7 @@
 #include "../Renderer/FrustomCulling.h"
 
 using array_3d = std::array<std::array<std::array<Block, CHUNK_Z>, CHUNK_Y>, CHUNK_X>;
-using vector_3d = std::vector<std::vector<std::vector<unsigned int>>>;
+using vector_3d = std::vector<std::vector<std::vector<unsigned char>>>;
 
 class ChunkMesh;
 class WorldGenerator;
@@ -26,10 +26,12 @@ public:
 	Block& GetBlock(const glm::vec3& blockPos);
 	Block& GetBlock(int x, int y, int z);
 	Block& GetWorldBlock(const glm::vec3& blockPos);
-	Block& GetWorldBlock(int x, int y, int z);
+	Block& GetWorldBlock(int wx, int wy, int wz);
 
-	int GetWorldLightLevel(int x, int y, int z);
-	void SetWorldLightLevel(int x, int y, int z, int level);
+	void SetLightLevel(int x, int y, int z, int level);
+	unsigned char GetLightLevel(int x, int y, int z);
+	unsigned char GetWorldLightLevel(int wx, int wy, int wz);
+	void SetWorldLightLevel(int wx, int wy, int wz, int level);
 
 	void SetupChunkNeighbor();
 	void CreateChunkMesh();
@@ -37,6 +39,8 @@ public:
 
 	void CreateLightMap();
 	int GetBlockMaxHeight(int x, int z);
+
+	static bool IsEmptyChunk(std::weak_ptr<Chunk> const& chunk);
 
 public:
 	//need to use heap memory? but pointer is heavy? 65,536 * 1 byte?
@@ -57,4 +61,5 @@ public:
 	//Lighting
 	vector_3d LightMap;
 	static const std::array <glm::vec3, 6> nearFaces;
+	Block emptyBlock;
 };

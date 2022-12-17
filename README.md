@@ -49,7 +49,7 @@ MineCraft Copy Naezan's Engine
     - [ ] Lighting
         * Ambient Occlusion(+라이트컬링)
         * ~~Sun Light~~
-        * Object Light(Flood fill Algorithm)
+        * ~~Object Light(Flood fill Algorithm)~~
         * *레이 트레이싱*
         * *DotProduct*
     - [?] ECS
