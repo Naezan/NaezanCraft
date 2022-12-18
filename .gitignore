@@ -4,7 +4,7 @@ Binaries/
 Intermediate/
 Build/
 tmp/
-**/NaezanCraft/Source/Optick/
+**/Optick/
 
 # Files
 *.user
