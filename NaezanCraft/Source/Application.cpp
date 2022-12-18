@@ -16,6 +16,8 @@ void Application::Run()
 {
 	while (isRunning)
 	{
+		OPTICK_FRAME("MainThread");
+
 		if (glfwWindowShouldClose(craftWindow->GetWindowObject()))
 		{
 			isRunning = false;

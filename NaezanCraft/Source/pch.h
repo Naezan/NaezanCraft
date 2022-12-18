@@ -19,3 +19,5 @@
 #include <Windows.h>
 
 #include "Constant.h"
+
+#include "Optick/optick.h"

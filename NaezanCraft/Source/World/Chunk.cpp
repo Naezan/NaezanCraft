@@ -279,6 +279,7 @@ void Chunk::SetupChunkNeighbor()
 
 void Chunk::CreateChunkMesh()
 {
+	OPTICK_EVENT();
 	if (chunkLoadState == ChunkLoadState::UnGenerated)
 		chunkLoadState = ChunkLoadState::Generated;
 
@@ -293,6 +294,7 @@ void Chunk::GenerateTerrain(std::unique_ptr<WorldGenerator>& worldGenerator)
 
 void Chunk::CreateLightMap()
 {
+	OPTICK_EVENT();
 	std::queue<glm::ivec3> blockPosQue;
 	//맨위의 벽들을 모두 15로 만든다
 	for (int x = 0; x < CHUNK_X; ++x)

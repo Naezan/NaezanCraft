@@ -65,6 +65,8 @@ void Window::Init()
 
 void Window::Update()
 {
+	OPTICK_EVENT();
+
 	glfwPollEvents();
 	//double buffering
 	glfwSwapBuffers(window);

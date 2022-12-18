@@ -52,6 +52,8 @@ void World::SetBlockDatas()
 
 void World::Update()
 {
+	OPTICK_EVENT();
+
 	scene->Update();
 
 	playerPosition = scene->GetPlayerPosition();
@@ -71,6 +73,8 @@ void World::Update()
 
 void World::Render()
 {
+	OPTICK_EVENT();
+
 	renderer->BeginRender(scene->GetCamera().lock()->GetViewProjectionMatrix());
 
 	scene->Render();
