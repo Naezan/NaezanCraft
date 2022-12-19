@@ -47,8 +47,8 @@ MineCraft Copy Naezan's Engine
         * *Instancing(메모리관리 후 검토)*
         * *BSP(Maybe Cave? or Town? but i am not implement cave and town)*
         * *Region Weather System(later if possible)*
-    - [ ] Lighting
-        * Ambient Occlusion(+라이트컬링)
+    - [x] Lighting
+        * ~~Ambient Occlusion(+라이트컬링)~~
         * ~~Sun Light~~
         * ~~Object Light(Flood fill Algorithm)~~
         * *레이 트레이싱*

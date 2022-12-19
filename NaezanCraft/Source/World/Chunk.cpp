@@ -5,14 +5,14 @@
 #include "../Renderer/Renderer.h"
 #include "../World/Generator/WorldGenerator.h"
 
-const std::array<glm::vec3, 6> Chunk::nearFaces
+const std::array<glm::ivec3, 6> Chunk::nearFaces
 {
-	glm::vec3(-1, 0, 0),
-	glm::vec3(1 , 0, 0),
-	glm::vec3(0 , 0,-1),
-	glm::vec3(0 , 0, 1),
-	glm::vec3(0 ,-1, 0),
-	glm::vec3(0 , 1, 0)
+	glm::ivec3(-1, 0, 0),
+	glm::ivec3(1 , 0, 0),
+	glm::ivec3(0 , 0,-1),
+	glm::ivec3(0 , 0, 1),
+	glm::ivec3(0 ,-1, 0),
+	glm::ivec3(0 , 1, 0)
 };
 
 Chunk::Chunk(const glm::vec3& pos) :
@@ -47,13 +47,83 @@ void Chunk::SetBlock(int x, int y, int z, BlockType type)
 
 Block& Chunk::GetBlock(const glm::vec3& blockPos)
 {
+	int x = blockPos.x;
+	int y = blockPos.y;
+	int z = blockPos.z;
+
+	if (y >= CHUNK_Y || y < 0)
+	{
+		return emptyBlock;
+	}
+
+	if (x < 0)
+	{
+		if (!IsEmptyChunk(LeftChunk))
+			return LeftChunk.lock()->GetBlock(CHUNK_X - 1, y, z);
+		else
+			return emptyBlock;
+	}
+	else if (x >= CHUNK_X)
+	{
+		if (!IsEmptyChunk(RightChunk))
+			return RightChunk.lock()->GetBlock(0, y, z);
+		else
+			return emptyBlock;
+	}
+	if (z < 0)
+	{
+		if (!IsEmptyChunk(BackChunk))
+			return BackChunk.lock()->GetBlock(x, z, CHUNK_Z - 1);
+		else
+			return emptyBlock;
+	}
+	else if (z >= CHUNK_Z)
+	{
+		if (!IsEmptyChunk(FrontChunk))
+			return FrontChunk.lock()->GetBlock(x, y, 0);
+		else
+			return emptyBlock;
+	}
+
 	return chunkBlocks[blockPos.x][blockPos.y][blockPos.z];
 }
 
 Block& Chunk::GetBlock(int x, int y, int z)
 {
-	if (chunkBlocks.empty())
+	if (y >= CHUNK_Y || y < 0)
+	{
 		return emptyBlock;
+	}
+
+	if (x < 0)
+	{
+		if (!IsEmptyChunk(LeftChunk))
+			return LeftChunk.lock()->GetBlock(CHUNK_X - 1, y, z);
+		else
+			return emptyBlock;
+	}
+	else if (x >= CHUNK_X)
+	{
+		if (!IsEmptyChunk(RightChunk))
+			return RightChunk.lock()->GetBlock(0, y, z);
+		else
+			return emptyBlock;
+	}
+	if (z < 0)
+	{
+		if (!IsEmptyChunk(BackChunk))
+			return BackChunk.lock()->GetBlock(x, z, CHUNK_Z - 1);
+		else
+			return emptyBlock;
+	}
+	else if (z >= CHUNK_Z)
+	{
+		if (!IsEmptyChunk(FrontChunk))
+			return FrontChunk.lock()->GetBlock(x, y, 0);
+		else
+			return emptyBlock;
+	}
+
 	return chunkBlocks[x][y][z];
 }
 
@@ -404,6 +474,163 @@ int Chunk::GetBlockMaxHeight(int x, int z)
 		if (!GetBlock(x, y, z).IsTransparent()) return y;
 	}
 	return 0;
+}
+
+void Chunk::CreateSSAO()
+{
+	for (int8_t x = 0; x < CHUNK_X; ++x)
+	{
+		for (int8_t z = 0; z < CHUNK_Z; ++z)
+		{
+			int h = GetBlockMaxHeight(x, z);
+			for (int8_t y = 0; y <= h; ++y)
+			{
+				Block& block = GetBlock(x, h, z);
+				if (!block.IsTransparent())
+				{
+					for (auto& dir : nearFaces)
+					{
+						CaculateAO(x, y, z, dir);
+					}
+				}
+			}
+		}
+	}
+}
+
+void Chunk::CaculateAO(int x, int y, int z, const glm::ivec3& dir)
+{
+	//Right
+	if (dir.x > 0)
+	{
+		bool topfront = !GetBlock(x + 1, y + 1, z + 1).IsTransparent();
+		bool topback = !GetBlock(x + 1, y + 1, z - 1).IsTransparent();
+		bool bottomfront = !GetBlock(x + 1, y - 1, z + 1).IsTransparent();
+		bool bottomback = !GetBlock(x + 1, y - 1, z - 1).IsTransparent();
+
+		bool top = !GetBlock(x + 1, y + 1, z).IsTransparent();
+		bool bottom = !GetBlock(x + 1, y - 1, z).IsTransparent();
+		bool front = !GetBlock(x + 1, y, z + 1).IsTransparent();
+		bool back = !GetBlock(x + 1, y, z - 1).IsTransparent();
+
+		//2비트로 하나의 점 표현가능
+		//1바이트면 한면 표현가능, 6바이트면 6면 다 표현가능
+		auto& block = GetBlock(x, y, z);
+
+		block.Set_rtf_AO(CacluateVertexAO(top, front, topfront));
+		block.Set_rtb_AO(CacluateVertexAO(top, back, topback));
+		block.Set_rBf_AO(CacluateVertexAO(bottom, front, bottomfront));
+		block.Set_rBb_AO(CacluateVertexAO(bottom, back, bottomback));
+	}
+	//Left
+	else if (dir.x < 0)
+	{
+		bool topfront = !GetBlock(x - 1, y + 1, z + 1).IsTransparent();
+		bool topback = !GetBlock(x - 1, y + 1, z - 1).IsTransparent();
+		bool bottomfront = !GetBlock(x - 1, y - 1, z + 1).IsTransparent();
+		bool bottomback = !GetBlock(x - 1, y - 1, z - 1).IsTransparent();
+
+		bool top = !GetBlock(x - 1, y + 1, z).IsTransparent();
+		bool bottom = !GetBlock(x - 1, y - 1, z).IsTransparent();
+		bool front = !GetBlock(x - 1, y, z + 1).IsTransparent();
+		bool back = !GetBlock(x - 1, y, z - 1).IsTransparent();
+
+		auto& block = GetBlock(x, y, z);
+
+		block.Set_ltf_AO(CacluateVertexAO(top, front, topfront));
+		block.Set_ltb_AO(CacluateVertexAO(top, back, topback));
+		block.Set_lBf_AO(CacluateVertexAO(bottom, front, bottomfront));
+		block.Set_lBb_AO(CacluateVertexAO(bottom, back, bottomback));
+	}
+	//Top
+	else if (dir.y > 0)
+	{
+		bool rightfront = !GetBlock(x + 1, y + 1, z + 1).IsTransparent();
+		bool rightback = !GetBlock(x + 1, y + 1, z - 1).IsTransparent();
+		bool leftfront = !GetBlock(x - 1, y + 1, z + 1).IsTransparent();
+		bool leftback = !GetBlock(x - 1, y + 1, z - 1).IsTransparent();
+
+		bool right = !GetBlock(x + 1, y + 1, z).IsTransparent();
+		bool left = !GetBlock(x - 1, y + 1, z).IsTransparent();
+		bool front = !GetBlock(x, y + 1, z + 1).IsTransparent();
+		bool back = !GetBlock(x, y + 1, z - 1).IsTransparent();
+
+		auto& block = GetBlock(x, y, z);
+
+		block.Set_trf_AO(CacluateVertexAO(right, front, rightfront));
+		block.Set_trb_AO(CacluateVertexAO(right, back, rightback));
+		block.Set_tlf_AO(CacluateVertexAO(left, front, leftfront));
+		block.Set_tlb_AO(CacluateVertexAO(left, back, leftback));
+	}
+	//Bottom
+	else if (dir.y < 0)
+	{
+		bool rightfront = !GetBlock(x + 1, y - 1, z + 1).IsTransparent();
+		bool rightback = !GetBlock(x + 1, y - 1, z - 1).IsTransparent();
+		bool leftfront = !GetBlock(x - 1, y - 1, z + 1).IsTransparent();
+		bool leftback = !GetBlock(x - 1, y - 1, z - 1).IsTransparent();
+
+		bool right = !GetBlock(x + 1, y - 1, z).IsTransparent();
+		bool left = !GetBlock(x - 1, y - 1, z).IsTransparent();
+		bool front = !GetBlock(x, y - 1, z + 1).IsTransparent();
+		bool back = !GetBlock(x, y - 1, z - 1).IsTransparent();
+
+		auto& block = GetBlock(x, y, z);
+
+		block.Set_Brf_AO(CacluateVertexAO(right, front, rightfront));
+		block.Set_Brb_AO(CacluateVertexAO(right, back, rightback));
+		block.Set_Blf_AO(CacluateVertexAO(left, front, leftfront));
+		block.Set_Blb_AO(CacluateVertexAO(left, back, leftback));
+	}
+	//Front
+	else if (dir.z > 0)
+	{
+		bool righttop = !GetBlock(x + 1, y + 1, z + 1).IsTransparent();
+		bool rightbottom = !GetBlock(x + 1, y - 1, z + 1).IsTransparent();
+		bool lefttop = !GetBlock(x - 1, y + 1, z + 1).IsTransparent();
+		bool leftbottom = !GetBlock(x - 1, y - 1, z + 1).IsTransparent();
+
+		bool right = !GetBlock(x + 1, y, z + 1).IsTransparent();
+		bool left = !GetBlock(x - 1, y, z + 1).IsTransparent();
+		bool top = !GetBlock(x, y + 1, z + 1).IsTransparent();
+		bool bottom = !GetBlock(x, y - 1, z + 1).IsTransparent();
+
+		auto& block = GetBlock(x, y, z);
+
+		block.Set_frt_AO(CacluateVertexAO(right, top, righttop));
+		block.Set_frB_AO(CacluateVertexAO(right, bottom, rightbottom));
+		block.Set_flt_AO(CacluateVertexAO(left, top, lefttop));
+		block.Set_flB_AO(CacluateVertexAO(left, bottom, leftbottom));
+	}
+	//Back
+	else if (dir.z < 0)
+	{
+		bool righttop = !GetBlock(x + 1, y + 1, z - 1).IsTransparent();
+		bool rightbottom = !GetBlock(x + 1, y - 1, z - 1).IsTransparent();
+		bool lefttop = !GetBlock(x - 1, y + 1, z - 1).IsTransparent();
+		bool leftbottom = !GetBlock(x - 1, y - 1, z - 1).IsTransparent();
+
+		bool right = !GetBlock(x + 1, y, z - 1).IsTransparent();
+		bool left = !GetBlock(x - 1, y, z - 1).IsTransparent();
+		bool top = !GetBlock(x, y + 1, z - 1).IsTransparent();
+		bool bottom = !GetBlock(x, y - 1, z - 1).IsTransparent();
+
+		auto& block = GetBlock(x, y, z);
+
+		block.Set_brt_AO(CacluateVertexAO(right, top, righttop));
+		block.Set_brB_AO(CacluateVertexAO(right, bottom, rightbottom));
+		block.Set_blt_AO(CacluateVertexAO(left, top, lefttop));
+		block.Set_blB_AO(CacluateVertexAO(left, bottom, leftbottom));
+	}
+}
+
+uint8_t Chunk::CacluateVertexAO(bool side1, bool side2, bool corner)
+{
+	if (side1 && side2)
+	{
+		return 0;
+	}
+	return 3 - (side1 + side2 + corner);
 }
 
 bool Chunk::IsEmptyChunk(std::weak_ptr<Chunk> const& chunk)

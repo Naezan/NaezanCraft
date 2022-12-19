@@ -24,7 +24,8 @@ public:
 	VertexBuffer(int vertexStride, const void* vertexPointer,
 		int texcoordStride, const void* texcoordPointer,
 		int lightStride, const void* lightPointer,
-		unsigned int posType, unsigned int texType, unsigned int lightType);
+		int AOStride, const void* AOPointer,
+		unsigned int posType, unsigned int texType, unsigned int lightType, unsigned int AOType);
 	~VertexBuffer();
 
 	virtual void Bind() override;

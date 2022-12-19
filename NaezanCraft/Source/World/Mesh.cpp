@@ -23,13 +23,15 @@ Mesh::~Mesh()
 void Mesh::CreateVertexBuffer(int vertexStride, const void* vertexPointer,
 	int texcoordStride, const void* texcoordPointer,
 	int lightStride, const void* lightPointer,
-	unsigned int posType, unsigned int texType, unsigned int lightType)
+	int AOStride, const void* AOPointer,
+	unsigned int posType, unsigned int texType, unsigned int lightType, unsigned int AOType)
 {
 	vertexBuffer = std::make_unique<VertexBuffer>(
 		static_cast<int>(vertexStride), vertexPointer,
 		static_cast<int>(texcoordStride), texcoordPointer,
 		static_cast<int>(lightStride), lightPointer,
-		posType, texType, lightType);
+		static_cast<int>(AOStride), AOPointer,
+		posType, texType, lightType, AOType);
 }
 
 void Mesh::CreateVertexBuffer(int vertexStride, const void* vertexPointer, int texcoordStride, const void* texcoordPointer, unsigned int posType, unsigned int texType)

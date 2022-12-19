@@ -3,7 +3,7 @@
 layout(location = 0) in vec3 in_Pos;
 layout(location = 1) in vec2 in_TexCoord;
 layout(location = 2) in float in_lightLevel;//LightLevel is 0~15(1byte~2byte for objectlight)
-//layout(location = 3) in uint in_AO;
+layout(location = 3) in float in_AO;//0~3
 
 out vec2 TexCoord;
 out float Light;
@@ -21,7 +21,7 @@ void main(){
     gl_Position = projectionview * model * vec4(in_Pos.xyz, 1.0);
     TexCoord = vec2(in_TexCoord.x, in_TexCoord.y);
     Light = in_lightLevel * lightIntensity;
-    //Light = (Light * LIGHT_COEF + MIN_LIGHT_VALUE) * in_AO;
-    Light = (Light * LIGHT_COEF + MIN_LIGHT_VALUE);
+    Light = (Light * LIGHT_COEF + MIN_LIGHT_VALUE) * (in_AO * 0.33);
+    //Light = (Light * LIGHT_COEF + MIN_LIGHT_VALUE);
 }
 

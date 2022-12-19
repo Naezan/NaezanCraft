@@ -37,8 +37,14 @@ public:
 	void CreateChunkMesh(bool isRebuild);
 	void GenerateTerrain(std::unique_ptr<WorldGenerator>& worldGenerator);
 
+	//Lighting
 	void CreateLightMap();
 	int GetBlockMaxHeight(int x, int z);
+
+	//AO
+	void CreateSSAO();
+	void CaculateAO(int x, int y, int z, const glm::ivec3& dir);
+	uint8_t CacluateVertexAO(bool side1, bool side2, bool corner);
 
 	static bool IsEmptyChunk(std::weak_ptr<Chunk> const& chunk);
 
@@ -60,6 +66,6 @@ public:
 
 	//Lighting
 	vector_3d LightMap;
-	static const std::array <glm::vec3, 6> nearFaces;
+	static const std::array <glm::ivec3, 6> nearFaces;
 	Block emptyBlock;
 };

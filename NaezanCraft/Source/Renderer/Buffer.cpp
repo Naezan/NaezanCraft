@@ -36,7 +36,8 @@ VertexBuffer::VertexBuffer(
 int vertexStride, const void* vertexPointer, 
 int texcoordStride, const void* texcoordPointer, 
 int lightStride, const void* lightPointer, 
-unsigned int posType, unsigned int texType, unsigned int lightType)
+int AOStride, const void* AOPointer,
+unsigned int posType, unsigned int texType, unsigned int lightType, unsigned int AOType)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 
@@ -52,6 +53,10 @@ unsigned int posType, unsigned int texType, unsigned int lightType)
 	//texture(uint8_t)
 	glVertexAttribPointer(2, 1, lightType, GL_FALSE, lightStride, lightPointer);
 	glEnableVertexAttribArray(2);
+
+	//AO(uint8_t)
+	glVertexAttribPointer(3, 1, AOType, GL_FALSE, AOStride, AOPointer);
+	glEnableVertexAttribArray(3);
 }
 
 VertexBuffer::~VertexBuffer()

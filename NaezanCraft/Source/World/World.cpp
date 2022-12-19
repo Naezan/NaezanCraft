@@ -90,10 +90,9 @@ void World::Render()
 			chunk.second->SetupChunkNeighbor();
 			//TODO 최적화 후 처리
 			//chunk.second->CreateLightMap();
+			chunk.second->CreateSSAO();
 			chunk.second->CreateChunkMesh(false);
 		}
-
-		//특정 조건이 있으면 리빌드매쉬
 
 		//if chunk location is out of range -> erase chunk
 		if (chunk.second->position.x < static_cast<int>(playerPosition.x / CHUNK_X) - renderDistance ||

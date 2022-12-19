@@ -19,6 +19,7 @@ struct VertTexCoord
 	glm::u8vec3 pos;
 	glm::u16vec2 texcoord;
 	uint8_t lightlevel;
+	uint8_t AO;
 };
 
 class ChunkMesh : public Mesh
