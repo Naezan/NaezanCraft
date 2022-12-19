@@ -16,14 +16,15 @@ const std::array<glm::vec3, 6> Chunk::nearFaces
 };
 
 Chunk::Chunk(const glm::vec3& pos) :
-	position(pos), chunkLoadState(ChunkLoadState::UnGenerated),
+	position(pos), chunkLoadState(ChunkLoadState::Unloaded),
 	chunkBox(glm::vec3(pos.x* CHUNK_X, pos.y* CHUNK_Y, pos.z* CHUNK_Z), CHUNK_X, CHUNK_Y, CHUNK_Z),
 	LightMap(CHUNK_X, std::vector<std::vector<unsigned char>>(CHUNK_Y, std::vector<unsigned char>(CHUNK_Z))),
-	emptyBlock(BlockType::Air)
+	emptyBlock(BlockType::Air),
+	chunkBlocks(CHUNK_X, std::vector<std::vector<Block>>(CHUNK_Y, std::vector<Block>(CHUNK_Z, BlockType::Air)))
 {
 	//TO DO change blocktype
 	//memset(&chunkBlocks[0][0][0], BlockType::Diamond, CHUNK_X * CHUNK_Y * CHUNK_Z * sizeof(Block));
-	std::fill(&chunkBlocks[0][0][0], &chunkBlocks[0][0][0] + CHUNK_SIZE, BlockType::Air);
+	//std::fill(&chunkBlocks[0][0][0], &chunkBlocks[0][0][0] + CHUNK_SIZE, BlockType::Air);
 }
 
 Chunk::~Chunk()
@@ -51,6 +52,8 @@ Block& Chunk::GetBlock(const glm::vec3& blockPos)
 
 Block& Chunk::GetBlock(int x, int y, int z)
 {
+	if (chunkBlocks.empty())
+		return emptyBlock;
 	return chunkBlocks[x][y][z];
 }
 
@@ -262,27 +265,54 @@ void Chunk::SetupChunkNeighbor()
 	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(position.x - 1), static_cast<int>(position.z)), LeftChunk))
 	{
 		LeftChunk.lock()->RightChunk = shared_from_this();
+		if (chunkLoadState == ChunkLoadState::Loaded && LeftChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
+		{
+			LeftChunk.lock()->CreateChunkMesh(true);
+		}
 	}
+	else
+		LeftChunk.reset();
 	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(position.x + 1), static_cast<int>(position.z)), RightChunk))
 	{
 		RightChunk.lock()->LeftChunk = shared_from_this();
+		if (chunkLoadState == ChunkLoadState::Loaded && RightChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
+		{
+			RightChunk.lock()->CreateChunkMesh(true);
+		}
 	}
+	else
+		RightChunk.reset();
 	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(position.x), static_cast<int>(position.z - 1)), BackChunk))
 	{
 		BackChunk.lock()->FrontChunk = shared_from_this();
+		if (chunkLoadState == ChunkLoadState::Loaded && BackChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
+		{
+			BackChunk.lock()->CreateChunkMesh(true);
+		}
 	}
+	else
+		BackChunk.reset();
 	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(position.x), static_cast<int>(position.z + 1)), FrontChunk))
 	{
 		FrontChunk.lock()->BackChunk = shared_from_this();
+		if (chunkLoadState == ChunkLoadState::Loaded && FrontChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
+		{
+			FrontChunk.lock()->CreateChunkMesh(true);
+		}
 	}
+	else
+		FrontChunk.reset();
 }
 
-void Chunk::CreateChunkMesh()
+void Chunk::CreateChunkMesh(bool isRebuild)
 {
 	OPTICK_EVENT();
-	if (chunkLoadState == ChunkLoadState::UnGenerated)
-		chunkLoadState = ChunkLoadState::Generated;
+	chunkLoadState = ChunkLoadState::Builted;
 
+	if (isRebuild)
+	{
+		chunkMesh.reset();
+	}
 	chunkMesh = std::make_unique<ChunkMesh>(shared_from_this());
 	chunkMesh->CreateMesh();
 }
@@ -369,6 +399,7 @@ void Chunk::CreateLightMap()
 
 int Chunk::GetBlockMaxHeight(int x, int z)
 {
+	OPTICK_EVENT();
 	for (int y = CHUNK_Y - 1; y >= 0; --y) {
 		if (!GetBlock(x, y, z).IsTransparent()) return y;
 	}
@@ -377,5 +408,9 @@ int Chunk::GetBlockMaxHeight(int x, int z)
 
 bool Chunk::IsEmptyChunk(std::weak_ptr<Chunk> const& chunk)
 {
+	if (chunk.expired())
+	{
+		return true;
+	}
 	return !chunk.owner_before(std::weak_ptr<Chunk>()) && !std::weak_ptr<Chunk>().owner_before(chunk);
 }

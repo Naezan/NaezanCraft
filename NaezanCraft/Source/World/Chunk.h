@@ -11,7 +11,7 @@ class WorldGenerator;
 
 enum class ChunkLoadState
 {
-	Generated, UnGenerated
+	Unloaded, Loaded, Builted
 };
 
 class Chunk : public std::enable_shared_from_this<Chunk>
@@ -34,7 +34,7 @@ public:
 	void SetWorldLightLevel(int wx, int wy, int wz, int level);
 
 	void SetupChunkNeighbor();
-	void CreateChunkMesh();
+	void CreateChunkMesh(bool isRebuild);
 	void GenerateTerrain(std::unique_ptr<WorldGenerator>& worldGenerator);
 
 	void CreateLightMap();
@@ -46,7 +46,7 @@ public:
 	//need to use heap memory? but pointer is heavy? 65,536 * 1 byte?
 	//one chunk has 65.536kbyte? chunk is heavy
 	//100 chunks has 6.5536mbyte.
-	array_3d chunkBlocks;
+	std::vector<std::vector<std::vector<Block>>> chunkBlocks;
 	glm::vec3 position;
 	ChunkLoadState chunkLoadState;
 	std::unique_ptr<ChunkMesh> chunkMesh;

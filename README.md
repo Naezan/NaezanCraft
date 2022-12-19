@@ -34,6 +34,7 @@ MineCraft Copy Naezan's Engine
     - [x] ~~프러스텀컬링(AABB)~~
     - [ ] 오컬루전 컬링 + 옥트리(조금 더 추가적인 연산을 필요로 하기에 적절하게 써야함)
     - [x] ~~Chunk Object Rendering~~
+    - [ ] 블럭 방향에 따라 다른 텍스처 로드
     - [ ] SkyBox
         * ~~Sun & Moon~~
         * Cloud
@@ -67,6 +68,6 @@ MineCraft Copy Naezan's Engine
 - BUG
   - 
     - [x] 16 * 16 Chunk is 15 * 15 Chunk
-    - [ ] 새로운 청크가 생성될때 기존의 청크의 벽면이 로드된 상태 등 서순설정이 필요함
+    - [x] 새로운 청크가 생성될때 기존의 청크의 벽면이 로드된 상태 등 서순설정이 필요함
     - [ ] 라이팅 맵 생성중 프레임 드랍 발생
       ![라이팅맵 프로파일링 결과](./Screenshot/LightMapOptimize.PNG)

@@ -66,6 +66,7 @@ void World::Update()
 			{
 				worldChunks[std::pair<int, int>(x, z)] = std::make_shared<Chunk>(glm::vec3(x, 0, z));
 				worldChunks[std::pair<int, int>(x, z)]->GenerateTerrain(worldGenerator);
+				worldChunks[std::pair<int, int>(x, z)]->chunkLoadState = ChunkLoadState::Loaded;
 			}
 		}
 	}
@@ -83,12 +84,16 @@ void World::Render()
 	std::vector<decltype(worldChunks)::key_type> deletableKey;
 	for (auto& chunk : worldChunks)
 	{
-		if (chunk.second->chunkLoadState == ChunkLoadState::UnGenerated)
+		if (chunk.second->chunkLoadState == ChunkLoadState::Unloaded || 
+			chunk.second->chunkLoadState == ChunkLoadState::Loaded)
 		{
 			chunk.second->SetupChunkNeighbor();
-			chunk.second->CreateLightMap();
-			chunk.second->CreateChunkMesh();
+			//TODO 최적화 후 처리
+			//chunk.second->CreateLightMap();
+			chunk.second->CreateChunkMesh(false);
 		}
+
+		//특정 조건이 있으면 리빌드매쉬
 
 		//if chunk location is out of range -> erase chunk
 		if (chunk.second->position.x < static_cast<int>(playerPosition.x / CHUNK_X) - renderDistance ||
@@ -114,6 +119,7 @@ void World::Render()
 	//last erase unvisible chunk
 	for (auto key : deletableKey)
 	{
+		//worldChunks[key].reset();
 		worldChunks.erase(key);
 	}
 	deletableKey.clear();

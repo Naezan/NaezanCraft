@@ -170,7 +170,48 @@ void ChunkMesh::AddFace(const glm::u8vec3& pos, const BlockType& Blocktype, cons
 		glm::u16vec2(SPRITE_WIDTH * texcoord.x, SPRITE_HEIGHT * texcoord.y)
 	};
 
-	const std::array<unsigned char, 6> lightLevels{
+	switch (faceType)
+	{
+	case Top:
+		meshVertices.push_back({ pos + vertices[Top][0],texcoords[0],15 });
+		meshVertices.push_back({ pos + vertices[Top][1],texcoords[1],15 });
+		meshVertices.push_back({ pos + vertices[Top][2],texcoords[2],15 });
+		meshVertices.push_back({ pos + vertices[Top][3],texcoords[3],15 });
+		break;
+	case Bottom:
+		meshVertices.push_back({ pos + vertices[Bottom][0],texcoords[0],15 });
+		meshVertices.push_back({ pos + vertices[Bottom][1],texcoords[1],15 });
+		meshVertices.push_back({ pos + vertices[Bottom][2],texcoords[2],15 });
+		meshVertices.push_back({ pos + vertices[Bottom][3],texcoords[3],15 });
+		break;
+	case Front:
+		meshVertices.push_back({ pos + vertices[Front][0],texcoords[0],15 });
+		meshVertices.push_back({ pos + vertices[Front][1],texcoords[1],15 });
+		meshVertices.push_back({ pos + vertices[Front][2],texcoords[2],15 });
+		meshVertices.push_back({ pos + vertices[Front][3],texcoords[3],15 });
+		break;
+	case Back:
+		meshVertices.push_back({ pos + vertices[Back][0],texcoords[0],15 });
+		meshVertices.push_back({ pos + vertices[Back][1],texcoords[1],15 });
+		meshVertices.push_back({ pos + vertices[Back][2],texcoords[2],15 });
+		meshVertices.push_back({ pos + vertices[Back][3],texcoords[3],15 });
+		break;
+	case Right:
+		meshVertices.push_back({ pos + vertices[Right][0],texcoords[0],15 });
+		meshVertices.push_back({ pos + vertices[Right][1],texcoords[1],15 });
+		meshVertices.push_back({ pos + vertices[Right][2],texcoords[2],15 });
+		meshVertices.push_back({ pos + vertices[Right][3],texcoords[3],15 });
+		break;
+	case Left:
+		meshVertices.push_back({ pos + vertices[Left][0],texcoords[0],15 });
+		meshVertices.push_back({ pos + vertices[Left][1],texcoords[1],15 });
+		meshVertices.push_back({ pos + vertices[Left][2],texcoords[2],15 });
+		meshVertices.push_back({ pos + vertices[Left][3],texcoords[3],15 });
+		break;
+	}
+
+	//TODO 최적화 후 처리
+	/*const std::array<unsigned char, 6> lightLevels{
 		parentChunk.lock()->GetLightLevel(pos.x, pos.y + 1, pos.z),
 		parentChunk.lock()->GetLightLevel(pos.x, pos.y - 1, pos.z),
 		parentChunk.lock()->GetLightLevel(pos.x, pos.y, pos.z + 1),
@@ -217,7 +258,7 @@ void ChunkMesh::AddFace(const glm::u8vec3& pos, const BlockType& Blocktype, cons
 		meshVertices.push_back({ pos + vertices[Left][2],texcoords[2],lightLevels[Left] });
 		meshVertices.push_back({ pos + vertices[Left][3],texcoords[3],lightLevels[Left] });
 		break;
-	}
+	}*/
 }
 
 glm::u16vec2 ChunkMesh::GetTexCoord(BlockType& type)

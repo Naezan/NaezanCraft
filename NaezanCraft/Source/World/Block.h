@@ -22,10 +22,13 @@ enum BlockType : uint8_t
 
 struct Block
 {
-	Block(const BlockType& type = BlockType::None) : blockType(type) {}
+	Block() : blockType(BlockType::None) {};
+	Block(const BlockType& type) : blockType(type) {}
 	BlockType blockType;
 
-	inline bool IsTransparent() { return blockType == BlockType::Air; }
+	inline bool IsTransparent() {
+		return this->blockType == BlockType::Air;
+	}
 
 	bool operator==(Block rv) const
 	{

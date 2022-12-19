@@ -67,7 +67,7 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 				//SetBlockType
 				int h = heightMap[x][z];
 				//현재 블록 위치위의 빈자리
-				if (chunk.lock()->GetBlock(x, y, z) == Block())
+				if (chunk.lock()->GetBlock(x, y, z).blockType == BlockType::None)
 				{
 					continue;
 				}
