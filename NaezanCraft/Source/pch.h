@@ -16,6 +16,9 @@
 #include <fstream>
 #include <sstream>
 
+#include <future>
+#include <mutex>
+
 #include <Windows.h>
 
 #include "Constant.h"

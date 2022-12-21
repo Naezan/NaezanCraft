@@ -22,6 +22,11 @@ public:
 	void Render();
 	void Shutdown();
 
+	void CreateChunk(std::shared_ptr<Chunk>& chunk);
+	void UpdateChunk();
+	void GenerateChunkTerrain(int x, int z);
+	void RemoveWorldChunk(std::vector<std::pair<int, int>>& _deletableKey);
+
 	static inline std::unique_ptr<World> CreateCraftWorld()
 	{
 		return std::make_unique<World>();
@@ -51,11 +56,14 @@ private:
 			return hash1;
 		}
 	};
-	//need to chage map?
 	std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> worldChunks;
+	std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> LoadChunks;
 
 	const int renderDistance = 5;
 	glm::vec3 playerPosition;
 
 	std::unique_ptr<WorldGenerator> worldGenerator;
+	std::mutex worldMutex;
+	std::vector<std::shared_ptr<std::future<void>>> updateFutures;
+	std::vector<std::shared_ptr<std::future<void>>> renderFutures;
 };
