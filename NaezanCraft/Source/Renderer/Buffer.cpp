@@ -64,6 +64,7 @@ VertexBuffer::~VertexBuffer()
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(3);
 }
 
 void VertexBuffer::Bind()
@@ -90,8 +91,9 @@ IndexBuffer::IndexBuffer(size_t size, const void* data)
 
 IndexBuffer::~IndexBuffer()
 {
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glDeleteBuffers(1, &bufferID);
 }
 
 void IndexBuffer::Bind()

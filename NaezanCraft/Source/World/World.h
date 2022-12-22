@@ -11,6 +11,20 @@ class Scene;
 class Chunk;
 class WorldGenerator;
 
+struct Pair_IntHash
+{
+	std::size_t operator () (const std::pair<int, int>& p) const {
+		std::size_t hash1 = std::hash<int>{}(p.first);
+		std::size_t hash2 = std::hash<int>{}(p.second);
+
+		if (hash1 != hash2) {
+			return hash1 ^ hash2;
+		}
+
+		return hash1;
+	}
+};
+
 class World
 {
 public:
@@ -22,6 +36,8 @@ public:
 	void Render();
 	void Shutdown();
 
+	void AsyncCreateChunk();
+	void RemoveChunk();
 	void CreateChunk(std::shared_ptr<Chunk>& chunk);
 	void UpdateChunk();
 	void GenerateChunkTerrain(int x, int z);
@@ -38,24 +54,12 @@ public:
 
 public:
 	static std::unordered_map<BlockType, std::pair<int, int>> BlockCoordData;
+	static std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> RenderChunks;
 
 private:
 	std::unique_ptr<Renderer> renderer;
 	std::unique_ptr<Scene> scene;
 
-	struct Pair_IntHash
-	{
-		std::size_t operator () (const std::pair<int, int>& p) const {
-			std::size_t hash1 = std::hash<int>{}(p.first);
-			std::size_t hash2 = std::hash<int>{}(p.second);
-
-			if (hash1 != hash2) {
-				return hash1 ^ hash2;
-			}
-
-			return hash1;
-		}
-	};
 	std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> worldChunks;
 	std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> LoadChunks;
 

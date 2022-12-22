@@ -28,7 +28,7 @@ const std::array<glm::u8vec3, 2> ChunkMesh::indices
 	glm::u8vec3(0, 1, 2) , glm::u8vec3(2, 3, 0)
 };
 
-ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>&& chunk)
+ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>&& chunk, bool isReload) : Mesh(isReload)
 {
 	parentChunk = chunk;
 
@@ -64,9 +64,20 @@ void ChunkMesh::CreateMesh()
 		}
 	}
 
+	if (isReloadMesh)
+	{
+		CreateBuffer();
+	}
+}
+
+void ChunkMesh::CreateBuffer()
+{
 	//SetVertexBuffer && texCoord
 	if (!meshVertices.empty())
 	{
+		vertexArray = std::make_unique<VertexArray>();
+		vertexArray->Bind();
+
 		CreateVertexBuffer(static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, pos),
 			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord),
 			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, lightlevel),

@@ -27,6 +27,7 @@ public:
 	Block& GetBlock(int x, int y, int z);
 	Block& GetWorldBlock(const glm::vec3& blockPos);
 	Block& GetWorldBlock(int wx, int wy, int wz);
+	void SetLoadState(const ChunkLoadState& state);
 
 	void SetLightLevel(int x, int y, int z, int level);
 	unsigned char GetLightLevel(int x, int y, int z);
@@ -34,7 +35,8 @@ public:
 	void SetWorldLightLevel(int wx, int wy, int wz, int level);
 
 	void SetupChunkNeighbor();
-	void CreateChunkMesh(bool isRebuild);
+	void CreateChunkMesh(bool _isRebuild);
+	void CreateMeshBuffer();
 	void GenerateTerrain(std::unique_ptr<WorldGenerator>& worldGenerator);
 
 	//Lighting

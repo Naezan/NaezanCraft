@@ -28,7 +28,7 @@ Cloud::Cloud()
 
 	//Mesh
 	{
-		cloudMesh = std::make_unique<Mesh>();
+		cloudMesh = std::make_unique<Mesh>(true);
 		//cloudMesh->CreateVertexBuffer(static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, pos),
 		//	static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, texcoord),
 		//	GL_FLOAT, GL_FLOAT);

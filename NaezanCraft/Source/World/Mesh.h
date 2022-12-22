@@ -11,7 +11,7 @@ class IndexBuffer;
 class Mesh
 {
 public:
-	Mesh();
+	Mesh(bool isCreateArrayBuffer);
 	virtual ~Mesh();
 
 	inline size_t GetIndicesCount() { return indicesCount; }
@@ -38,4 +38,5 @@ protected:
 
 	std::vector<unsigned int> meshIndices;
 	int indicesCount;
+	bool isReloadMesh;
 };

@@ -173,7 +173,7 @@ SkyBox::SkyBox()
 			2, 3, 0
 		};
 
-		sunMesh = std::make_unique<Mesh>();
+		sunMesh = std::make_unique<Mesh>(true);
 		sunMesh->CreateVertexBuffer(static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, pos),
 			static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, texcoord),
 			GL_FLOAT, GL_FLOAT);
@@ -182,7 +182,7 @@ SkyBox::SkyBox()
 		sunMesh->CreateIndexBuffer();
 		sunMesh->UnbindAll();
 
-		moonMesh = std::make_unique<Mesh>();
+		moonMesh = std::make_unique<Mesh>(true);
 		moonMesh->CreateVertexBuffer(static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, pos),
 			static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, texcoord),
 			GL_FLOAT, GL_FLOAT);

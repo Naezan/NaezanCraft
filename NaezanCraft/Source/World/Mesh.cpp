@@ -4,17 +4,20 @@
 #include "../Renderer/VertexArray.h"
 #include "../Renderer/Buffer.h"
 
-Mesh::Mesh()
+Mesh::Mesh(bool isCreateArrayBuffer) : isReloadMesh(isCreateArrayBuffer)
 {
-	vertexArray = std::make_unique<VertexArray>();
-	vertexArray->Bind();
+	if (isCreateArrayBuffer)
+	{
+		vertexArray = std::make_unique<VertexArray>();
+		vertexArray->Bind();
+	}
 
 	indicesCount = 0;
 }
 
 Mesh::~Mesh()
 {
-	UnbindAll();
+	indicesCount = 0;
 	vertexArray.reset();
 	vertexBuffer.reset();
 	indexBuffer.reset();
