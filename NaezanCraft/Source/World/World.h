@@ -62,7 +62,7 @@ private:
 	std::unique_ptr<Scene> scene;
 
 	std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> worldChunks;
-	std::unordered_map<std::pair<int, int>, std::weak_ptr<Chunk>, Pair_IntHash> LoadChunks;
+	std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> LoadChunks;
 
 	const int renderDistance = 5;
 	glm::vec3 playerPosition;

@@ -133,7 +133,7 @@ void World::AsyncCreateChunk(const ChunkLoadState& loadState)
 		{
 			continue;
 		}
-		if (chunk.second.lock()->chunkLoadState == loadState)
+		if (chunk.second->chunkLoadState == loadState)
 		{
 			CreateChunk(chunk.second);
 		}
@@ -153,14 +153,14 @@ void World::RemoveChunk()
 		}
 
 		//if chunk location is out of range -> erase chunk
-		if (chunk.second.lock()->position.x < static_cast<int>(playerPosition.x / CHUNK_X) - renderDistance ||
-			chunk.second.lock()->position.x > static_cast<int>(playerPosition.x / CHUNK_X) + renderDistance ||
-			chunk.second.lock()->position.z < static_cast<int>(playerPosition.z / CHUNK_Z) - renderDistance ||
-			chunk.second.lock()->position.z > static_cast<int>(playerPosition.z / CHUNK_Z) + renderDistance)
+		if (chunk.second->position.x < static_cast<int>(playerPosition.x / CHUNK_X) - renderDistance ||
+			chunk.second->position.x > static_cast<int>(playerPosition.x / CHUNK_X) + renderDistance ||
+			chunk.second->position.z < static_cast<int>(playerPosition.z / CHUNK_Z) - renderDistance ||
+			chunk.second->position.z > static_cast<int>(playerPosition.z / CHUNK_Z) + renderDistance)
 		{
 			deletableKey.push_back(std::make_pair(
-				static_cast<int>(chunk.second.lock()->position.x),
-				static_cast<int>(chunk.second.lock()->position.z)
+				static_cast<int>(chunk.second->position.x),
+				static_cast<int>(chunk.second->position.z)
 			));
 		}
 	}

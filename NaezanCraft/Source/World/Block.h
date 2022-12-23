@@ -33,6 +33,9 @@ struct Block
 	unsigned char BackAO = 0xff;
 
 	inline bool IsTransparent() {
+		return this->blockType == BlockType::Air;
+	}
+	inline bool IsFluid() {
 		return (this->blockType == BlockType::Air) || (this->blockType == BlockType::Water);
 	}
 

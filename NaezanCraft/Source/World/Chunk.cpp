@@ -443,7 +443,7 @@ void Chunk::CreateLightMap()
 			if (dy < 0) continue;
 
 			Block& block = GetWorldBlock(dx, dy, dz);
-			if (block.IsTransparent())
+			if (block.IsFluid())
 			{
 				bool isChangeLight = false;
 				int maxHeight = GetBlockMaxHeight(localPos.x, localPos.z);
@@ -499,7 +499,7 @@ void Chunk::CreateSSAO()
 			for (int8_t y = 0; y <= h; ++y)
 			{
 				Block& block = GetBlock(x, h, z);
-				if (!block.IsTransparent())
+				if (!block.IsFluid())
 				{
 					for (auto& dir : nearFaces)
 					{
@@ -516,15 +516,15 @@ void Chunk::CaculateAO(int x, int y, int z, const glm::ivec3& dir)
 	//Right
 	if (dir.x > 0)
 	{
-		bool topfront = !GetBlock(x + 1, y + 1, z + 1).IsTransparent();
-		bool topback = !GetBlock(x + 1, y + 1, z - 1).IsTransparent();
-		bool bottomfront = !GetBlock(x + 1, y - 1, z + 1).IsTransparent();
-		bool bottomback = !GetBlock(x + 1, y - 1, z - 1).IsTransparent();
+		bool topfront = !GetBlock(x + 1, y + 1, z + 1).IsFluid();
+		bool topback = !GetBlock(x + 1, y + 1, z - 1).IsFluid();
+		bool bottomfront = !GetBlock(x + 1, y - 1, z + 1).IsFluid();
+		bool bottomback = !GetBlock(x + 1, y - 1, z - 1).IsFluid();
 
-		bool top = !GetBlock(x + 1, y + 1, z).IsTransparent();
-		bool bottom = !GetBlock(x + 1, y - 1, z).IsTransparent();
-		bool front = !GetBlock(x + 1, y, z + 1).IsTransparent();
-		bool back = !GetBlock(x + 1, y, z - 1).IsTransparent();
+		bool top = !GetBlock(x + 1, y + 1, z).IsFluid();
+		bool bottom = !GetBlock(x + 1, y - 1, z).IsFluid();
+		bool front = !GetBlock(x + 1, y, z + 1).IsFluid();
+		bool back = !GetBlock(x + 1, y, z - 1).IsFluid();
 
 		//2비트로 하나의 점 표현가능
 		//1바이트면 한면 표현가능, 6바이트면 6면 다 표현가능
@@ -538,15 +538,15 @@ void Chunk::CaculateAO(int x, int y, int z, const glm::ivec3& dir)
 	//Left
 	else if (dir.x < 0)
 	{
-		bool topfront = !GetBlock(x - 1, y + 1, z + 1).IsTransparent();
-		bool topback = !GetBlock(x - 1, y + 1, z - 1).IsTransparent();
-		bool bottomfront = !GetBlock(x - 1, y - 1, z + 1).IsTransparent();
-		bool bottomback = !GetBlock(x - 1, y - 1, z - 1).IsTransparent();
+		bool topfront = !GetBlock(x - 1, y + 1, z + 1).IsFluid();
+		bool topback = !GetBlock(x - 1, y + 1, z - 1).IsFluid();
+		bool bottomfront = !GetBlock(x - 1, y - 1, z + 1).IsFluid();
+		bool bottomback = !GetBlock(x - 1, y - 1, z - 1).IsFluid();
 
-		bool top = !GetBlock(x - 1, y + 1, z).IsTransparent();
-		bool bottom = !GetBlock(x - 1, y - 1, z).IsTransparent();
-		bool front = !GetBlock(x - 1, y, z + 1).IsTransparent();
-		bool back = !GetBlock(x - 1, y, z - 1).IsTransparent();
+		bool top = !GetBlock(x - 1, y + 1, z).IsFluid();
+		bool bottom = !GetBlock(x - 1, y - 1, z).IsFluid();
+		bool front = !GetBlock(x - 1, y, z + 1).IsFluid();
+		bool back = !GetBlock(x - 1, y, z - 1).IsFluid();
 
 		auto& block = GetBlock(x, y, z);
 
@@ -558,15 +558,15 @@ void Chunk::CaculateAO(int x, int y, int z, const glm::ivec3& dir)
 	//Top
 	else if (dir.y > 0)
 	{
-		bool rightfront = !GetBlock(x + 1, y + 1, z + 1).IsTransparent();
-		bool rightback = !GetBlock(x + 1, y + 1, z - 1).IsTransparent();
-		bool leftfront = !GetBlock(x - 1, y + 1, z + 1).IsTransparent();
-		bool leftback = !GetBlock(x - 1, y + 1, z - 1).IsTransparent();
+		bool rightfront = !GetBlock(x + 1, y + 1, z + 1).IsFluid();
+		bool rightback = !GetBlock(x + 1, y + 1, z - 1).IsFluid();
+		bool leftfront = !GetBlock(x - 1, y + 1, z + 1).IsFluid();
+		bool leftback = !GetBlock(x - 1, y + 1, z - 1).IsFluid();
 
-		bool right = !GetBlock(x + 1, y + 1, z).IsTransparent();
-		bool left = !GetBlock(x - 1, y + 1, z).IsTransparent();
-		bool front = !GetBlock(x, y + 1, z + 1).IsTransparent();
-		bool back = !GetBlock(x, y + 1, z - 1).IsTransparent();
+		bool right = !GetBlock(x + 1, y + 1, z).IsFluid();
+		bool left = !GetBlock(x - 1, y + 1, z).IsFluid();
+		bool front = !GetBlock(x, y + 1, z + 1).IsFluid();
+		bool back = !GetBlock(x, y + 1, z - 1).IsFluid();
 
 		auto& block = GetBlock(x, y, z);
 
@@ -578,15 +578,15 @@ void Chunk::CaculateAO(int x, int y, int z, const glm::ivec3& dir)
 	//Bottom
 	else if (dir.y < 0)
 	{
-		bool rightfront = !GetBlock(x + 1, y - 1, z + 1).IsTransparent();
-		bool rightback = !GetBlock(x + 1, y - 1, z - 1).IsTransparent();
-		bool leftfront = !GetBlock(x - 1, y - 1, z + 1).IsTransparent();
-		bool leftback = !GetBlock(x - 1, y - 1, z - 1).IsTransparent();
+		bool rightfront = !GetBlock(x + 1, y - 1, z + 1).IsFluid();
+		bool rightback = !GetBlock(x + 1, y - 1, z - 1).IsFluid();
+		bool leftfront = !GetBlock(x - 1, y - 1, z + 1).IsFluid();
+		bool leftback = !GetBlock(x - 1, y - 1, z - 1).IsFluid();
 
-		bool right = !GetBlock(x + 1, y - 1, z).IsTransparent();
-		bool left = !GetBlock(x - 1, y - 1, z).IsTransparent();
-		bool front = !GetBlock(x, y - 1, z + 1).IsTransparent();
-		bool back = !GetBlock(x, y - 1, z - 1).IsTransparent();
+		bool right = !GetBlock(x + 1, y - 1, z).IsFluid();
+		bool left = !GetBlock(x - 1, y - 1, z).IsFluid();
+		bool front = !GetBlock(x, y - 1, z + 1).IsFluid();
+		bool back = !GetBlock(x, y - 1, z - 1).IsFluid();
 
 		auto& block = GetBlock(x, y, z);
 
@@ -598,15 +598,15 @@ void Chunk::CaculateAO(int x, int y, int z, const glm::ivec3& dir)
 	//Front
 	else if (dir.z > 0)
 	{
-		bool righttop = !GetBlock(x + 1, y + 1, z + 1).IsTransparent();
-		bool rightbottom = !GetBlock(x + 1, y - 1, z + 1).IsTransparent();
-		bool lefttop = !GetBlock(x - 1, y + 1, z + 1).IsTransparent();
-		bool leftbottom = !GetBlock(x - 1, y - 1, z + 1).IsTransparent();
+		bool righttop = !GetBlock(x + 1, y + 1, z + 1).IsFluid();
+		bool rightbottom = !GetBlock(x + 1, y - 1, z + 1).IsFluid();
+		bool lefttop = !GetBlock(x - 1, y + 1, z + 1).IsFluid();
+		bool leftbottom = !GetBlock(x - 1, y - 1, z + 1).IsFluid();
 
-		bool right = !GetBlock(x + 1, y, z + 1).IsTransparent();
-		bool left = !GetBlock(x - 1, y, z + 1).IsTransparent();
-		bool top = !GetBlock(x, y + 1, z + 1).IsTransparent();
-		bool bottom = !GetBlock(x, y - 1, z + 1).IsTransparent();
+		bool right = !GetBlock(x + 1, y, z + 1).IsFluid();
+		bool left = !GetBlock(x - 1, y, z + 1).IsFluid();
+		bool top = !GetBlock(x, y + 1, z + 1).IsFluid();
+		bool bottom = !GetBlock(x, y - 1, z + 1).IsFluid();
 
 		auto& block = GetBlock(x, y, z);
 
@@ -618,15 +618,15 @@ void Chunk::CaculateAO(int x, int y, int z, const glm::ivec3& dir)
 	//Back
 	else if (dir.z < 0)
 	{
-		bool righttop = !GetBlock(x + 1, y + 1, z - 1).IsTransparent();
-		bool rightbottom = !GetBlock(x + 1, y - 1, z - 1).IsTransparent();
-		bool lefttop = !GetBlock(x - 1, y + 1, z - 1).IsTransparent();
-		bool leftbottom = !GetBlock(x - 1, y - 1, z - 1).IsTransparent();
+		bool righttop = !GetBlock(x + 1, y + 1, z - 1).IsFluid();
+		bool rightbottom = !GetBlock(x + 1, y - 1, z - 1).IsFluid();
+		bool lefttop = !GetBlock(x - 1, y + 1, z - 1).IsFluid();
+		bool leftbottom = !GetBlock(x - 1, y - 1, z - 1).IsFluid();
 
-		bool right = !GetBlock(x + 1, y, z - 1).IsTransparent();
-		bool left = !GetBlock(x - 1, y, z - 1).IsTransparent();
-		bool top = !GetBlock(x, y + 1, z - 1).IsTransparent();
-		bool bottom = !GetBlock(x, y - 1, z - 1).IsTransparent();
+		bool right = !GetBlock(x + 1, y, z - 1).IsFluid();
+		bool left = !GetBlock(x - 1, y, z - 1).IsFluid();
+		bool top = !GetBlock(x, y + 1, z - 1).IsFluid();
+		bool bottom = !GetBlock(x, y - 1, z - 1).IsFluid();
 
 		auto& block = GetBlock(x, y, z);
 
