@@ -9,7 +9,6 @@ Mesh::Mesh(bool isCreateArrayBuffer) : isReloadMesh(isCreateArrayBuffer)
 	if (isCreateArrayBuffer)
 	{
 		vertexArray = std::make_unique<VertexArray>();
-		vertexArray->Bind();
 	}
 
 	indicesCount = 0;
@@ -17,10 +16,10 @@ Mesh::Mesh(bool isCreateArrayBuffer) : isReloadMesh(isCreateArrayBuffer)
 
 Mesh::~Mesh()
 {
-	indicesCount = 0;
-	vertexArray.reset();
 	vertexBuffer.reset();
 	indexBuffer.reset();
+	vertexArray.reset();
+	indicesCount = 0;
 }
 
 void Mesh::CreateVertexBuffer(int vertexStride, const void* vertexPointer,
@@ -73,12 +72,22 @@ void Mesh::UnBindVertexArray()
 	vertexArray->UnBind();
 }
 
+void Mesh::BindAll()
+{
+	if (vertexArray != nullptr && vertexBuffer != nullptr && indexBuffer != nullptr)
+	{
+		vertexArray->Bind();
+		vertexBuffer->Bind();
+		indexBuffer->Bind();
+	}
+}
+
 void Mesh::UnbindAll()
 {
-	if (vertexArray != nullptr)
-		vertexArray->UnBind();
-	if (vertexBuffer != nullptr)
-		vertexBuffer->UnBind();
-	if (indexBuffer != nullptr)
+	if (vertexArray != nullptr && vertexBuffer != nullptr && indexBuffer != nullptr)
+	{
 		indexBuffer->UnBind();
+		vertexBuffer->UnBind();
+		vertexArray->UnBind();
+	}
 }

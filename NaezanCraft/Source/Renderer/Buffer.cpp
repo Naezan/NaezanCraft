@@ -61,6 +61,8 @@ unsigned int posType, unsigned int texType, unsigned int lightType, unsigned int
 
 VertexBuffer::~VertexBuffer()
 {
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
@@ -91,17 +93,15 @@ IndexBuffer::IndexBuffer(size_t size, const void* data)
 
 IndexBuffer::~IndexBuffer()
 {
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void IndexBuffer::Bind()
 {
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
 }
 
 void IndexBuffer::UnBind()
 {
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//
 }

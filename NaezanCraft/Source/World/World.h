@@ -10,6 +10,7 @@ class Renderer;
 class Scene;
 class Chunk;
 class WorldGenerator;
+enum class ChunkLoadState;
 
 struct Pair_IntHash
 {
@@ -36,9 +37,9 @@ public:
 	void Render();
 	void Shutdown();
 
-	void AsyncCreateChunk();
+	void AsyncCreateChunk(const ChunkLoadState& loadState);
 	void RemoveChunk();
-	void CreateChunk(std::shared_ptr<Chunk>& chunk);
+	void CreateChunk(std::weak_ptr<Chunk> chunk);
 	void UpdateChunk();
 	void GenerateChunkTerrain(int x, int z);
 	void RemoveWorldChunk(std::vector<std::pair<int, int>>& _deletableKey);
@@ -61,13 +62,17 @@ private:
 	std::unique_ptr<Scene> scene;
 
 	std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> worldChunks;
-	std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> LoadChunks;
+	std::unordered_map<std::pair<int, int>, std::weak_ptr<Chunk>, Pair_IntHash> LoadChunks;
 
 	const int renderDistance = 5;
 	glm::vec3 playerPosition;
 
 	std::unique_ptr<WorldGenerator> worldGenerator;
 	std::mutex worldMutex;
-	std::vector<std::shared_ptr<std::future<void>>> updateFutures;
-	std::vector<std::shared_ptr<std::future<void>>> renderFutures;
+	std::deque<std::shared_ptr<std::future<void>>> updateFutures;
+	std::deque<std::shared_ptr<std::future<void>>> renderFutures;
+
+	bool isCompleteCreateChunk;
+	std::future_status curStatus;
+	std::future_status prevStatus;
 };

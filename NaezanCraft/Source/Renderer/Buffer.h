@@ -10,7 +10,7 @@ public:
 	virtual void UnBind() = 0;
 
 protected:
-	uint32_t bufferID;
+	uint32_t bufferID = 0;
 };
 
 class VertexBuffer : public Buffer

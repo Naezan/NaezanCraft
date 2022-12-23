@@ -39,8 +39,13 @@ ChunkMesh::~ChunkMesh()
 {
 	parentChunk.reset();
 
+	indexBuffer.reset();
+	vertexBuffer.reset();
+	vertexArray.reset();
+
 	meshIndices.clear();
 	meshVertices.clear();
+	indicesCount = 0;
 }
 
 void ChunkMesh::CreateMesh()
@@ -76,7 +81,6 @@ void ChunkMesh::CreateBuffer()
 	if (!meshVertices.empty())
 	{
 		vertexArray = std::make_unique<VertexArray>();
-		vertexArray->Bind();
 
 		CreateVertexBuffer(static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, pos),
 			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord),
@@ -99,7 +103,9 @@ void ChunkMesh::CreateBuffer()
 		}
 
 		CreateIndexBuffer();
-		UnbindAll();
+		indexBuffer->UnBind();
+		vertexBuffer->UnBind();
+		vertexArray->UnBind();
 	}
 }
 

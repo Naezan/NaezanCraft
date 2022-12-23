@@ -67,7 +67,9 @@ MineCraft Copy Naezan's Engine
 
 - BUG
   - 
-    - [x] 16 * 16 Chunk is 15 * 15 Chunk
-    - [x] 새로운 청크가 생성될때 기존의 청크의 벽면이 로드된 상태 등 서순설정이 필요함
-    - [ ] 라이팅 맵 생성중 프레임 드랍 발생
+    - [x] ~~16 * 16 Chunk is 15 * 15 Chunk~~
+    - [x] ~~새로운 청크가 생성될때 기존의 청크의 벽면이 로드된 상태 등 서순설정이 필요함~~
+    - [x] ~~라이팅 맵 생성중 프레임 드랍 발생~~
       ![라이팅맵 프로파일링 결과](./Screenshot/LightMapOptimize.PNG)
+    - [ ] 최적화중에 CPU가 Lock에 의해서 많은 시간 놀고있는것을 발견했다 왜일까?
+      ![약80%의 속도를 향상시켰다 하지만 CPU가 논다](./Screenshot/Optimize1.PNG)

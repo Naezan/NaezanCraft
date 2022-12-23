@@ -12,5 +12,5 @@ public:
 	inline const uint32_t GetArrayID() const { return arrayID; }
 
 private:
-	uint32_t arrayID;
+	uint32_t arrayID = 0;
 };

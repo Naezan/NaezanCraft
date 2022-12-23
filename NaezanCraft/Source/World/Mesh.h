@@ -29,6 +29,7 @@ public:
 	virtual void SetIndexBufferVector(std::vector<unsigned int>& indexData);
 	void BindVertexArray();
 	void UnBindVertexArray();
+	void BindAll();
 	void UnbindAll();
 
 protected:
@@ -37,6 +38,6 @@ protected:
 	std::unique_ptr<IndexBuffer> indexBuffer;
 
 	std::vector<unsigned int> meshIndices;
-	int indicesCount;
+	int indicesCount = 0;
 	bool isReloadMesh;
 };

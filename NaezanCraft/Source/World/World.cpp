@@ -32,7 +32,7 @@ World::World()
 		}
 	}
 
-	renderFutures.push_back(std::make_shared<std::future<void>>(std::async(std::launch::async, &World::AsyncCreateChunk, this)));
+	renderFutures.push_back(std::make_shared<std::future<void>>(std::async(std::launch::async, &World::AsyncCreateChunk, this, ChunkLoadState::Unloaded)));
 }
 
 World::~World()
@@ -63,22 +63,42 @@ void World::Update()
 	playerPosition = scene->GetPlayerPosition();
 
 	UpdateChunk();
-	//
+
+	//if curstate
+
+	if (!updateFutures.empty())
+	{
+		curStatus = updateFutures.back()->wait_for(std::chrono::milliseconds(1));
+		if (curStatus == std::future_status::ready && prevStatus == std::future_status::timeout)
+		{
+			if (isCompleteCreateChunk)
+			{
+				isCompleteCreateChunk = false;
+				RemoveChunk();
+				updateFutures.clear();
+				renderFutures.push_back(std::make_shared<std::future<void>>(std::async(std::launch::async, &World::AsyncCreateChunk, this, ChunkLoadState::Loaded)));
+			}
+		}
+		prevStatus = curStatus;
+	}
 }
 
 void World::Render()
 {
 	OPTICK_EVENT();
 
-	RemoveChunk();
-
-	int ChunkCount = 0;
 	renderer->BeginRender(scene->GetCamera().lock()->GetViewProjectionMatrix());
 
 	scene->Render();
 
+	int ChunkCount = 0;
 	for (auto& chunk : RenderChunks)
 	{
+		if (Chunk::IsEmptyChunk(chunk.second))
+		{
+			continue;
+		}
+
 		if (scene->GetCamera().lock()->GetFrustum().AABB(chunk.second->chunkBox) != CullingState::OUTSIDE)
 		{
 			if (chunk.second->chunkLoadState == ChunkLoadState::Loaded)
@@ -104,17 +124,22 @@ void World::Shutdown()
 	RenderChunks.clear();
 }
 
-void World::AsyncCreateChunk()
+void World::AsyncCreateChunk(const ChunkLoadState& loadState)
 {
 	//LoadChunkList에 있는 녀석들만 렌더링하고 삭제하고 등 처리
-	for (auto& chunk : LoadChunks)
+	for (const auto chunk : LoadChunks)
 	{
-		if (chunk.second->chunkLoadState == ChunkLoadState::Unloaded ||
-			chunk.second->chunkLoadState == ChunkLoadState::Loaded)
+		if (Chunk::IsEmptyChunk(chunk.second))
+		{
+			continue;
+		}
+		if (chunk.second.lock()->chunkLoadState == loadState)
 		{
 			CreateChunk(chunk.second);
 		}
 	}
+
+	isCompleteCreateChunk = true;
 }
 
 void World::RemoveChunk()
@@ -122,15 +147,20 @@ void World::RemoveChunk()
 	std::vector<decltype(worldChunks)::key_type> deletableKey;
 	for (auto& chunk : LoadChunks)
 	{
+		if (Chunk::IsEmptyChunk(chunk.second))
+		{
+			continue;
+		}
+
 		//if chunk location is out of range -> erase chunk
-		if (chunk.second->position.x < static_cast<int>(playerPosition.x / CHUNK_X) - renderDistance ||
-			chunk.second->position.x > static_cast<int>(playerPosition.x / CHUNK_X) + renderDistance ||
-			chunk.second->position.z < static_cast<int>(playerPosition.z / CHUNK_Z) - renderDistance ||
-			chunk.second->position.z > static_cast<int>(playerPosition.z / CHUNK_Z) + renderDistance)
+		if (chunk.second.lock()->position.x < static_cast<int>(playerPosition.x / CHUNK_X) - renderDistance ||
+			chunk.second.lock()->position.x > static_cast<int>(playerPosition.x / CHUNK_X) + renderDistance ||
+			chunk.second.lock()->position.z < static_cast<int>(playerPosition.z / CHUNK_Z) - renderDistance ||
+			chunk.second.lock()->position.z > static_cast<int>(playerPosition.z / CHUNK_Z) + renderDistance)
 		{
 			deletableKey.push_back(std::make_pair(
-				static_cast<int>(chunk.second->position.x),
-				static_cast<int>(chunk.second->position.z)
+				static_cast<int>(chunk.second.lock()->position.x),
+				static_cast<int>(chunk.second.lock()->position.z)
 			));
 		}
 	}
@@ -141,17 +171,19 @@ void World::RemoveChunk()
 	}
 }
 
-void World::CreateChunk(std::shared_ptr<Chunk>& chunk)
+void World::CreateChunk(std::weak_ptr<Chunk> chunk)
 {
-	chunk->SetupChunkNeighbor();
-	//TODO 최적화 후 처리
-	//chunk.second->CreateLightMap();
-	chunk->CreateSSAO();
-
-	chunk->CreateChunkMesh(false);
+	chunk.lock()->SetupChunkNeighbor();
+	//chunk->CreateLightMap();
+	chunk.lock()->CreateSSAO();
 
 	std::lock_guard<std::mutex> lock(worldMutex);
-	RenderChunks[std::pair<int, int>(static_cast<int>(chunk->position.x), static_cast<int>(chunk->position.z))] = chunk;
+	if (Chunk::IsEmptyChunk(chunk))
+	{
+		return;
+	}
+	chunk.lock()->CreateChunkMesh(false);
+	RenderChunks[std::pair<int, int>(static_cast<int>(chunk.lock()->position.x), static_cast<int>(chunk.lock()->position.z))] = chunk.lock();
 }
 
 void World::UpdateChunk()
@@ -163,7 +195,6 @@ void World::UpdateChunk()
 			if (!IsChunkCreatedByPos(x, z))
 			{
 				updateFutures.push_back(std::make_shared<std::future<void>>(std::async(std::launch::async, &World::GenerateChunkTerrain, this, x, z)));
-				//GenerateChunkTerrain(x, z);
 			}
 		}
 	}
@@ -181,10 +212,12 @@ void World::GenerateChunkTerrain(int x, int z)
 void World::RemoveWorldChunk(std::vector<decltype(worldChunks)::key_type>& _deletableKey)
 {
 	//last erase unvisible chunk
-	std::lock_guard<std::mutex> lock(worldMutex);
 	for (auto key : _deletableKey)
 	{
-		//worldChunks[key].reset();
+		std::lock_guard<std::mutex> lock(worldMutex);
+		worldChunks[key].reset();
+		LoadChunks[key].reset();
+		RenderChunks[key].reset();
 		worldChunks.erase(key);
 		LoadChunks.erase(key);
 		RenderChunks.erase(key);

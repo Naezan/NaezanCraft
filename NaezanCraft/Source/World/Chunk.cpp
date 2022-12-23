@@ -254,7 +254,7 @@ unsigned char Chunk::GetLightLevel(int x, int y, int z)
 	}*/
 
 	return LightMap[x][y][z];
-} 
+}
 
 unsigned char Chunk::GetWorldLightLevel(int wx, int wy, int wz)
 {
@@ -342,8 +342,7 @@ void Chunk::SetupChunkNeighbor()
 		LeftChunk.lock()->RightChunk = shared_from_this();
 		if (chunkLoadState == ChunkLoadState::Loaded && LeftChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
 		{
-			LeftChunk.lock()->CreateChunkMesh(true);
-
+			//LeftChunk.lock()->CreateChunkMesh(true);
 		}
 	}
 	else
@@ -353,8 +352,7 @@ void Chunk::SetupChunkNeighbor()
 		RightChunk.lock()->LeftChunk = shared_from_this();
 		if (chunkLoadState == ChunkLoadState::Loaded && RightChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
 		{
-			RightChunk.lock()->CreateChunkMesh(true);
-
+			//RightChunk.lock()->CreateChunkMesh(true);
 		}
 	}
 	else
@@ -364,8 +362,7 @@ void Chunk::SetupChunkNeighbor()
 		BackChunk.lock()->FrontChunk = shared_from_this();
 		if (chunkLoadState == ChunkLoadState::Loaded && BackChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
 		{
-			BackChunk.lock()->CreateChunkMesh(true);
-
+			//BackChunk.lock()->CreateChunkMesh(true);
 		}
 	}
 	else
@@ -375,8 +372,7 @@ void Chunk::SetupChunkNeighbor()
 		FrontChunk.lock()->BackChunk = shared_from_this();
 		if (chunkLoadState == ChunkLoadState::Loaded && FrontChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
 		{
-			FrontChunk.lock()->CreateChunkMesh(true);
-
+			//FrontChunk.lock()->CreateChunkMesh(true);
 		}
 	}
 	else
@@ -386,11 +382,14 @@ void Chunk::SetupChunkNeighbor()
 void Chunk::CreateChunkMesh(bool _isRebuild)
 {
 	OPTICK_EVENT();
-	chunkLoadState = ChunkLoadState::Loaded;
 
 	if (_isRebuild)
 	{
 		chunkMesh.reset();
+	}
+	else
+	{
+		chunkLoadState = ChunkLoadState::Loaded;
 	}
 	chunkMesh = std::make_unique<ChunkMesh>(shared_from_this(), _isRebuild);
 	chunkMesh->CreateMesh();
