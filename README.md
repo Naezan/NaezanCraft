@@ -57,7 +57,7 @@ MineCraft Copy Naezan's Engine
     - [?] Object Pool(*다른 사이드 프로젝트로 할까 생각중*)
     - [ ] Collision
         * 레이케스트
-        * AABB
+        * AABB-> OOBB
         * delete and emplace Block
         * 쿼드 트리 -> 옥트리
     - [?] AI(Too Much, if i can, i do)

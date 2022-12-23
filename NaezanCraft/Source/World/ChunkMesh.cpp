@@ -39,9 +39,9 @@ ChunkMesh::~ChunkMesh()
 {
 	parentChunk.reset();
 
+	vertexArray.reset();
 	indexBuffer.reset();
 	vertexBuffer.reset();
-	vertexArray.reset();
 
 	meshIndices.clear();
 	meshVertices.clear();

@@ -75,7 +75,6 @@ void World::Update()
 			{
 				isCompleteCreateChunk = false;
 				RemoveChunk();
-				updateFutures.clear();
 				renderFutures.push_back(std::make_shared<std::future<void>>(std::async(std::launch::async, &World::AsyncCreateChunk, this, ChunkLoadState::Loaded)));
 			}
 		}
@@ -129,13 +128,14 @@ void World::AsyncCreateChunk(const ChunkLoadState& loadState)
 	//LoadChunkList에 있는 녀석들만 렌더링하고 삭제하고 등 처리
 	for (const auto chunk : LoadChunks)
 	{
-		if (Chunk::IsEmptyChunk(chunk.second))
+		auto tmpchunk = chunk;
+		if (Chunk::IsEmptyChunk(tmpchunk.second))
 		{
 			continue;
 		}
-		if (chunk.second->chunkLoadState == loadState)
+		if (tmpchunk.second->chunkLoadState == loadState)
 		{
-			CreateChunk(chunk.second);
+			CreateChunk(tmpchunk.second);
 		}
 	}
 
@@ -147,20 +147,21 @@ void World::RemoveChunk()
 	std::vector<decltype(worldChunks)::key_type> deletableKey;
 	for (auto& chunk : LoadChunks)
 	{
-		if (Chunk::IsEmptyChunk(chunk.second))
+		auto tmpchunk = chunk;
+		if (Chunk::IsEmptyChunk(tmpchunk.second))
 		{
 			continue;
 		}
 
 		//if chunk location is out of range -> erase chunk
-		if (chunk.second->position.x < static_cast<int>(playerPosition.x / CHUNK_X) - renderDistance ||
-			chunk.second->position.x > static_cast<int>(playerPosition.x / CHUNK_X) + renderDistance ||
-			chunk.second->position.z < static_cast<int>(playerPosition.z / CHUNK_Z) - renderDistance ||
-			chunk.second->position.z > static_cast<int>(playerPosition.z / CHUNK_Z) + renderDistance)
+		if (tmpchunk.second->position.x < static_cast<int>(playerPosition.x / CHUNK_X) - renderDistance ||
+			tmpchunk.second->position.x > static_cast<int>(playerPosition.x / CHUNK_X) + renderDistance ||
+			tmpchunk.second->position.z < static_cast<int>(playerPosition.z / CHUNK_Z) - renderDistance ||
+			tmpchunk.second->position.z > static_cast<int>(playerPosition.z / CHUNK_Z) + renderDistance)
 		{
 			deletableKey.push_back(std::make_pair(
-				static_cast<int>(chunk.second->position.x),
-				static_cast<int>(chunk.second->position.z)
+				static_cast<int>(tmpchunk.second->position.x),
+				static_cast<int>(tmpchunk.second->position.z)
 			));
 		}
 	}
@@ -177,12 +178,14 @@ void World::CreateChunk(std::weak_ptr<Chunk> chunk)
 	//chunk->CreateLightMap();
 	chunk.lock()->CreateSSAO();
 
-	std::lock_guard<std::mutex> lock(worldMutex);
+	//std::lock_guard<std::mutex> lock(worldMutex);
 	if (Chunk::IsEmptyChunk(chunk))
 	{
 		return;
 	}
 	chunk.lock()->CreateChunkMesh(false);
+	std::lock_guard<std::mutex> lock(worldMutex);
+	LoadChunks[std::pair<int, int>(static_cast<int>(chunk.lock()->position.x), static_cast<int>(chunk.lock()->position.z))] = chunk.lock();
 	RenderChunks[std::pair<int, int>(static_cast<int>(chunk.lock()->position.x), static_cast<int>(chunk.lock()->position.z))] = chunk.lock();
 }
 
