@@ -11,7 +11,7 @@ class WorldGenerator;
 
 enum class ChunkLoadState
 {
-	Unloaded, Loaded, Builted
+	Unloaded, MeshLoaded, Builted
 };
 
 class Chunk : public std::enable_shared_from_this<Chunk>

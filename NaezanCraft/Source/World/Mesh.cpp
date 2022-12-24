@@ -10,14 +10,19 @@ Mesh::Mesh(bool isCreateArrayBuffer) : isReloadMesh(isCreateArrayBuffer)
 	{
 		vertexArray = std::make_unique<VertexArray>();
 	}
-
-	indicesCount = 0;
 }
 
 Mesh::~Mesh()
 {
-	vertexBuffer.reset();
+	if (indexBuffer != nullptr)
+		indexBuffer->DeleteBuffer();
+	if (vertexBuffer != nullptr)
+		vertexBuffer->DeleteBuffer();
+	if (vertexArray != nullptr)
+		vertexArray->DeleteBuffer();
+
 	indexBuffer.reset();
+	vertexBuffer.reset();
 	vertexArray.reset();
 	indicesCount = 0;
 }
@@ -49,6 +54,7 @@ void Mesh::CreateIndexBuffer()
 	indexBuffer = std::make_unique<IndexBuffer>(meshIndices.size() * sizeof(unsigned int), &meshIndices.front());
 	indicesCount = meshIndices.size();
 	meshIndices.clear();
+	meshIndices.shrink_to_fit();
 }
 
 void Mesh::SetVertexBufferData(size_t size, const void* data)
@@ -59,6 +65,7 @@ void Mesh::SetVertexBufferData(size_t size, const void* data)
 void Mesh::SetIndexBufferVector(std::vector<unsigned int>& indexData)
 {
 	meshIndices.clear();
+	meshIndices.shrink_to_fit();
 	meshIndices.assign(indexData.begin(), indexData.end());
 }
 
@@ -70,24 +77,4 @@ void Mesh::BindVertexArray()
 void Mesh::UnBindVertexArray()
 {
 	vertexArray->UnBind();
-}
-
-void Mesh::BindAll()
-{
-	if (vertexArray != nullptr && vertexBuffer != nullptr && indexBuffer != nullptr)
-	{
-		vertexArray->Bind();
-		vertexBuffer->Bind();
-		indexBuffer->Bind();
-	}
-}
-
-void Mesh::UnbindAll()
-{
-	if (vertexArray != nullptr && vertexBuffer != nullptr && indexBuffer != nullptr)
-	{
-		indexBuffer->UnBind();
-		vertexBuffer->UnBind();
-		vertexArray->UnBind();
-	}
 }

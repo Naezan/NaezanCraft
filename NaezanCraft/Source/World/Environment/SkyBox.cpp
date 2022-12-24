@@ -44,80 +44,74 @@ SkyBox::SkyBox()
 	}
 
 	//SkyVertex
-	{
 		//4th value is weight value, for change specific weather color
-		std::vector<GLfloat> vertexCoords{
-			//Back
-			SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 3,
-			-SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 0,
-			-SKY_SIZE,  SKY_SIZE, -SKY_SIZE, 1,
-			SKY_SIZE,  SKY_SIZE, -SKY_SIZE, 2,
+	std::vector<GLfloat> vertexCoords{
+		//Back
+		SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 3,
+		-SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 0,
+		-SKY_SIZE,  SKY_SIZE, -SKY_SIZE, 1,
+		SKY_SIZE,  SKY_SIZE, -SKY_SIZE, 2,
 
-			//Front
-			-SKY_SIZE, -SKY_SIZE, SKY_SIZE, 4,
-			SKY_SIZE, -SKY_SIZE, SKY_SIZE, 7,
-			SKY_SIZE,  SKY_SIZE, SKY_SIZE, 5,
-			-SKY_SIZE,  SKY_SIZE, SKY_SIZE, 6,
+		//Front
+		-SKY_SIZE, -SKY_SIZE, SKY_SIZE, 4,
+		SKY_SIZE, -SKY_SIZE, SKY_SIZE, 7,
+		SKY_SIZE,  SKY_SIZE, SKY_SIZE, 5,
+		-SKY_SIZE,  SKY_SIZE, SKY_SIZE, 6,
 
-			//Right
-			SKY_SIZE, -SKY_SIZE,  SKY_SIZE, 7,
-			SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 3,
-			SKY_SIZE,  SKY_SIZE, -SKY_SIZE, 2,
-			SKY_SIZE,  SKY_SIZE,  SKY_SIZE, 5,
+		//Right
+		SKY_SIZE, -SKY_SIZE,  SKY_SIZE, 7,
+		SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 3,
+		SKY_SIZE,  SKY_SIZE, -SKY_SIZE, 2,
+		SKY_SIZE,  SKY_SIZE,  SKY_SIZE, 5,
 
-			//Left
-			-SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 0,
-			-SKY_SIZE, -SKY_SIZE,  SKY_SIZE, 4,
-			-SKY_SIZE,  SKY_SIZE,  SKY_SIZE, 6,
-			-SKY_SIZE,  SKY_SIZE, -SKY_SIZE, 1,
+		//Left
+		-SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 0,
+		-SKY_SIZE, -SKY_SIZE,  SKY_SIZE, 4,
+		-SKY_SIZE,  SKY_SIZE,  SKY_SIZE, 6,
+		-SKY_SIZE,  SKY_SIZE, -SKY_SIZE, 1,
 
-			//Top
-			-SKY_SIZE, SKY_SIZE,  SKY_SIZE, 6,
-			SKY_SIZE, SKY_SIZE,  SKY_SIZE, 5,
-			SKY_SIZE, SKY_SIZE, -SKY_SIZE, 2,
-			-SKY_SIZE, SKY_SIZE, -SKY_SIZE, 1,
+		//Top
+		-SKY_SIZE, SKY_SIZE,  SKY_SIZE, 6,
+		SKY_SIZE, SKY_SIZE,  SKY_SIZE, 5,
+		SKY_SIZE, SKY_SIZE, -SKY_SIZE, 2,
+		-SKY_SIZE, SKY_SIZE, -SKY_SIZE, 1,
 
-			//Bottom
-			-SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 0,
-			SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 3,
-			SKY_SIZE, -SKY_SIZE,  SKY_SIZE, 7,
-			-SKY_SIZE, -SKY_SIZE,  SKY_SIZE, 4,
-		};
+		//Bottom
+		-SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 0,
+		SKY_SIZE, -SKY_SIZE, -SKY_SIZE, 3,
+		SKY_SIZE, -SKY_SIZE,  SKY_SIZE, 7,
+		-SKY_SIZE, -SKY_SIZE,  SKY_SIZE, 4,
+	};
 
-		std::vector<GLuint> indices{
-			0, 1, 2,
-			2, 3, 0,
+	std::vector<GLuint> indices{
+		0, 1, 2,
+		2, 3, 0,
 
-			4, 5, 6,
-			6, 7, 4,
+		4, 5, 6,
+		6, 7, 4,
 
-			8, 9, 10,
-			10, 11, 8,
+		8, 9, 10,
+		10, 11, 8,
 
-			12, 13, 14,
-			14, 15, 12,
+		12, 13, 14,
+		14, 15, 12,
 
-			16, 17, 18,
-			18, 19, 16,
+		16, 17, 18,
+		18, 19, 16,
 
-			20, 21, 22,
-			22, 23, 20
-		};
+		20, 21, 22,
+		22, 23, 20
+	};
 
-		vertexArray = std::make_unique<VertexArray>();
-		vertexArray->Bind();
+	vertexArray = std::make_unique<VertexArray>();
 
-		vertexBuffer = std::make_unique<VertexBuffer>(0, (void*)0);
-		vertexBuffer->SetBufferData(vertexCoords.size() * sizeof(GLfloat), &vertexCoords.front());
+	indexBuffer = std::make_unique<IndexBuffer>(indices.size() * sizeof(GLuint), &indices.front());
+	skyIndicesSize = sizeof(indices);
 
-		indexBuffer = std::make_unique<IndexBuffer>(indices.size() * sizeof(GLuint), &indices.front());
-		skyIndicesSize = indices.size();
-		indices.clear();
+	vertexBuffer = std::make_unique<VertexBuffer>(0, (void*)0);
+	vertexBuffer->SetBufferData(vertexCoords.size() * sizeof(GLfloat),&vertexCoords.front());
 
-		vertexArray->UnBind();
-		vertexBuffer->UnBind();
-		indexBuffer->UnBind();
-	}
+	vertexArray->UnBind();
 
 	//SunMoonShader
 	{
@@ -143,57 +137,59 @@ SkyBox::SkyBox()
 	}
 
 	//SunMoonVertex
+	struct SunMoonVertexCoord
 	{
-		struct SunMoonVertexCoord
-		{
-			glm::vec3 pos;
-			glm::vec2 texcoord;
-		};
+		glm::vec3 pos;
+		glm::vec2 texcoord;
+	};
 
-		std::vector<SunMoonVertexCoord> sunVertexCoords
-		{
-			{ glm::vec3(-20,  20, 400),	glm::vec2(0, 1) },
-			{ glm::vec3(20,  20, 400),	glm::vec2(1, 1) },
-			{ glm::vec3(20, -20, 400),	glm::vec2(1, 0) },
-			{ glm::vec3(-20, -20, 400),	glm::vec2(0, 0) }
-		};
+	std::vector<SunMoonVertexCoord> sunVertexCoords
+	{
+		{ glm::vec3(-20,  20, 400),	glm::vec2(0, 1) },
+		{ glm::vec3(20,  20, 400),	glm::vec2(1, 1) },
+		{ glm::vec3(20, -20, 400),	glm::vec2(1, 0) },
+		{ glm::vec3(-20, -20, 400),	glm::vec2(0, 0) }
+	};
 
-		//TO DO change random Moon texCoord
-		std::vector<SunMoonVertexCoord> MoonVertexCoords
-		{
-			{ glm::vec3(-15,  15, -400),glm::vec2(0, .5) },
-			{ glm::vec3(15,  15, -400),	glm::vec2(.25, .5) },
-			{ glm::vec3(15, -15, -400),	glm::vec2(.25, 0) },
-			{ glm::vec3(-15, -15, -400),glm::vec2(0, 0) }
-		};
+	//TO DO change random Moon texCoord
+	std::vector<SunMoonVertexCoord> MoonVertexCoords
+	{
+		{ glm::vec3(-15,  15, -400),glm::vec2(0, .5) },
+		{ glm::vec3(15,  15, -400),	glm::vec2(.25, .5) },
+		{ glm::vec3(15, -15, -400),	glm::vec2(.25, 0) },
+		{ glm::vec3(-15, -15, -400),glm::vec2(0, 0) }
+	};
 
-		std::vector<unsigned int> IndexCoords
-		{
-			0, 1, 2,
-			2, 3, 0
-		};
+	std::vector<unsigned int> IndexCoords
+	{
+		0, 1, 2,
+		2, 3, 0
+	};
 
-		sunMesh = std::make_unique<Mesh>(true);
-		sunMesh->CreateVertexBuffer(static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, pos),
-			static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, texcoord),
-			GL_FLOAT, GL_FLOAT);
-		sunMesh->SetVertexBufferData(sunVertexCoords.size() * sizeof(SunMoonVertexCoord), &sunVertexCoords.front());
-		sunMesh->SetIndexBufferVector(IndexCoords);
-		sunMesh->CreateIndexBuffer();
-		sunMesh->UnbindAll();
+	sunMesh = std::make_unique<Mesh>(true);
 
-		moonMesh = std::make_unique<Mesh>(true);
-		moonMesh->CreateVertexBuffer(static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, pos),
-			static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, texcoord),
-			GL_FLOAT, GL_FLOAT);
-		moonMesh->SetVertexBufferData(MoonVertexCoords.size() * sizeof(SunMoonVertexCoord), &MoonVertexCoords.front());
-		moonMesh->SetIndexBufferVector(IndexCoords);
-		moonMesh->CreateIndexBuffer();
-		moonMesh->UnbindAll();
+	sunMesh->SetIndexBufferVector(IndexCoords);
+	sunMesh->CreateIndexBuffer();
 
-		sunMoonIndicesSize = IndexCoords.size();
+	sunMesh->CreateVertexBuffer(static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, pos),
+		static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, texcoord),
+		GL_FLOAT, GL_FLOAT);
+	sunMesh->SetVertexBufferData(sunVertexCoords.size() * sizeof(SunMoonVertexCoord), &sunVertexCoords.front());
 
-	}
+	sunMesh->UnBindVertexArray();
+
+	moonMesh = std::make_unique<Mesh>(true);
+	moonMesh->SetIndexBufferVector(IndexCoords);
+	moonMesh->CreateIndexBuffer();
+
+	moonMesh->CreateVertexBuffer(static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, pos),
+		static_cast<int>(sizeof(SunMoonVertexCoord)), (void*)offsetof(SunMoonVertexCoord, texcoord),
+		GL_FLOAT, GL_FLOAT);
+	moonMesh->SetVertexBufferData(MoonVertexCoords.size() * sizeof(SunMoonVertexCoord), &MoonVertexCoords.front());
+
+	sunMoonIndicesSize = IndexCoords.size();
+
+	moonMesh->UnBindVertexArray();
 
 	//TODO Cloud
 	{
@@ -203,9 +199,17 @@ SkyBox::SkyBox()
 
 SkyBox::~SkyBox()
 {
-	vertexArray.reset();
-	vertexBuffer.reset();
+	if (indexBuffer != nullptr)
+		indexBuffer->DeleteBuffer();
+	if (vertexBuffer != nullptr)
+		vertexBuffer->DeleteBuffer();
+	if (vertexArray != nullptr)
+		vertexArray->DeleteBuffer();
+
 	indexBuffer.reset();
+	vertexBuffer.reset();
+	vertexArray.reset();
+
 	glDeleteProgram(skyShaderProgram);
 	glDeleteProgram(sunMoonShaderProgram);
 }
@@ -219,38 +223,33 @@ void SkyBox::Update(glm::vec3& playerPos)
 
 void SkyBox::Render(std::weak_ptr<Camera>& camera)
 {
+	glDisable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+
+
 	//Render Sky
-	{
-		glDisable(GL_CULL_FACE);
-		glEnable(GL_BLEND);
-		glUseProgram(skyShaderProgram);
-		skyBoxShaders[ShaderType::VERTEX]->Update(camera, TransformMatrix);
+	glUseProgram(skyShaderProgram);
+	skyBoxShaders[ShaderType::VERTEX]->Update(camera, TransformMatrix);
 
-		vertexArray->Bind();
-		glDrawElements(GL_TRIANGLES, skyIndicesSize, GL_UNSIGNED_INT, nullptr);
-		vertexArray->UnBind();
-	}
+	vertexArray->Bind();
+	glDrawElements(GL_TRIANGLES, skyIndicesSize, GL_UNSIGNED_INT, nullptr);
+	vertexArray->UnBind();
 
-	{
-		glDisable(GL_CULL_FACE);
-		glEnable(GL_BLEND);
-		glUseProgram(sunMoonShaderProgram);
-		sunMoonShaders[ShaderType::VERTEX]->Update(camera, TransformMatrix);
 
-		//Sun
-		TextureManager::BindTexture("Sun");
+	glUseProgram(sunMoonShaderProgram);
+	sunMoonShaders[ShaderType::VERTEX]->Update(camera, TransformMatrix);
+	
+	//Sun
+	TextureManager::BindTexture("Sun");
+	sunMesh->BindVertexArray();
+	glDrawElements(GL_TRIANGLES, sunMoonIndicesSize, GL_UNSIGNED_INT, nullptr);
+	sunMesh->UnBindVertexArray();
 
-		sunMesh->BindVertexArray();
-		glDrawElements(GL_TRIANGLES, sunMoonIndicesSize, GL_UNSIGNED_INT, nullptr);
-		sunMesh->UnBindVertexArray();
-
-		//Moon
-		TextureManager::BindTexture("Moon");
-
-		moonMesh->BindVertexArray();
-		glDrawElements(GL_TRIANGLES, sunMoonIndicesSize, GL_UNSIGNED_INT, nullptr);
-		moonMesh->UnBindVertexArray();
-	}
+	//Moon
+	TextureManager::BindTexture("Moon");
+	moonMesh->BindVertexArray();
+	glDrawElements(GL_TRIANGLES, sunMoonIndicesSize, GL_UNSIGNED_INT, nullptr);
+	moonMesh->UnBindVertexArray();
 
 	//TO DO Cloud
 	{

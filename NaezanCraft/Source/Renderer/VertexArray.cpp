@@ -10,7 +10,7 @@ VertexArray::VertexArray()
 
 VertexArray::~VertexArray()
 {
-	glDeleteVertexArrays(1, &arrayID);
+	//glDeleteVertexArrays(1, &arrayID);
 }
 
 void VertexArray::Bind()
@@ -21,4 +21,10 @@ void VertexArray::Bind()
 void VertexArray::UnBind()
 {
 	glBindVertexArray(0);
+}
+
+void VertexArray::DeleteBuffer()
+{
+	if (arrayID)
+		glDeleteVertexArrays(1, &arrayID);
 }

@@ -6,7 +6,6 @@
 
 class Player;
 class Camera;
-class SkyBox;
 
 extern float worldTime;
 extern float sunIntensity;
@@ -27,5 +26,4 @@ public:
 private:
 	std::unique_ptr<Player> player;//현재 플레이어는 1명만
 	std::weak_ptr<Camera> playerCamera;
-	std::unique_ptr<SkyBox> sky;
 };

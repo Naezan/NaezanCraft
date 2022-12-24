@@ -29,8 +29,6 @@ public:
 	virtual void SetIndexBufferVector(std::vector<unsigned int>& indexData);
 	void BindVertexArray();
 	void UnBindVertexArray();
-	void BindAll();
-	void UnbindAll();
 
 protected:
 	std::unique_ptr<VertexArray> vertexArray;

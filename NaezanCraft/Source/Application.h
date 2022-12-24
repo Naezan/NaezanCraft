@@ -20,6 +20,7 @@ public:
 
 	inline static std::unique_ptr<Window>& GetWindow() { return instance->craftWindow; }
 	inline static std::unique_ptr<World>& GetWorld() { return instance->craftWorld; }
+	inline static bool IsRunning() { return instance->isRunning; }
 
 private:
 	std::unique_ptr<Window> craftWindow;

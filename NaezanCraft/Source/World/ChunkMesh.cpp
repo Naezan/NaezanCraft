@@ -32,16 +32,24 @@ ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>&& chunk, bool isReload) : Mesh(isRel
 {
 	parentChunk = chunk;
 
+	meshVertices.clear();
 	meshVertices.reserve(CHUNK_SIZE * 6);//한면당4개의점 * chunkSize 1024 -> 2304 576 (256 + 320)
 }
 
 ChunkMesh::~ChunkMesh()
 {
-	parentChunk.reset();
+	if (indexBuffer != nullptr)
+		indexBuffer->DeleteBuffer();
+	if (vertexBuffer != nullptr)
+		vertexBuffer->DeleteBuffer();
+	if (vertexArray != nullptr)
+		vertexArray->DeleteBuffer();
 
-	vertexArray.reset();
 	indexBuffer.reset();
 	vertexBuffer.reset();
+	vertexArray.reset();
+
+	parentChunk.reset();
 
 	meshIndices.clear();
 	meshVertices.clear();
@@ -82,14 +90,6 @@ void ChunkMesh::CreateBuffer()
 	{
 		vertexArray = std::make_unique<VertexArray>();
 
-		CreateVertexBuffer(static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, pos),
-			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord),
-			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, lightlevel),
-			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, AO),
-			GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE);
-
-		SetVertexBufferData(meshVertices.size() * sizeof(VertTexCoord), &meshVertices.front());
-
 		float blockCount = (meshVertices.size() / 4.f);
 		meshIndices.resize(blockCount * 6);
 		for (int i = 0; i < blockCount; ++i)
@@ -103,9 +103,16 @@ void ChunkMesh::CreateBuffer()
 		}
 
 		CreateIndexBuffer();
-		indexBuffer->UnBind();
-		vertexBuffer->UnBind();
-		vertexArray->UnBind();
+
+		CreateVertexBuffer(static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, pos),
+			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord),
+			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, lightlevel),
+			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, AO),
+			GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE);
+
+		SetVertexBufferData(meshVertices.size() * sizeof(VertTexCoord), &meshVertices.front());
+	
+		
 	}
 }
 

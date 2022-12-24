@@ -340,7 +340,7 @@ void Chunk::SetupChunkNeighbor()
 	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(position.x - 1), static_cast<int>(position.z)), LeftChunk))
 	{
 		LeftChunk.lock()->RightChunk = shared_from_this();
-		if (chunkLoadState == ChunkLoadState::Loaded && LeftChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
+		if (chunkLoadState == ChunkLoadState::MeshLoaded && LeftChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
 		{
 			//LeftChunk.lock()->CreateChunkMesh(true);
 		}
@@ -350,7 +350,7 @@ void Chunk::SetupChunkNeighbor()
 	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(position.x + 1), static_cast<int>(position.z)), RightChunk))
 	{
 		RightChunk.lock()->LeftChunk = shared_from_this();
-		if (chunkLoadState == ChunkLoadState::Loaded && RightChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
+		if (chunkLoadState == ChunkLoadState::MeshLoaded && RightChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
 		{
 			//RightChunk.lock()->CreateChunkMesh(true);
 		}
@@ -360,7 +360,7 @@ void Chunk::SetupChunkNeighbor()
 	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(position.x), static_cast<int>(position.z - 1)), BackChunk))
 	{
 		BackChunk.lock()->FrontChunk = shared_from_this();
-		if (chunkLoadState == ChunkLoadState::Loaded && BackChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
+		if (chunkLoadState == ChunkLoadState::MeshLoaded && BackChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
 		{
 			//BackChunk.lock()->CreateChunkMesh(true);
 		}
@@ -370,7 +370,7 @@ void Chunk::SetupChunkNeighbor()
 	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(position.x), static_cast<int>(position.z + 1)), FrontChunk))
 	{
 		FrontChunk.lock()->BackChunk = shared_from_this();
-		if (chunkLoadState == ChunkLoadState::Loaded && FrontChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
+		if (chunkLoadState == ChunkLoadState::MeshLoaded && FrontChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
 		{
 			//FrontChunk.lock()->CreateChunkMesh(true);
 		}
@@ -387,12 +387,11 @@ void Chunk::CreateChunkMesh(bool _isRebuild)
 	{
 		chunkMesh.reset();
 	}
-	else
-	{
-		chunkLoadState = ChunkLoadState::Loaded;
-	}
+
+	//TODO 메쉬 생성 자체를 쓰레드에 넣지않고 외부에서 따로 처리해줘야하고 여기선 그 메쉬를 복사해서 가져와줘야한다
 	chunkMesh = std::make_unique<ChunkMesh>(shared_from_this(), _isRebuild);
 	chunkMesh->CreateMesh();
+	SetLoadState(ChunkLoadState::MeshLoaded);
 }
 
 void Chunk::CreateMeshBuffer()
