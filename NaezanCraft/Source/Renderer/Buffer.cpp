@@ -3,9 +3,16 @@
 
 #include <glad/glad.h>
 
-VertexBuffer::VertexBuffer(int vertexStride, const void* vertexPointer)
+Buffer::Buffer()
 {
 	glGenBuffers(1, &bufferID);
+}
+
+Buffer::~Buffer() = default;
+
+
+VertexBuffer::VertexBuffer(int vertexStride, const void* vertexPointer)
+{
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 
 	glEnableVertexAttribArray(0);
@@ -17,7 +24,6 @@ VertexBuffer::VertexBuffer(
 	int texcoordStride, const void* texcoordPointer,
 	unsigned int posType, unsigned int texType)
 {
-	glGenBuffers(1, &bufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 
 	glEnableVertexAttribArray(0);
@@ -34,7 +40,6 @@ VertexBuffer::VertexBuffer(
 	int AOStride, const void* AOPointer,
 	unsigned int posType, unsigned int texType, unsigned int lightType, unsigned int AOType)
 {
-	glGenBuffers(1, &bufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 
 	//index, size(vec3 개수), type(점 하나의 타입, 크기), normalized(정규화 여부), stride(건너뛸 거리), pointer(상대적 시작 위치, 거리?)
@@ -55,14 +60,7 @@ VertexBuffer::VertexBuffer(
 	glVertexAttribPointer(3, 1, AOType, GL_FALSE, AOStride, AOPointer);
 }
 
-VertexBuffer::~VertexBuffer()
-{
-	/*glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(2);
-	glDisableVertexAttribArray(3);*/
-	//glDeleteBuffers(1, &bufferID);
-}
+VertexBuffer::~VertexBuffer() = default;
 
 void VertexBuffer::Bind()
 {
@@ -76,6 +74,10 @@ void VertexBuffer::UnBind()
 
 void VertexBuffer::DeleteBuffer()
 {
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(3);
 	if (bufferID)
 		glDeleteBuffers(1, &bufferID);
 }
@@ -88,15 +90,11 @@ void VertexBuffer::SetBufferData(size_t size, const void* data)
 
 IndexBuffer::IndexBuffer(size_t size, const void* data)
 {
-	glGenBuffers(1, &bufferID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 }
 
-IndexBuffer::~IndexBuffer()
-{
-	//glDeleteBuffers(1, &bufferID);
-}
+IndexBuffer::~IndexBuffer() = default;
 
 void IndexBuffer::Bind()
 {

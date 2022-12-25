@@ -1,6 +1,19 @@
 #pragma once
 
-class VertexBuffer
+class Buffer
+{
+public:
+	Buffer();
+	virtual ~Buffer();
+
+	virtual void Bind() = 0;
+	virtual void UnBind() = 0;
+	virtual void DeleteBuffer() = 0;
+
+protected:
+	uint32_t bufferID = 0;
+};
+class VertexBuffer : public Buffer
 {
 public:
 	//This is for SkyBox
@@ -15,26 +28,20 @@ public:
 		unsigned int posType, unsigned int texType, unsigned int lightType, unsigned int AOType);
 	~VertexBuffer();
 
-	void Bind();
-	void UnBind();
-	void DeleteBuffer();
+	virtual void Bind() override;
+	virtual void UnBind() override;
+	virtual void DeleteBuffer() override;
 
 	void SetBufferData(size_t size, const void* data);
-
-private:
-	uint32_t bufferID = 0;
 };
 
-class IndexBuffer
+class IndexBuffer : public Buffer
 {
 public:
 	IndexBuffer(size_t size, const void* data);
 	~IndexBuffer();
 
-	void Bind();
-	void UnBind();
-	void DeleteBuffer();
-
-private:
-	uint32_t bufferID = 0;
+	virtual void Bind() override;
+	virtual void UnBind() override;
+	virtual void DeleteBuffer() override;
 };
