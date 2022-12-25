@@ -9,7 +9,7 @@ class Camera : public Actor
 public:
 	Camera(glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f), glm::vec3 front = glm::vec3(0.f, 0.f, -1.f),
 		float fovy = 45.f, float aspect = 1280.0f / 720.0f, float zNear = 0.01f, float zFar = 1000.0f);
-	~Camera() = default;
+	~Camera();
 
 	virtual void Update() override;
 

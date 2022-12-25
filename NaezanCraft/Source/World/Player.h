@@ -9,7 +9,7 @@ class Player : public Actor
 {
 public:
 	Player(glm::vec3 pos, glm::vec3 vel = glm::vec3(1.f, 1.f, 1.f), glm::vec3 acc = glm::vec3(0.f, 0.f, 0.f), glm::vec3 dir = glm::vec3(0.f, 0.f, -1.f));
-	~Player() = default;
+	~Player();
 
 	virtual void Update() override;
 

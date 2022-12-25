@@ -28,7 +28,7 @@ const std::array<glm::u8vec3, 2> ChunkMesh::indices
 	glm::u8vec3(0, 1, 2) , glm::u8vec3(2, 3, 0)
 };
 
-ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>&& chunk, bool isReload) : Mesh(isReload)
+ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>&& chunk)
 {
 	parentChunk = chunk;
 
@@ -38,22 +38,6 @@ ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>&& chunk, bool isReload) : Mesh(isRel
 
 ChunkMesh::~ChunkMesh()
 {
-	if (indexBuffer != nullptr)
-		indexBuffer->DeleteBuffer();
-	if (vertexBuffer != nullptr)
-		vertexBuffer->DeleteBuffer();
-	if (vertexArray != nullptr)
-		vertexArray->DeleteBuffer();
-
-	indexBuffer.reset();
-	vertexBuffer.reset();
-	vertexArray.reset();
-
-	parentChunk.reset();
-
-	meshIndices.clear();
-	meshVertices.clear();
-	indicesCount = 0;
 }
 
 void ChunkMesh::CreateMesh()
@@ -75,11 +59,6 @@ void ChunkMesh::CreateMesh()
 				AddFaces(glm::uvec3(x, y, z), block.blockType, texcord);
 			}
 		}
-	}
-
-	if (isReloadMesh)
-	{
-		CreateBuffer();
 	}
 }
 
@@ -111,8 +90,9 @@ void ChunkMesh::CreateBuffer()
 			GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE);
 
 		SetVertexBufferData(meshVertices.size() * sizeof(VertTexCoord), &meshVertices.front());
-	
-		
+
+		vertexBuffer->UnBind();
+		vertexArray->UnBind();
 	}
 }
 
@@ -300,6 +280,16 @@ void ChunkMesh::AddFace(const glm::u8vec3& pos, const BlockType& Blocktype, cons
 		meshVertices.push_back({ pos + vertices[Left][3],texcoords[3],lightLevels[Left] });
 		break;
 	}*/
+}
+
+void ChunkMesh::DeleteChunkMesh()
+{
+	DeleteMesh();
+
+	parentChunk.reset();
+
+	meshIndices.clear();
+	meshVertices.clear();
 }
 
 glm::u16vec2 ChunkMesh::GetTexCoord(BlockType& type)

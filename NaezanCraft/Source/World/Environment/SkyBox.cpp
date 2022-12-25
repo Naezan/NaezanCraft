@@ -111,6 +111,7 @@ SkyBox::SkyBox()
 	vertexBuffer = std::make_unique<VertexBuffer>(0, (void*)0);
 	vertexBuffer->SetBufferData(vertexCoords.size() * sizeof(GLfloat),&vertexCoords.front());
 
+	vertexBuffer->UnBind();
 	vertexArray->UnBind();
 
 	//SunMoonShader
@@ -166,7 +167,8 @@ SkyBox::SkyBox()
 		2, 3, 0
 	};
 
-	sunMesh = std::make_unique<Mesh>(true);
+	sunMesh = std::make_unique<Mesh>();
+	sunMesh->CreateVertexArray();
 
 	sunMesh->SetIndexBufferVector(IndexCoords);
 	sunMesh->CreateIndexBuffer();
@@ -176,9 +178,12 @@ SkyBox::SkyBox()
 		GL_FLOAT, GL_FLOAT);
 	sunMesh->SetVertexBufferData(sunVertexCoords.size() * sizeof(SunMoonVertexCoord), &sunVertexCoords.front());
 
+	sunMesh->UnBindVertexBuffer();
 	sunMesh->UnBindVertexArray();
 
-	moonMesh = std::make_unique<Mesh>(true);
+	moonMesh = std::make_unique<Mesh>();
+	moonMesh->CreateVertexArray();
+
 	moonMesh->SetIndexBufferVector(IndexCoords);
 	moonMesh->CreateIndexBuffer();
 
@@ -189,6 +194,7 @@ SkyBox::SkyBox()
 
 	sunMoonIndicesSize = IndexCoords.size();
 
+	moonMesh->UnBindVertexBuffer();
 	moonMesh->UnBindVertexArray();
 
 	//TODO Cloud
@@ -209,6 +215,9 @@ SkyBox::~SkyBox()
 	indexBuffer.reset();
 	vertexBuffer.reset();
 	vertexArray.reset();
+
+	sunMesh->DeleteMesh();
+	moonMesh->DeleteMesh();
 
 	glDeleteProgram(skyShaderProgram);
 	glDeleteProgram(sunMoonShaderProgram);

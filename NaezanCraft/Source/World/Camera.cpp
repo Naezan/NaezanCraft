@@ -16,6 +16,8 @@ Camera::Camera(glm::vec3 pos, glm::vec3 front, float _fovy, float _aspect, float
 	projectionXviewMatrix = projectionMatrix * viewMatrix;//view -> projection 수행 행렬에선 반대로 계산
 }
 
+Camera::~Camera() = default;
+
 void Camera::Update()
 {
 	UpdateViewMatrix();

@@ -161,7 +161,7 @@ void World::CreateChunk(std::weak_ptr<Chunk> chunk)
 	//chunk.lock()->CreateLightMap();
 	chunk.lock()->CreateSSAO();
 
-	chunk.lock()->CreateChunkMesh(false);
+	chunk.lock()->CreateChunkMesh();
 
 	chunk.lock()->SetupChunkNeighbor();
 }
@@ -184,6 +184,8 @@ void World::RemoveWorldChunk(std::vector<decltype(worldChunks)::key_type>& _dele
 {
 	for (auto key : _deletableKey)
 	{
+		if (worldChunks[key]->chunkMesh != nullptr)
+			worldChunks[key]->chunkMesh->DeleteChunkMesh();
 		worldChunks[key].reset();
 		worldChunks.erase(key);
 	}

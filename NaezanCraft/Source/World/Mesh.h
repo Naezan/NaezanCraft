@@ -11,11 +11,12 @@ class IndexBuffer;
 class Mesh
 {
 public:
-	Mesh(bool isCreateArrayBuffer);
+	Mesh();
 	virtual ~Mesh();
 
 	inline size_t GetIndicesCount() { return indicesCount; }
 
+	void CreateVertexArray();
 	void CreateVertexBuffer(int vertexStride, const void* vertexPointer,
 		int texcoordStride, const void* texcoordPointer,
 		int lightStride, const void* lightPointer,
@@ -27,8 +28,12 @@ public:
 	virtual void CreateIndexBuffer();
 	virtual void SetVertexBufferData(size_t size, const void* data);
 	virtual void SetIndexBufferVector(std::vector<unsigned int>& indexData);
+	void BindVertexBuffer();
+	void UnBindVertexBuffer();
 	void BindVertexArray();
 	void UnBindVertexArray();
+
+	void DeleteMesh();
 
 protected:
 	std::unique_ptr<VertexArray> vertexArray;
@@ -37,5 +42,4 @@ protected:
 
 	std::vector<unsigned int> meshIndices;
 	int indicesCount = 0;
-	bool isReloadMesh;
 };

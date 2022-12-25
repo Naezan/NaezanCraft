@@ -379,17 +379,14 @@ void Chunk::SetupChunkNeighbor()
 		FrontChunk.reset();
 }
 
-void Chunk::CreateChunkMesh(bool _isRebuild)
+void Chunk::CreateChunkMesh()
 {
 	OPTICK_EVENT();
 
-	if (_isRebuild)
-	{
-		chunkMesh.reset();
-	}
+	chunkMesh.reset();
 
 	//TODO 메쉬 생성 자체를 쓰레드에 넣지않고 외부에서 따로 처리해줘야하고 여기선 그 메쉬를 복사해서 가져와줘야한다
-	chunkMesh = std::make_unique<ChunkMesh>(shared_from_this(), _isRebuild);
+	chunkMesh = std::make_unique<ChunkMesh>(shared_from_this());
 	chunkMesh->CreateMesh();
 	SetLoadState(ChunkLoadState::MeshLoaded);
 }

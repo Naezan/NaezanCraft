@@ -25,13 +25,14 @@ struct VertTexCoord
 class ChunkMesh : public Mesh
 {
 public:
-	ChunkMesh(std::shared_ptr<Chunk>&& chunk, bool isReload = false);
+	ChunkMesh(std::shared_ptr<Chunk>&& chunk);
 	~ChunkMesh();
 
 	void CreateMesh();
 	void CreateBuffer();
 	void AddFaces(const glm::u8vec3& pos, BlockType& type, const glm::u16vec2& texcoord);
 	void AddFace(const glm::u8vec3& pos, const BlockType& Blocktype, const FaceType& faceType, const glm::u16vec2& texcoord);
+	void DeleteChunkMesh();
 
 	glm::u16vec2 GetTexCoord(BlockType& type);
 

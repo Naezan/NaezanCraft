@@ -35,7 +35,7 @@ public:
 	void SetWorldLightLevel(int wx, int wy, int wz, int level);
 
 	void SetupChunkNeighbor();
-	void CreateChunkMesh(bool _isRebuild);
+	void CreateChunkMesh();
 	void CreateMeshBuffer();
 	void GenerateTerrain(std::unique_ptr<WorldGenerator>& worldGenerator);
 
