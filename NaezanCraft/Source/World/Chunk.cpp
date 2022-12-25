@@ -342,7 +342,7 @@ void Chunk::SetupChunkNeighbor()
 		LeftChunk.lock()->RightChunk = shared_from_this();
 		if (chunkLoadState == ChunkLoadState::MeshLoaded && LeftChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
 		{
-			//LeftChunk.lock()->CreateChunkMesh(true);
+			//LeftChunk.lock()->CreateChunkMesh();
 		}
 	}
 	else
@@ -352,7 +352,7 @@ void Chunk::SetupChunkNeighbor()
 		RightChunk.lock()->LeftChunk = shared_from_this();
 		if (chunkLoadState == ChunkLoadState::MeshLoaded && RightChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
 		{
-			//RightChunk.lock()->CreateChunkMesh(true);
+			//RightChunk.lock()->CreateChunkMesh();
 		}
 	}
 	else
@@ -362,7 +362,7 @@ void Chunk::SetupChunkNeighbor()
 		BackChunk.lock()->FrontChunk = shared_from_this();
 		if (chunkLoadState == ChunkLoadState::MeshLoaded && BackChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
 		{
-			//BackChunk.lock()->CreateChunkMesh(true);
+			//BackChunk.lock()->CreateChunkMesh();
 		}
 	}
 	else
@@ -372,7 +372,7 @@ void Chunk::SetupChunkNeighbor()
 		FrontChunk.lock()->BackChunk = shared_from_this();
 		if (chunkLoadState == ChunkLoadState::MeshLoaded && FrontChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
 		{
-			//FrontChunk.lock()->CreateChunkMesh(true);
+			//FrontChunk.lock()->CreateChunkMesh();
 		}
 	}
 	else
