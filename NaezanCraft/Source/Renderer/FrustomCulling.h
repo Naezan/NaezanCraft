@@ -1,8 +1,6 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "../../Collision/Collision.h"
 
 class Camera;
 
@@ -24,19 +22,6 @@ struct Plan
 	glm::vec3 normal{ 0.f, 1.f, 0.f };
 
 	float distance = 0.f;
-};
-
-struct AABox
-{
-	AABox(const glm::vec3& _corner, float _x, float _y, float _z) :
-		corner(_corner), x(_x), y(_y), z(_z) {}
-
-
-	glm::vec3 corner;
-	float x, y, z;
-
-	glm::vec3 GetVertexP(glm::vec3& normal);
-	glm::vec3 GetVertexN(glm::vec3& normal);
 };
 
 struct Frustum

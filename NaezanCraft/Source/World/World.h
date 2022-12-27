@@ -52,6 +52,7 @@ public:
 	bool GetChunkByPos(const std::pair<int, int>& key, std::weak_ptr<Chunk>& outChunk);
 	bool IsChunkCreatedByPos(int x, int y);
 	bool IsChunkCreatedByPos(const std::pair<int, int>& pos);
+	bool GetBlockByWorldPos(int x, int y, int z, Block& block);
 
 public:
 	static std::unordered_map<BlockType, std::pair<int, int>> BlockCoordData;

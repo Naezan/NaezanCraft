@@ -36,7 +36,7 @@ struct Block
 		return this->blockType == BlockType::Air;
 	}
 	inline bool IsFluid() {
-		return (this->blockType == BlockType::Air) || (this->blockType == BlockType::Water);
+		return (this->blockType == BlockType::Air) || (this->blockType == BlockType::Water) || (this->blockType == BlockType::Lava);
 	}
 
 	bool operator==(Block rv) const

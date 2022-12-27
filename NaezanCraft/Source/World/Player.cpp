@@ -4,9 +4,11 @@
 #include "../Input/InputSystem.h"
 #include "../Window.h"
 #include "../Event/EventSystem.h"
+#include "../Application.h"
+#include "Chunk.h"
 
 Player::Player(glm::vec3 pos, glm::vec3 vel, glm::vec3 acc, glm::vec3 dir)
-	: velocity(vel), acceleration(acc), forwardDirection(dir)
+	: velocity(vel), acceleration(acc), forwardDirection(dir), playerBox(glm::vec3(-.3f, -1.5f, -.3f), .6f, 1.5f, .6f)
 {
 	position = pos;
 	mainCamera = std::make_shared<Camera>(position);
@@ -21,29 +23,125 @@ Player::~Player() = default;
 
 void Player::Update()
 {
-	const static float cameraSpeed = 0.05f; // adjust accordingly
+	bool isMoving = false;
+	const static float cameraSpeed = 0.1f; // adjust accordingly
+	velocity = glm::vec3();
 	if (Input::GetIsKeyPressed(GLFW_KEY_W))
 	{
-		position += cameraSpeed * mainCamera->GetForwadDir() * velocity;
-		mainCamera->GetPosition() = position;
+		velocity += mainCamera->GetForwadDir();
+		isMoving = true;
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_S))
 	{
-		position -= cameraSpeed * mainCamera->GetForwadDir() * velocity;
-		mainCamera->GetPosition() = position;
+		velocity -= mainCamera->GetForwadDir();
+		isMoving = true;
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_A))
 	{
-		position -= glm::normalize(glm::cross(mainCamera->GetForwadDir(), Actor::UpVector)) * cameraSpeed * velocity;
-		mainCamera->GetPosition() = position;
+		velocity -= glm::normalize(glm::cross(mainCamera->GetForwadDir(), Actor::UpVector));
+		isMoving = true;
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_D))
 	{
-		position += glm::normalize(glm::cross(mainCamera->GetForwadDir(), Actor::UpVector)) * cameraSpeed * velocity;
-		mainCamera->GetPosition() = position;
+		velocity += glm::normalize(glm::cross(mainCamera->GetForwadDir(), Actor::UpVector));
+		isMoving = true;
+	}
+	if (Input::GetIsKeyPressed(GLFW_KEY_Q))
+	{
+		velocity.y = 1;
+		isMoving = true;
+	}
+	if (Input::GetIsKeyPressed(GLFW_KEY_E))
+	{
+		velocity.y = -1;
+		isMoving = true;
 	}
 
+	//월드 기준 벡터
+
+	glm::normalize(velocity);
+	std::array<glm::vec3, 3> directions = { glm::vec3(velocity.x, 0, 0), glm::vec3(0, velocity.y, 0), glm::vec3(0, 0, velocity.z) };
+	for (int i = 0; i < 3; ++i)
+	{
+		if (isMoving)
+		{
+			switch (i)
+			{
+			case DIR_X:
+				position.x += cameraSpeed * velocity.x;
+				break;
+			case DIR_Y:
+				position.y += cameraSpeed * velocity.y;
+				break;
+			case DIR_Z:
+				position.z += cameraSpeed * velocity.z;
+				break;
+			}
+			Collision(directions[i]);
+		}
+	}
+
+	mainCamera->GetPosition() = position;
 	mainCamera->Update();
+}
+
+void Player::Collision(const glm::vec3& dir)
+{
+	glm::vec3 cornerWorldPos = position + playerBox.corner;
+
+	//y = 0에서 1.5까지
+
+	float dx = cornerWorldPos.x;
+	float dz = cornerWorldPos.z;
+	if (dx < 0)
+	{
+		dx = std::floor(dx);
+	}
+	if (dz < 0)
+	{
+		dz = std::floor(dz);
+	}
+
+	for (int y = cornerWorldPos.y; y < cornerWorldPos.y + playerBox.y; ++y)
+	{
+		for (int x = dx; x < cornerWorldPos.x + playerBox.x; ++x)
+		{
+			for (int z = dz; z < cornerWorldPos.z + playerBox.z; ++z)
+			{
+				Block block;
+				GET_World()->GetBlockByWorldPos(x, y, z, block);
+				if (!block.IsFluid())
+				{
+					if (dir.y > 0)
+					{
+						position.y = y;
+					}
+					else if (dir.y < 0)
+					{
+						position.y = (y + 1) + playerBox.y;
+					}
+
+					if (dir.x > 0)
+					{
+						position.x = x - (playerBox.x / 2.f) - 0.001f;
+					}
+					else if (dir.x < 0)
+					{
+						position.x = (x + 1) + (playerBox.x / 2.f);
+					}
+
+					if (dir.z > 0)
+					{
+						position.z = z - (playerBox.z / 2.f) - 0.001f;
+					}
+					else if (dir.z < 0)
+					{
+						position.z = (z + 1) + (playerBox.z / 2.f);
+					}
+				}
+			}
+		}
+	}
 }
 
 void Player::OnCursorPos(const Event& event)

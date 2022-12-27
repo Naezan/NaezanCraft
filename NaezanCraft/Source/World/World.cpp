@@ -229,3 +229,41 @@ bool World::IsChunkCreatedByPos(const std::pair<int, int>& pos)
 
 	return true;
 }
+
+bool World::GetBlockByWorldPos(int x, int y, int z, Block& block)
+{
+	std::pair<int, int> key(x, z);
+	if (key.first < 0)
+	{
+		key.first -= (CHUNK_X - 1);
+	}
+	key.first /= CHUNK_X;
+
+	if (key.second < 0)
+	{
+		key.second -= (CHUNK_Z - 1);
+	}
+	key.second /= CHUNK_Z;
+
+	std::weak_ptr<Chunk> outChunk;
+	if (GetChunkByPos(key, outChunk))
+	{
+		x %= CHUNK_X;
+		z %= CHUNK_Z;
+
+		if (x < 0)
+		{
+			x += CHUNK_X;
+			x %= CHUNK_X;
+		}
+		if (z < 0)
+		{
+			z += CHUNK_Z;
+			z %= CHUNK_Z;
+		}
+		block = outChunk.lock()->GetBlock(x, y, z);
+		return true;
+	}
+
+	return false;
+}

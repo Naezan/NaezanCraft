@@ -71,7 +71,12 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 				{
 					continue;
 				}
-				if (y > h)
+
+				if (x <= 10 && z <= 10)
+				{
+					chunk.lock()->SetBlock(x, y, z, BlockType::Diamond);
+				}
+				else if (y > h)
 				{
 					if (y <= WATER_HEIGHT)
 					{
