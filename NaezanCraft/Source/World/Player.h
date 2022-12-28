@@ -5,10 +5,11 @@
 
 class Camera;
 class Event;
+struct Block;
 
 enum Dir
 {
-	DIR_X, DIR_Y, DIR_Z
+	DIR_X, DIR_Y, DIR_Z, DIR_END
 };
 
 class Player : public Actor

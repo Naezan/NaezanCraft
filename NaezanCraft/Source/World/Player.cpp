@@ -6,6 +6,7 @@
 #include "../Event/EventSystem.h"
 #include "../Application.h"
 #include "Chunk.h"
+#include "../Math/Ray.h"
 
 Player::Player(glm::vec3 pos, glm::vec3 vel, glm::vec3 acc, glm::vec3 dir)
 	: velocity(vel), acceleration(acc), forwardDirection(dir), playerBox(glm::vec3(-.3f, -1.5f, -.3f), .6f, 1.5f, .6f)
@@ -24,7 +25,7 @@ Player::~Player() = default;
 void Player::Update()
 {
 	bool isMoving = false;
-	const static float cameraSpeed = 0.1f; // adjust accordingly
+	const static float cameraSpeed = 0.2f; // adjust accordingly
 	velocity = glm::vec3();
 	if (Input::GetIsKeyPressed(GLFW_KEY_W))
 	{
@@ -58,12 +59,11 @@ void Player::Update()
 	}
 
 	//월드 기준 벡터
-
 	glm::normalize(velocity);
 	std::array<glm::vec3, 3> directions = { glm::vec3(velocity.x, 0, 0), glm::vec3(0, velocity.y, 0), glm::vec3(0, 0, velocity.z) };
-	for (int i = 0; i < 3; ++i)
+	if (isMoving)
 	{
-		if (isMoving)
+		for (int i = 0; i < DIR_END; ++i)
 		{
 			switch (i)
 			{
@@ -80,6 +80,10 @@ void Player::Update()
 			Collision(directions[i]);
 		}
 	}
+
+	//raycast
+	auto rayBlock = Ray::BlockTraversal(position, mainCamera->GetForwadDir());
+
 
 	mainCamera->GetPosition() = position;
 	mainCamera->Update();
@@ -123,7 +127,7 @@ void Player::Collision(const glm::vec3& dir)
 
 					if (dir.x > 0)
 					{
-						position.x = x - (playerBox.x / 2.f) - 0.001f;
+						position.x = x - (playerBox.x / 2.f) - 0.001f;//Add adjustment value(need to decimal type)
 					}
 					else if (dir.x < 0)
 					{
@@ -132,7 +136,7 @@ void Player::Collision(const glm::vec3& dir)
 
 					if (dir.z > 0)
 					{
-						position.z = z - (playerBox.z / 2.f) - 0.001f;
+						position.z = z - (playerBox.z / 2.f) - 0.001f;//Add adjustment value(need to decimal type)
 					}
 					else if (dir.z < 0)
 					{
