@@ -84,8 +84,8 @@ void Player::Update()
 		}
 	}
 
-	//raycast
-	auto rayBlock = Ray::BlockTraversal(position, mainCamera->GetForwadDir(), outLineBlockPosition);
+	//raycast 0.5칸정도 에러가 보인다
+	rayBlock = Ray::BlockTraversal(position, mainCamera->GetForwadDir(), outLineBlockPosition);
 	/*switch (rayBlock.blockType)
 	{
 	case Air: std::cout << "Air" << std::endl;
@@ -104,13 +104,16 @@ void Player::Update()
 
 void Player::Render()
 {
-	OutLine outline(outLineBlockPosition);
-	outline.SetPV(mainCamera->GetViewProjectionMatrix());
-	outline.Render();
+	if (rayBlock.blockType != Air)
+	{
+		OutLine outline(outLineBlockPosition);
+		outline.SetPV(mainCamera->GetViewProjectionMatrix());
+		outline.Render();
+	}
 
-	/*Line line(position, position + mainCamera->GetForwadDir() * 10.f);
+	Line line(position, position + mainCamera->GetForwadDir() * 10.f);
 	line.setMVP(mainCamera->GetViewProjectionMatrix());
-	line.Render();*/
+	line.Render();
 }
 
 void Player::Collision(const glm::vec3& dir)

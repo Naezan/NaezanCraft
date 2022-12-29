@@ -7,17 +7,39 @@
 Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm::vec3& outPosition)
 {
 	std::weak_ptr<Chunk> curChunk;
-	Block block(BlockType::Air);
-	GET_World()->GetChunkByPos(std::make_pair(static_cast<int>(ray_start.x / CHUNK_X), static_cast<int>(ray_start.z / CHUNK_Z)), curChunk);
+	int dx = ray_start.x, dz = ray_start.z;
+	if (ray_start.x < 0)
+	{
+		dx = std::floor(dx);
+	}
+	if (ray_start.y < 0)
+	{
+		dz = std::floor(dz);
+	}
+	std::pair<int, int> key(dx, dz);
+	if (key.first < 0)
+	{
+		key.first -= (CHUNK_X - 1);
+	}
+	key.first /= CHUNK_X;
 
+	if (key.second < 0)
+	{
+		key.second -= (CHUNK_Z - 1);
+	}
+	key.second /= CHUNK_Z;
+
+	GET_World()->GetChunkByPos(key, curChunk);
+
+	Block block(BlockType::Air);
 	if (Chunk::IsEmptyChunk(curChunk))
 		return block;
 
 	glm::vec3 blockPos;
 	//청크의 블럭 로컬위치(내림처리)
-	blockPos.x = static_cast<int>(ray_start.x) % CHUNK_X;
-	blockPos.y = static_cast<int>(ray_start.y) % CHUNK_Y;
-	blockPos.z = static_cast<int>(ray_start.z) % CHUNK_Z;
+	blockPos.x = ray_start.x >= 0 ? static_cast<int>(ray_start.x) % CHUNK_X : ((static_cast<int>(ray_start.x) % CHUNK_X) + CHUNK_X) % CHUNK_X;
+	blockPos.y = static_cast<int>(ray_start.y);
+	blockPos.z = ray_start.z >= 0 ? static_cast<int>(ray_start.z) % CHUNK_Z : ((static_cast<int>(ray_start.z) % CHUNK_Z) + CHUNK_Z) % CHUNK_Z;
 
 	float stepX = dir.x >= 0 ? 1 : -1;
 	float stepY = dir.y >= 0 ? 1 : -1;
@@ -28,11 +50,12 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 	float nextY = (blockPos.y + stepY);
 	float nextZ = (blockPos.z + stepZ) + curChunk.lock()->position.z * CHUNK_Z;
 
-	float tMaxX = (nextX - ray_start.x) / dir.x;//다음블럭위치 - 광선의 월드위치
+	//다음블럭위치 - 광선의 월드위치
+	float tMaxX = (nextX - ray_start.x) / dir.x;
 	float tMaxY = (nextY - ray_start.y) / dir.y;
 	float tMaxZ = (nextZ - ray_start.z) / dir.z;
-
-	float tDeltaX = stepX / dir.x;//한칸 전진할때의 대각선의 길이 단순히 dir의 역수로 이루어진다는걸 계산을 조금해보면 알 수 있다.
+	//한칸 전진할때의 대각선의 길이 단순히 dir의 역수로 이루어진다는걸 계산을 조금해보면 알 수 있다.
+	float tDeltaX = stepX / dir.x;
 	float tDeltaY = stepY / dir.y;
 	float tDeltaZ = stepZ / dir.z;
 
@@ -47,8 +70,18 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 				tMaxX += tDeltaX;
 				if (blockPos.x >= CHUNK_X || blockPos.x < 0)
 				{
-					//x방향에 있는 다음청크로 변경, 다음청크가 없으면 return block
-					return block;
+					if (stepX > 0)
+					{
+						curChunk = curChunk.lock()->RightChunk;
+						blockPos.x = 0;
+					}
+					else
+					{
+						curChunk = curChunk.lock()->LeftChunk;
+						blockPos.x = 15;
+					}
+					if (Chunk::IsEmptyChunk(curChunk))
+						return block;
 				}
 			}
 			//z면을 닿았다는 뜻
@@ -58,8 +91,18 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 				tMaxZ += tDeltaZ;
 				if (blockPos.z >= CHUNK_Z || blockPos.z < 0)
 				{
-					//z방향에 있는 다음청크로 변경, 다음청크가 없으면 return block
-					return block;
+					if (stepZ > 0)
+					{
+						curChunk = curChunk.lock()->FrontChunk;
+						blockPos.z = 0;
+					}
+					else
+					{
+						curChunk = curChunk.lock()->BackChunk;
+						blockPos.z = 15;
+					}
+					if (Chunk::IsEmptyChunk(curChunk))
+						return block;
 				}
 			}
 		}
@@ -82,12 +125,22 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 				tMaxZ += tDeltaZ;
 				if (blockPos.z >= CHUNK_Z || blockPos.z < 0)
 				{
-					//z방향에 있는 다음청크로 변경, 다음청크가 없으면 return block
-					return block;
+					if (stepZ > 0)
+					{
+						curChunk = curChunk.lock()->FrontChunk;
+						blockPos.z = 0;
+					}
+					else
+					{
+						curChunk = curChunk.lock()->BackChunk;
+						blockPos.z = 15;
+					}
+					if (Chunk::IsEmptyChunk(curChunk))
+						return block;
 				}
 			}
 		}
-
+		fDistance = fDistance < 0 ? fDistance * -1 : fDistance;
 		block = curChunk.lock()->GetBlock(blockPos.x, blockPos.y, blockPos.z);
 	}
 

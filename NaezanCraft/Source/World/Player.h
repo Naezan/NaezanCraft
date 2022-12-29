@@ -2,10 +2,10 @@
 
 #include "Actor.h"
 #include "../../Collision/Collision.h"
+#include "Block.h"
 
 class Camera;
 class Event;
-struct Block;
 
 enum Dir
 {
@@ -32,5 +32,6 @@ private:
 	glm::vec3 velocity, acceleration, forwardDirection;
 	std::shared_ptr<Camera> mainCamera;//single play
 	AABox playerBox;
+	Block rayBlock;
 	glm::vec3 outLineBlockPosition;
 };
