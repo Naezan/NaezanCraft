@@ -46,9 +46,9 @@ void Renderer::RenderChunk(std::weak_ptr<Chunk> chunk)
 	glDisable(GL_BLEND);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
-	//glDepthFunc(GL_LEQUAL);
-	//glCullFace(GL_FRONT);
-	//glFrontFace(GL_CCW);
+	/*glDepthFunc(GL_LEQUAL);
+	glCullFace(GL_FRONT);
+	glFrontFace(GL_CCW);*/
 	glUseProgram(shaderProgram);
 
 	TextureManager::BindTexture("CubeAtlas");

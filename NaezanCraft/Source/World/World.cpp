@@ -66,9 +66,6 @@ void World::Render()
 
 	renderer->BeginRender(scene->GetCamera().lock()->GetViewProjectionMatrix());
 
-	scene->Render();
-	sky->Render(scene->GetCamera());
-
 	int ChunkCount = 0;
 	std::unique_lock<std::mutex> lock(worldMutex);
 	for (auto& chunk : worldChunks)
@@ -87,6 +84,9 @@ void World::Render()
 			}
 		}
 	}
+
+	scene->Render();
+	sky->Render(scene->GetCamera());
 
 	RemoveChunk();
 	//std::cout << ChunkCount << std::endl;

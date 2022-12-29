@@ -19,6 +19,7 @@ public:
 	~Player();
 
 	virtual void Update() override;
+	virtual void Render() override;
 	void Collision(const glm::vec3& dir);
 
 	inline glm::vec3& GetVelocity() { return velocity; }
@@ -31,4 +32,5 @@ private:
 	glm::vec3 velocity, acceleration, forwardDirection;
 	std::shared_ptr<Camera> mainCamera;//single play
 	AABox playerBox;
+	glm::vec3 outLineBlockPosition;
 };

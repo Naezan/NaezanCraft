@@ -44,7 +44,7 @@ void Window::Init()
 	//setup glad depends on OS? In this case we are using window 10
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
-		NC_LOG_FATAL("Fail to Load Glad.");
+		NC_LOG_FATAL("Failed to initialize GLAD.");
 		exit(EXIT_FAILURE);
 	}
 

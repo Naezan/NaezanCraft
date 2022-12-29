@@ -16,6 +16,7 @@ public:
 	virtual ~Actor() {}
 
 	virtual void Update() = 0;
+	virtual void Render();
 	void SetOwner(Actor* owner);
 	inline Actor*& GetOwner() { return Owner; }
 	inline glm::vec3& GetPosition() { return position; }

@@ -7,9 +7,12 @@
 #include "../Application.h"
 #include "Chunk.h"
 #include "../Math/Ray.h"
+#include "../Util/OutLine.h"
+#include "../Util/Line.h"
 
 Player::Player(glm::vec3 pos, glm::vec3 vel, glm::vec3 acc, glm::vec3 dir)
-	: velocity(vel), acceleration(acc), forwardDirection(dir), playerBox(glm::vec3(-.3f, -1.5f, -.3f), .6f, 1.5f, .6f)
+	: velocity(vel), acceleration(acc), forwardDirection(dir), playerBox(glm::vec3(-.3f, -1.5f, -.3f), .6f, 1.5f, .6f),
+	outLineBlockPosition(0, 0, 0)
 {
 	position = pos;
 	mainCamera = std::make_shared<Camera>(position);
@@ -82,11 +85,32 @@ void Player::Update()
 	}
 
 	//raycast
-	auto rayBlock = Ray::BlockTraversal(position, mainCamera->GetForwadDir());
-
+	auto rayBlock = Ray::BlockTraversal(position, mainCamera->GetForwadDir(), outLineBlockPosition);
+	/*switch (rayBlock.blockType)
+	{
+	case Air: std::cout << "Air" << std::endl;
+		break;
+	case Dirt:std::cout << "Dirt" << std::endl;
+		break;
+	case Stone:std::cout << "Stone" << std::endl;
+		break;
+	case Sand:std::cout << "Sand" << std::endl;
+		break;
+	}*/
 
 	mainCamera->GetPosition() = position;
 	mainCamera->Update();
+}
+
+void Player::Render()
+{
+	OutLine outline(outLineBlockPosition);
+	outline.SetPV(mainCamera->GetViewProjectionMatrix());
+	outline.Render();
+
+	/*Line line(position, position + mainCamera->GetForwadDir() * 10.f);
+	line.setMVP(mainCamera->GetViewProjectionMatrix());
+	line.Render();*/
 }
 
 void Player::Collision(const glm::vec3& dir)

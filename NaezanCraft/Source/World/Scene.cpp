@@ -22,6 +22,7 @@ void Scene::Update()
 
 void Scene::Render()
 {
+	player->Render();
 }
 
 glm::vec3& Scene::GetPlayerPosition()

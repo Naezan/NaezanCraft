@@ -21,7 +21,7 @@ class Ray final
 	[[nodiscard]] inline constexpr glm::vec3 GetDirection() const { return this->direction; }
 
 public:
-	static Block BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir);
+	static Block BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm::vec3& outPosition);
 
 private:
 	// The origin of the ray.
