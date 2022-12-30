@@ -33,5 +33,9 @@ private:
 	std::shared_ptr<Camera> mainCamera;//single play
 	AABox playerBox;
 	Block rayBlock;
-	glm::vec3 outLineBlockPosition;
+	//삭제할 위치
+	glm::vec3 outBlockPosition;
+	//설치할 위치
+	glm::vec3 outFaceBlockPosition;
+	BlockType handBlockType;
 };

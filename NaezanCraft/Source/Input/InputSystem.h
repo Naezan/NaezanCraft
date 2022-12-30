@@ -29,13 +29,14 @@ public:
 	static bool GetIsMouseButtonPressed(const int button)
 	{
 		GLFWwindow* window = GET_WINDOW_OBJECT();
-		glfwGetMouseButton(window, button);
+		return glfwGetMouseButton(window, button) == GLFW_PRESS;
 	}
 	static bool GetIsMouseButtonReleased(const int button)
 	{
 		GLFWwindow* window = GET_WINDOW_OBJECT();
-		glfwGetMouseButton(window, button);
+		return glfwGetMouseButton(window, button) == GLFW_RELEASE;
 	}
-private:
-
+public:
+	static inline bool isLeftMousePressed = false;
+	static inline bool isRightMousePressed = false;
 };

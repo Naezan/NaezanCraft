@@ -55,9 +55,9 @@ MineCraft Copy Naezan's Engine
         * *DotProduct*
     - [?] ECS
     - [?] Object Pool(*다른 사이드 프로젝트로 할까 생각중*)
-    - [ ] Collision
+    - [x] Collision
         * ~~레이케스트~~(reference : https://github.com/cgyurgyik/fast-voxel-traversal-algorithm/blob/master/overview/FastVoxelTraversalOverview.md)
-        * delete and emplace Block
+        * ~~delete and emplace Block~~
         * *(AABB-> OOBB, 내가 이전에 사용한 AABB방법을 이용하려면 엔티티 컴포넌트 시스템을 이용했어야 했다 하지만 이번 프로젝트에선 ECS를 사용하지 않을 것이기때문에 AABB나 OBB가 적절하지 않아 보였다. 그럼에도 다른방법으로 사용할 수 있다는것을 알고있고 고려해볼만한 사항이라고 생각해두고 있다.)*
         * *(쿼드 트리 -> 옥트리, 청크 기반 충돌을 사용했다 옥트리를 사용하고 싶었지만 적절하진 않았다)*
     - [?] AI(Too Much, if i can, i do)
@@ -74,6 +74,8 @@ MineCraft Copy Naezan's Engine
 
     - [x] ~~최적화중에 CPU가 Lock에 의해서 많은 시간 놀고있는것을 발견했다 아마 스레드분리하는 곳에서 문제가 발생했고 그 문제를 해결하기 위해서 유사 싱글 스레드를 사용하였다. 그리고 OpenGL에서는 스레드를 지원해주지 않기때문에 분리해서 처리해줘야한다.~~
       ![약80%의 속도를 향상시켰다 하지만 CPU가 논다](./Screenshot/Optimize1.PNG)
+    - [ ] 청크경계면에 블럭을 설치할때 fatal error 발생, 메모리릭이 있는듯하다
+    - [ ] SSAO의 렌더링이 다음 블럭 설치까지 딜레이가 생긴다
 
 - 현재 최적화 상태
   ![현재 최적화 상태](./Screenshot/Optimize2.PNG)

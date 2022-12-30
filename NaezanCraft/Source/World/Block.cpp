@@ -17,7 +17,7 @@ uint8_t Block::Get_rBf_AO()
 
 uint8_t Block::Get_rBb_AO()
 {
-    return (RightAO >> 6) & 0b11;;
+    return (RightAO >> 6) & 0b11;
 }
 
 void Block::Set_rtf_AO(uint8_t ao)

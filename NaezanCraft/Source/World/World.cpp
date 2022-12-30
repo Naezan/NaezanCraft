@@ -57,7 +57,7 @@ void World::Update()
 	playerPosition = scene->GetPlayerPosition();
 
 	//블록 설치 또는 삭제할때 이 함수가 실행된다
-	//UpdateChunk();
+	UpdateChunk();
 }
 
 void World::Render()
@@ -101,8 +101,6 @@ void World::Shutdown()
 
 void World::AsyncLoadChunk(const ChunkLoadState& loadState)
 {
-	std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> loadChunks;
-
 	while (Application::IsRunning())
 	{
 		for (int x = static_cast<int>(playerPosition.x / CHUNK_X) - renderDistance; x <= static_cast<int>(playerPosition.x / CHUNK_X) + renderDistance; ++x)
@@ -162,23 +160,29 @@ void World::CreateChunk(std::weak_ptr<Chunk> chunk)
 	chunk.lock()->CreateSSAO();
 
 	std::unique_lock<std::mutex> lock(worldMutex);
-	chunk.lock()->CreateChunkMesh();
+	chunk.lock()->CreateChunkMesh(false);
 
 	chunk.lock()->SetupChunkNeighbor();
 }
 
 void World::UpdateChunk()
 {
-	/*for (int x = static_cast<int>(playerPosition.x / CHUNK_X) - renderDistance; x <= static_cast<int>(playerPosition.x / CHUNK_X) + renderDistance; ++x)
+	std::unique_lock<std::mutex> lock(worldMutex);
+	for (auto& loadinfo : reloadChunks)
 	{
-		for (int z = static_cast<int>(playerPosition.z / CHUNK_Z) - renderDistance; z <= static_cast<int>(playerPosition.z / CHUNK_Z) + renderDistance; ++z)
+		auto chunk = loadChunks.find(loadinfo.first);
+		if (chunk != loadChunks.end())
 		{
-			if (!IsChunkCreatedByPos(x, z))
+			if (chunk->second->chunkLoadState == ChunkLoadState::Builted)
 			{
-
+				chunk->second->CreateChunkMesh(true);
+				std::weak_ptr<Chunk> outChunk;
+				GetChunkByPos(loadinfo.first, outChunk);
+				outChunk.lock()->ReloadSSAO(loadinfo.second);
 			}
 		}
-	}*/
+	}
+	reloadChunks.clear();
 }
 
 void World::RemoveWorldChunk(std::vector<decltype(worldChunks)::key_type>& _deletableKey)
@@ -266,4 +270,64 @@ bool World::GetBlockByWorldPos(int x, int y, int z, Block& block)
 	}
 
 	return false;
+}
+
+bool World::SetBlockByWorldPos(int x, int y, int z, BlockType blocktype)
+{
+	std::pair<int, int> key(x, z);
+	if (key.first < 0)
+	{
+		key.first -= (CHUNK_X - 1);
+	}
+	key.first /= CHUNK_X;
+
+	if (key.second < 0)
+	{
+		key.second -= (CHUNK_Z - 1);
+	}
+	key.second /= CHUNK_Z;
+
+	std::weak_ptr<Chunk> outChunk;
+	if (GetChunkByPos(key, outChunk))
+	{
+		x %= CHUNK_X;
+		z %= CHUNK_Z;
+
+		if (x < 0)
+		{
+			x += CHUNK_X;
+			x %= CHUNK_X;
+		}
+		if (z < 0)
+		{
+			z += CHUNK_Z;
+			z %= CHUNK_Z;
+		}
+		outChunk.lock()->SetBlock(x, y, z, blocktype);
+
+		//리로드할 청크 추가
+		RegisterReloadChunk(key, glm::vec3(x, y, z));
+		return true;
+	}
+	return false;
+}
+
+bool World::CanEmplaceBlockByWorldPos(int blockX, int blockY, int blockZ, int faceblockX, int faceblockY, int faceblockZ)
+{
+	Block outBlock;
+	if (GetBlockByWorldPos(blockX, blockY, blockZ, outBlock) && !outBlock.IsFluid())
+	{
+		Block faceBlock;
+		if (GetBlockByWorldPos(faceblockX, faceblockY, faceblockZ, faceBlock) && faceBlock.IsFluid())
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void World::RegisterReloadChunk(std::pair<int, int> key, const glm::vec3& blockPos)
+{
+	reloadChunks.emplace(key, blockPos);
 }

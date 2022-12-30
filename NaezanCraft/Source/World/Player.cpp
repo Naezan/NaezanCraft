@@ -12,7 +12,7 @@
 
 Player::Player(glm::vec3 pos, glm::vec3 vel, glm::vec3 acc, glm::vec3 dir)
 	: velocity(vel), acceleration(acc), forwardDirection(dir), playerBox(glm::vec3(-.3f, -1.5f, -.3f), .6f, 1.5f, .6f),
-	outLineBlockPosition(0, 0, 0)
+	outBlockPosition(0, 0, 0), outFaceBlockPosition(0, 0, 0), handBlockType(BlockType::Diamond)
 {
 	position = pos;
 	mainCamera = std::make_shared<Camera>(position);
@@ -60,6 +60,46 @@ void Player::Update()
 		velocity.y = -1;
 		isMoving = true;
 	}
+	if (Input::GetIsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
+	{
+		//DeleteBlock
+		if (!Input::isLeftMousePressed)
+		{
+			Input::isLeftMousePressed = true;
+			GET_World()->SetBlockByWorldPos(outBlockPosition.x, outBlockPosition.y, outBlockPosition.z, BlockType::Air);
+		}
+	}
+	if (Input::GetIsMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT))
+	{
+		//삭제
+		if (Input::isLeftMousePressed)
+		{
+			Input::isLeftMousePressed = false;
+		}
+	}
+	if (Input::GetIsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT))
+	{
+		//EmplaceBlock
+		if (!Input::isRightMousePressed)
+		{
+			Input::isRightMousePressed = true;
+			if (GET_World()->CanEmplaceBlockByWorldPos(
+				outBlockPosition.x, outBlockPosition.y, outBlockPosition.z,
+				outFaceBlockPosition.x, outFaceBlockPosition.y, outFaceBlockPosition.z)
+				)
+			{
+				GET_World()->SetBlockByWorldPos(outFaceBlockPosition.x, outFaceBlockPosition.y, outFaceBlockPosition.z, handBlockType);
+			}
+		}
+	}
+	if (Input::GetIsMouseButtonReleased(GLFW_MOUSE_BUTTON_RIGHT))
+	{
+		//설치
+		if (Input::isRightMousePressed)
+		{
+			Input::isRightMousePressed = false;
+		}
+	}
 
 	//월드 기준 벡터
 	glm::normalize(velocity);
@@ -88,37 +128,27 @@ void Player::Update()
 	mainCamera->Update();
 
 	//raycast 0.5칸정도 에러가 보인다
-	rayBlock = Ray::BlockTraversal(position, mainCamera->GetForwadDir(), outLineBlockPosition);
-
-	Block bottomBlock;
-	GET_World()->GetBlockByWorldPos(std::floor(position.x), position.y - 2.f, std::floor(position.z), bottomBlock);
-	switch (bottomBlock.blockType)
-	{
-	case Air: std::cout << "Air" << std::endl;
-		break;
-	case Dirt:std::cout << "Dirt" << std::endl;
-		break;
-	case Stone:std::cout << "Stone" << std::endl;
-		break;
-	case Sand:std::cout << "Sand" << std::endl;
-		break;
-	case Water:std::cout << "Water" << std::endl;
-		break;
-	}
+	rayBlock = Ray::BlockTraversal(position, mainCamera->GetForwadDir(), outBlockPosition, outFaceBlockPosition);
 }
 
 void Player::Render()
 {
 	if (rayBlock.blockType != Air)
 	{
-		OutLine outline(outLineBlockPosition);
-		outline.SetPV(mainCamera->GetViewProjectionMatrix());
-		outline.Render();
+		OutLine outlineblock(outBlockPosition);
+		outlineblock.SetPV(mainCamera->GetViewProjectionMatrix());
+		outlineblock.SetColor(glm::vec3(1, 0, 0));
+		outlineblock.Render();
+
+		OutLine outlinefaceblock(outFaceBlockPosition);
+		outlinefaceblock.SetPV(mainCamera->GetViewProjectionMatrix());
+		outlinefaceblock.SetColor(glm::vec3(0, 1, 0));
+		outlinefaceblock.Render();
 	}
 
-	Line line(position, position + mainCamera->GetForwadDir() * 10.f);
+	/*Line line(position, position + mainCamera->GetForwadDir() * 10.f);
 	line.setMVP(mainCamera->GetViewProjectionMatrix());
-	line.Render();
+	line.Render();*/
 }
 
 void Player::Collision(const glm::vec3& dir)

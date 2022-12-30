@@ -53,6 +53,9 @@ public:
 	bool IsChunkCreatedByPos(int x, int y);
 	bool IsChunkCreatedByPos(const std::pair<int, int>& pos);
 	bool GetBlockByWorldPos(int x, int y, int z, Block& block);
+	bool SetBlockByWorldPos(int x, int y, int z, BlockType blocktype);
+	bool CanEmplaceBlockByWorldPos(int blockX, int blockY, int blockZ, int faceblockX, int faceblockY, int faceblockZ);
+	void RegisterReloadChunk(std::pair<int, int> key, const glm::vec3& blockPos);
 
 public:
 	static std::unordered_map<BlockType, std::pair<int, int>> BlockCoordData;
@@ -64,6 +67,8 @@ private:
 	std::unique_ptr<SkyBox> sky;
 
 	std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> worldChunks;
+	std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> loadChunks;
+	std::map<std::pair<int, int>, glm::vec3> reloadChunks;
 
 	const int renderDistance = 5;
 	glm::vec3 playerPosition;

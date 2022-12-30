@@ -35,7 +35,7 @@ public:
 	void SetWorldLightLevel(int wx, int wy, int wz, int level);
 
 	void SetupChunkNeighbor();
-	void CreateChunkMesh();
+	void CreateChunkMesh(bool isReload);
 	void CreateMeshBuffer();
 	void GenerateTerrain(std::unique_ptr<WorldGenerator>& worldGenerator);
 
@@ -45,6 +45,8 @@ public:
 
 	//AO
 	void CreateSSAO();
+	void ReloadSSAO(int x, int y, int z);
+	void ReloadSSAO(const glm::vec3& loadPos);
 	void CaculateAO(int x, int y, int z, const glm::ivec3& dir);
 	uint8_t CacluateVertexAO(bool side1, bool side2, bool corner);
 

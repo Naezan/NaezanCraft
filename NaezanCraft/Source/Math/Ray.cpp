@@ -4,7 +4,7 @@
 #include "../Application.h"
 #include "Ray.h"
 
-Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm::vec3& outPosition)
+Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm::vec3& outPosition, glm::vec3& outBlockFacePosition)
 {
 	std::weak_ptr<Chunk> curChunk;
 	int dx = ray_start.x, dz = ray_start.z;
@@ -46,9 +46,6 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 	float stepZ = dir.z >= 0 ? 1 : -1;
 
 	//다음에 검사할 블럭 월드 위치
-	/*float curIndexX = (blockPos.x + stepX) + curChunk.lock()->position.x * CHUNK_X;
-	float curIndexY = (blockPos.y + stepY);
-	float curIndexZ = (blockPos.z + stepZ) + curChunk.lock()->position.z * CHUNK_Z;*/
 	float curIndexX = dir.x >= 0 ? 1 : 0;
 	float curIndexY = dir.y >= 0 ? 1 : 0;
 	float curIndexZ = dir.z >= 0 ? 1 : 0;
@@ -61,6 +58,9 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 	float tDeltaX = stepX / dir.x;
 	float tDeltaY = stepY / dir.y;
 	float tDeltaZ = stepZ / dir.z;
+
+	//제일 작은 좌표를 저장할 뭔가 값이 필요
+	char faceDirInfo = 0b00000000;
 
 	float fDistance = 0;
 	//RayBlock 만약에 광선범위를 벗어나거나 블럭을 찾으면 반복문을 빠져온다
@@ -86,6 +86,8 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 					if (Chunk::IsEmptyChunk(curChunk))
 						return block;
 				}
+				//x가 음수라는것은 x의 양수쪽면을 보고있다는것을 의미한다
+				faceDirInfo = stepX < 0 ? 0b00001100 : 0b00000100;
 			}
 			//z면을 닿았다는 뜻
 			else {
@@ -107,6 +109,7 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 					if (Chunk::IsEmptyChunk(curChunk))
 						return block;
 				}
+				faceDirInfo = stepZ < 0 ? 0b00001001 : 0b00000001;
 			}
 		}
 		else {
@@ -120,6 +123,7 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 					//못찾음
 					return block;
 				}
+				faceDirInfo = stepY < 0 ? 0b00001010 : 0b00000010;
 			}
 			//z면을닿았다는 뜻
 			else {
@@ -141,6 +145,7 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 					if (Chunk::IsEmptyChunk(curChunk))
 						return block;
 				}
+				faceDirInfo = stepZ < 0 ? 0b00001001 : 0b00000001;
 			}
 		}
 		fDistance = fDistance < 0 ? fDistance * -1 : fDistance;
@@ -148,7 +153,27 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 	}
 
 	if (block.blockType != Air)
+	{
 		outPosition = glm::vec3(blockPos.x + curChunk.lock()->position.x * CHUNK_X, blockPos.y, blockPos.z + curChunk.lock()->position.z * CHUNK_Z);
+
+		if (faceDirInfo >> 3 == 1)
+		{
+			blockPos.x += ((faceDirInfo >> 2) & 0b00000001);
+			blockPos.y += ((faceDirInfo >> 1) & 0b00000001);
+			blockPos.z += ((faceDirInfo) & 0b00000001);
+			blockPos.x = blockPos.x >= CHUNK_X ? 0 : blockPos.x;
+			blockPos.z = blockPos.z >= CHUNK_Z ? 0 : blockPos.z;
+		}
+		else
+		{
+			blockPos.x += ((faceDirInfo >> 2) & 0b00000001) * -1;
+			blockPos.y += ((faceDirInfo >> 1) & 0b00000001) * -1;
+			blockPos.z += ((faceDirInfo) & 0b00000001) * -1;
+			blockPos.x = blockPos.x < 0 ? 15 : blockPos.x;
+			blockPos.z = blockPos.z < 0 ? 15 : blockPos.z;
+		}
+		outBlockFacePosition = glm::vec3(blockPos.x + curChunk.lock()->position.x * CHUNK_X, blockPos.y, blockPos.z + curChunk.lock()->position.z * CHUNK_Z);
+	}
 
 	return block;
 }

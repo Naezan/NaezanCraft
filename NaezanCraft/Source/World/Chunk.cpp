@@ -379,11 +379,14 @@ void Chunk::SetupChunkNeighbor()
 		FrontChunk.reset();
 }
 
-void Chunk::CreateChunkMesh()
+void Chunk::CreateChunkMesh(bool isReload)
 {
 	OPTICK_EVENT();
 
-	//chunkMesh.reset();
+	if (isReload)
+	{
+		chunkMesh.reset();
+	}
 
 	//TODO 메쉬 생성 자체를 쓰레드에 넣지않고 외부에서 따로 처리해줘야하고 여기선 그 메쉬를 복사해서 가져와줘야한다
 	chunkMesh = std::make_unique<ChunkMesh>(shared_from_this());
@@ -500,6 +503,51 @@ void Chunk::CreateSSAO()
 					for (auto& dir : nearFaces)
 					{
 						CaculateAO(x, y, z, dir);
+					}
+				}
+			}
+		}
+	}
+}
+
+void Chunk::ReloadSSAO(int x, int y, int z)
+{
+	for (int8_t dx = x - 1; dx <= x + 1; ++dx)
+	{
+		for (int8_t dz = z - 1; dz <= z + 1; ++dz)
+		{
+			for (int8_t dy = y - 1; dy <= y + 1; ++dy)
+			{
+				Block& block = GetBlock(dx, dy, dz);
+				if (!block.IsFluid())
+				{
+					for (auto& dir : nearFaces)
+					{
+						CaculateAO(dx, dy, dz, dir);
+					}
+				}
+			}
+		}
+	}
+}
+
+void Chunk::ReloadSSAO(const glm::vec3& loadPos)
+{
+	int x = loadPos.x;
+	int y = loadPos.y;
+	int z = loadPos.z;
+	for (int8_t dx = x - 1; dx <= x + 1; ++dx)
+	{
+		for (int8_t dz = z - 1; dz <= z + 1; ++dz)
+		{
+			for (int8_t dy = y - 1; dy <= y + 1; ++dy)
+			{
+				Block& block = GetBlock(dx, dy, dz);
+				if (!block.IsFluid())
+				{
+					for (auto& dir : nearFaces)
+					{
+						CaculateAO(dx, dy, dz, dir);
 					}
 				}
 			}
