@@ -170,15 +170,13 @@ void World::UpdateChunk()
 	std::unique_lock<std::mutex> lock(worldMutex);
 	for (auto& loadinfo : reloadChunks)
 	{
-		auto chunk = loadChunks.find(loadinfo.first);
-		if (chunk != loadChunks.end())
+		auto chunk = worldChunks.find(loadinfo.first);
+		if (chunk != worldChunks.end())
 		{
 			if (chunk->second->chunkLoadState == ChunkLoadState::Builted)
 			{
+				chunk->second->ReloadSSAO(loadinfo.second);
 				chunk->second->CreateChunkMesh(true);
-				std::weak_ptr<Chunk> outChunk;
-				GetChunkByPos(loadinfo.first, outChunk);
-				outChunk.lock()->ReloadSSAO(loadinfo.second);
 			}
 		}
 	}
