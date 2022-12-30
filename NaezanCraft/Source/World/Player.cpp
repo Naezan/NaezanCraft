@@ -84,9 +84,15 @@ void Player::Update()
 		}
 	}
 
+	mainCamera->GetPosition() = position;
+	mainCamera->Update();
+
 	//raycast 0.5칸정도 에러가 보인다
 	rayBlock = Ray::BlockTraversal(position, mainCamera->GetForwadDir(), outLineBlockPosition);
-	/*switch (rayBlock.blockType)
+
+	Block bottomBlock;
+	GET_World()->GetBlockByWorldPos(std::floor(position.x), position.y - 2.f, std::floor(position.z), bottomBlock);
+	switch (bottomBlock.blockType)
 	{
 	case Air: std::cout << "Air" << std::endl;
 		break;
@@ -96,10 +102,9 @@ void Player::Update()
 		break;
 	case Sand:std::cout << "Sand" << std::endl;
 		break;
-	}*/
-
-	mainCamera->GetPosition() = position;
-	mainCamera->Update();
+	case Water:std::cout << "Water" << std::endl;
+		break;
+	}
 }
 
 void Player::Render()

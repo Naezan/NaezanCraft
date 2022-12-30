@@ -46,14 +46,17 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 	float stepZ = dir.z >= 0 ? 1 : -1;
 
 	//다음에 검사할 블럭 월드 위치
-	float nextX = (blockPos.x + stepX) + curChunk.lock()->position.x * CHUNK_X;
-	float nextY = (blockPos.y + stepY);
-	float nextZ = (blockPos.z + stepZ) + curChunk.lock()->position.z * CHUNK_Z;
+	/*float curIndexX = (blockPos.x + stepX) + curChunk.lock()->position.x * CHUNK_X;
+	float curIndexY = (blockPos.y + stepY);
+	float curIndexZ = (blockPos.z + stepZ) + curChunk.lock()->position.z * CHUNK_Z;*/
+	float curIndexX = dir.x >= 0 ? 1 : 0;
+	float curIndexY = dir.y >= 0 ? 1 : 0;
+	float curIndexZ = dir.z >= 0 ? 1 : 0;
 
 	//다음블럭위치 - 광선의 월드위치
-	float tMaxX = (nextX - ray_start.x) / dir.x;
-	float tMaxY = (nextY - ray_start.y) / dir.y;
-	float tMaxZ = (nextZ - ray_start.z) / dir.z;
+	float tMaxX = ray_start.x >= 0 ? (std::floor(ray_start.x) + curIndexX - ray_start.x) / dir.x : (std::ceil(ray_start.x) + curIndexX - ray_start.x) / dir.x;
+	float tMaxY = ray_start.y >= 0 ? (std::floor(ray_start.y) + curIndexY - ray_start.y) / dir.y : (std::ceil(ray_start.y) + curIndexY - ray_start.y) / dir.y;
+	float tMaxZ = ray_start.z >= 0 ? (std::floor(ray_start.z) + curIndexZ - ray_start.z) / dir.z : (std::ceil(ray_start.z) + curIndexZ - ray_start.z) / dir.z;
 	//한칸 전진할때의 대각선의 길이 단순히 dir의 역수로 이루어진다는걸 계산을 조금해보면 알 수 있다.
 	float tDeltaX = stepX / dir.x;
 	float tDeltaY = stepY / dir.y;
