@@ -50,6 +50,7 @@ void Window::Init()
 
 	glViewport(0, 0, Width, Height);
 	glDepthFunc(GL_LESS);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//위 기능이 있어야지 화이트맵 텍스쳐를 사용할 수 있다
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	//gladLoadGL();

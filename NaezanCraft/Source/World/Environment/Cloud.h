@@ -3,6 +3,7 @@
 #include "../../Renderer/Shader.h"
 
 class CloudShader;
+class Camera;
 
 class Cloud
 {
@@ -11,7 +12,7 @@ public:
 	~Cloud();
 
 	void Update();
-	void Render();
+	void Render(std::weak_ptr<Camera>& camera, glm::mat4& transformMatrix);
 
 private:
 	uint32_t cloudShaderProgram;
