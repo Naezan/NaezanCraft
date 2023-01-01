@@ -28,7 +28,6 @@ Player::~Player() = default;
 void Player::Update()
 {
 	bool isMoving = false;
-	const static float cameraSpeed = 0.2f; // adjust accordingly
 	velocity = glm::vec3();
 	if (Input::GetIsKeyPressed(GLFW_KEY_W))
 	{
@@ -111,13 +110,13 @@ void Player::Update()
 			switch (i)
 			{
 			case DIR_X:
-				position.x += cameraSpeed * velocity.x;
+				position.x += PLAYER_SPEED * velocity.x;
 				break;
 			case DIR_Y:
-				position.y += cameraSpeed * velocity.y;
+				position.y += PLAYER_SPEED * velocity.y;
 				break;
 			case DIR_Z:
-				position.z += cameraSpeed * velocity.z;
+				position.z += PLAYER_SPEED * velocity.z;
 				break;
 			}
 			Collision(directions[i]);

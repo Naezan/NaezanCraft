@@ -13,3 +13,6 @@ constexpr int SPRITE_HEIGHT = 16;
 constexpr float SKY_SIZE = 500;
 
 constexpr int WATER_HEIGHT = 60;
+
+constexpr float PLAYER_SPEED = 0.2f;
+constexpr float CLOUD_SPEED = 0.1f;

@@ -236,7 +236,7 @@ void SkyBox::Update(glm::vec3& playerPos)
 {
 	TransformMatrix = glm::translate(glm::mat4(1.0f), playerPos);
 
-	//cloud->Update();
+	cloud->Update(playerPos);
 }
 
 void SkyBox::Render(std::weak_ptr<Camera>& camera)

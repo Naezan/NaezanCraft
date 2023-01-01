@@ -8,7 +8,7 @@
 
 #include <glad/glad.h>
 
-Cloud::Cloud()
+Cloud::Cloud(glm::vec3 _position) : renderPosition(_position), updatePosition(_position), isStartRender(false), deltaPos(0.f)
 {
 	//Shader
 	{
@@ -75,9 +75,14 @@ Cloud::~Cloud()
 	glDeleteProgram(cloudShaderProgram);
 }
 
-void Cloud::Update()
+void Cloud::Update(glm::vec3 playerPos)
 {
-	//Nothing
+	if (!isStartRender)
+	{
+		isStartRender = true;
+		renderPosition = playerPos;
+	}
+	updatePosition = playerPos;
 }
 
 void Cloud::Render(std::weak_ptr<Camera>& camera, glm::mat4& transformMatrix)
@@ -87,13 +92,41 @@ void Cloud::Render(std::weak_ptr<Camera>& camera, glm::mat4& transformMatrix)
 
 	glUseProgram(cloudShaderProgram);
 
+	deltaPos += CLOUD_SPEED;
+
+	if (deltaPos > 4096) {
+		deltaPos = 0;
+	}
+
+	if (abs(updatePosition.x - renderPosition.x) > 4096) {
+		renderPosition.x = updatePosition.x;
+	}
+
+	if (abs(updatePosition.z - renderPosition.z) > 4096) {
+		renderPosition.z = updatePosition.z;
+	}
+
+	TextureManager::BindTexture("Cloud");
 
 	glUniform1f(glGetUniformLocation(cloudShaderProgram, "lightIntensity"), sunIntensity);
 	glUniformMatrix4fv(glGetUniformLocation(cloudShaderProgram, "projectionview"), 1, GL_FALSE, glm::value_ptr(camera.lock()->GetViewProjectionMatrix()));
-	glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+	glm::mat4 backmodel = glm::translate(glm::mat4(1.0f), glm::vec3(renderPosition.x, 0, renderPosition.z + deltaPos - 4096));
+	glUniformMatrix4fv(glGetUniformLocation(cloudShaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(backmodel));
+
+	cloudMesh->BindVertexArray();
+	glDrawElements(GL_TRIANGLES, cloudIndicesSize, GL_UNSIGNED_INT, nullptr);
+	cloudMesh->UnBindVertexArray();
+
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(renderPosition.x, 0, renderPosition.z + deltaPos));
 	glUniformMatrix4fv(glGetUniformLocation(cloudShaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 
-	TextureManager::BindTexture("Cloud");
+	cloudMesh->BindVertexArray();
+	glDrawElements(GL_TRIANGLES, cloudIndicesSize, GL_UNSIGNED_INT, nullptr);
+	cloudMesh->UnBindVertexArray();
+
+	glm::mat4 frontmodel = glm::translate(glm::mat4(1.0f), glm::vec3(renderPosition.x, 0, renderPosition.z + deltaPos + 4096));
+	glUniformMatrix4fv(glGetUniformLocation(cloudShaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(frontmodel));
+
 	cloudMesh->BindVertexArray();
 	glDrawElements(GL_TRIANGLES, cloudIndicesSize, GL_UNSIGNED_INT, nullptr);
 	cloudMesh->UnBindVertexArray();

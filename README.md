@@ -35,9 +35,9 @@ MineCraft Copy Naezan's Engine
     - [ ] 오컬루전 컬링 + 옥트리(조금 더 추가적인 연산을 필요로 하기에 적절하게 써야함)
     - [x] ~~Chunk Object Rendering~~
     - [ ] 블럭 방향에 따라 다른 텍스처 로드
-    - [ ] SkyBox
+    - [x] ~~SkyBox~~
         * ~~Sun & Moon~~
-        * Cloud
+        * ~~Cloud~~
     - [ ] Map Generator
         * ~~Render Chunk When Player Move~~
         * ~~청크 랜덤 블록 렌더링~~
@@ -47,7 +47,7 @@ MineCraft Copy Naezan's Engine
         * *Instancing(메모리관리 후 검토)*
         * *BSP(Maybe Cave? or Town? but i am not implement cave and town)*
         * *Region Weather System(later if possible)*
-    - [x] Lighting
+    - [x] ~~Lighting~~
         * ~~Ambient Occlusion(+라이트컬링)~~
         * ~~Sun Light~~
         * ~~Object Light(Flood fill Algorithm)~~
@@ -55,7 +55,7 @@ MineCraft Copy Naezan's Engine
         * *DotProduct*
     - [?] ECS
     - [?] Object Pool(*다른 사이드 프로젝트로 할까 생각중*)
-    - [x] Collision
+    - [x] ~~Collision~~
         * ~~레이케스트~~(reference : https://github.com/cgyurgyik/fast-voxel-traversal-algorithm/blob/master/overview/FastVoxelTraversalOverview.md)
         * ~~delete and emplace Block~~
         * *(AABB-> OOBB, 내가 이전에 사용한 AABB방법을 이용하려면 엔티티 컴포넌트 시스템을 이용했어야 했다 하지만 이번 프로젝트에선 ECS를 사용하지 않을 것이기때문에 AABB나 OBB가 적절하지 않아 보였다. 그럼에도 다른방법으로 사용할 수 있다는것을 알고있고 고려해볼만한 사항이라고 생각해두고 있다.)*
