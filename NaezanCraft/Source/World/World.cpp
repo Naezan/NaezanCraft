@@ -39,6 +39,10 @@ void World::SetBlockDatas()
 	BlockCoordData[Sand] = std::make_pair(22, 13);
 	BlockCoordData[Stone] = std::make_pair(23, 15);
 	//BlockCoordData[Grass] = std::make_pair(10, 10);
+	BlockCoordData[OakLog] = std::make_pair(16, 15);
+	BlockCoordData[OakLeaves] = std::make_pair(16, 0);
+	BlockCoordData[BirchLog] = std::make_pair(16, 11);
+	BlockCoordData[BirchLeaves] = std::make_pair(16, 1);
 	BlockCoordData[Water] = std::make_pair(4, 2);
 	BlockCoordData[Lava] = std::make_pair(4, 0);
 	BlockCoordData[Iron] = std::make_pair(6, 15);

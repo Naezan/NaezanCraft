@@ -42,7 +42,7 @@ MineCraft Copy Naezan's Engine
         * ~~Render Chunk When Player Move~~
         * ~~청크 랜덤 블록 렌더링~~
         * 세이브 로드 청크, 월드(SaveWorld, LoadWorld, SaveChunk, LoadChunk)
-        * World Objects(like tree, catus etc..)
+        * ~~World Objects(like tree, catus etc..)~~
         * 그리디 메싱 + 비등방성문제
         * *Instancing(메모리관리 후 검토)*
         * *BSP(Maybe Cave? or Town? but i am not implement cave and town)*

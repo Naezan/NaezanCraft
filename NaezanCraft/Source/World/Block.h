@@ -10,6 +10,10 @@ enum BlockType : uint8_t
 	Sand,
 	Stone,
 	Grass,
+	OakLog,
+	OakLeaves,
+	BirchLog,
+	BirchLeaves,
 	Water,
 	Lava,
 	Iron,
@@ -33,10 +37,23 @@ struct Block
 	unsigned char BackAO = 0xff;
 
 	inline bool IsTransparent() {
-		return this->blockType == BlockType::Air;
+		return (this->blockType == BlockType::Air) || (this->blockType == BlockType::OakLeaves) ||
+			(this->blockType == BlockType::BirchLeaves);
 	}
 	inline bool IsFluid() {
 		return (this->blockType == BlockType::Air) || (this->blockType == BlockType::Water) || (this->blockType == BlockType::Lava);
+	}
+	inline bool IsSmooth() {
+		return 
+		(this->blockType == BlockType::Air) || 
+		(this->blockType == BlockType::Water) || 
+		(this->blockType == BlockType::Lava) || 
+		(this->blockType == BlockType::OakLeaves) ||
+		(this->blockType == BlockType::BirchLeaves);
+	}
+
+	inline bool IsGrowable() {
+		return (this->blockType == BlockType::Grass) || (this->blockType == BlockType::Dirt);
 	}
 
 	bool operator==(Block rv) const

@@ -13,4 +13,5 @@ void main()
 {
 	Outcolor = texelFetch(cubeTexture, ivec2(TexCoord.xy), 0);
 	Outcolor = vec4(Outcolor.rgb * Light, Outcolor.a);
+	if (Outcolor.a == 0) discard;
 }

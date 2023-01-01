@@ -17,6 +17,7 @@ public:
 	void SetHeightMap(std::weak_ptr<Chunk> chunk);
 	int GetBlockHeight(float x, float z);
 	void SetChunkBlocks(int height, std::weak_ptr<Chunk> chunk);
+	void GenerateTree(std::weak_ptr<Chunk> chunk, int x, int y, int z);
 
 private:
 	heightMap_2d heightMap;

@@ -13,7 +13,7 @@
 Renderer::Renderer()
 {
 	//텍스쳐 Atlas
-	TextureManager::AddTexture("CubeAtlas", "../Assets/Textures/Atlas.png");
+	TextureManager::AddTexture("CubeAtlas", "../Assets/Textures/AtlasEdit.png");
 
 	//쉐이더
 	renderShaders.emplace(ShaderType::VERTEX, Shader::CreateShader<ShaderType::VERTEX>("../Assets/Shaders/CubeVert.vs"));

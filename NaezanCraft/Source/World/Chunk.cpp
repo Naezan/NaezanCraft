@@ -37,11 +37,61 @@ Chunk::~Chunk()
 
 void Chunk::SetBlock(const glm::vec3& blockPos, BlockType type)
 {
+	if (blockPos.x < 0)
+	{
+		if (!IsEmptyChunk(LeftChunk))
+			LeftChunk.lock()->SetBlock(CHUNK_X - 1, blockPos.y, blockPos.z, type);
+		return;
+	}
+	else if (blockPos.x >= CHUNK_X)
+	{
+		if (!IsEmptyChunk(RightChunk))
+			RightChunk.lock()->SetBlock(0, blockPos.y, blockPos.z, type);
+		return;
+	}
+	if (blockPos.z < 0)
+	{
+		if (!IsEmptyChunk(BackChunk))
+			BackChunk.lock()->SetBlock(blockPos.x, blockPos.y, CHUNK_Z - 1, type);
+		return;
+	}
+	else if (blockPos.z >= CHUNK_Z)
+	{
+		if (!IsEmptyChunk(FrontChunk))
+			FrontChunk.lock()->SetBlock(blockPos.x, blockPos.y, 0, type);
+		return;
+	}
+
 	chunkBlocks[blockPos.x][blockPos.y][blockPos.z].blockType = type;
 }
 
 void Chunk::SetBlock(int x, int y, int z, BlockType type)
 {
+	if (x < 0)
+	{
+		if (!IsEmptyChunk(LeftChunk))
+			LeftChunk.lock()->SetBlock(CHUNK_X - 1, y, z, type);
+		return;
+	}
+	else if (x >= CHUNK_X)
+	{
+		if (!IsEmptyChunk(RightChunk))
+			RightChunk.lock()->SetBlock(0, y, z, type);
+		return;
+	}
+	if (z < 0)
+	{
+		if (!IsEmptyChunk(BackChunk))
+			BackChunk.lock()->SetBlock(x, y, CHUNK_Z - 1, type);
+		return;
+	}
+	else if (z >= CHUNK_Z)
+	{
+		if (!IsEmptyChunk(FrontChunk))
+			FrontChunk.lock()->SetBlock(x, y, 0, type);
+		return;
+	}
+
 	chunkBlocks[x][y][z].blockType = type;
 }
 
@@ -442,7 +492,7 @@ void Chunk::CreateLightMap()
 			if (dy < 0) continue;
 
 			Block& block = GetWorldBlock(dx, dy, dz);
-			if (block.IsFluid())
+			if (block.IsSmooth())
 			{
 				bool isChangeLight = false;
 				int maxHeight = GetBlockMaxHeight(localPos.x, localPos.z);
@@ -483,7 +533,7 @@ int Chunk::GetBlockMaxHeight(int x, int z)
 {
 	OPTICK_EVENT();
 	for (int y = CHUNK_Y - 1; y >= 0; --y) {
-		if (!GetBlock(x, y, z).IsTransparent()) return y;
+		if (GetBlock(x, y, z) != BlockType::Air) return y;
 	}
 	return 0;
 }
@@ -498,7 +548,7 @@ void Chunk::CreateSSAO()
 			for (int8_t y = 0; y <= h; ++y)
 			{
 				Block& block = GetBlock(x, h, z);
-				if (!block.IsFluid())
+				if (!block.IsSmooth())
 				{
 					for (auto& dir : nearFaces)
 					{
@@ -519,7 +569,7 @@ void Chunk::ReloadSSAO(int x, int y, int z)
 			for (int8_t dy = y - 1; dy <= y + 1; ++dy)
 			{
 				Block& block = GetBlock(dx, dy, dz);
-				if (!block.IsFluid())
+				if (!block.IsSmooth())
 				{
 					for (auto& dir : nearFaces)
 					{
@@ -543,7 +593,7 @@ void Chunk::ReloadSSAO(const glm::vec3& loadPos)
 			for (int8_t dy = y - 1; dy <= y + 1; ++dy)
 			{
 				Block& block = GetBlock(dx, dy, dz);
-				if (!block.IsFluid())
+				if (!block.IsSmooth())
 				{
 					for (auto& dir : nearFaces)
 					{
@@ -560,15 +610,15 @@ void Chunk::CaculateAO(int x, int y, int z, const glm::ivec3& dir)
 	//Right
 	if (dir.x > 0)
 	{
-		bool topfront = !GetBlock(x + 1, y + 1, z + 1).IsFluid();
-		bool topback = !GetBlock(x + 1, y + 1, z - 1).IsFluid();
-		bool bottomfront = !GetBlock(x + 1, y - 1, z + 1).IsFluid();
-		bool bottomback = !GetBlock(x + 1, y - 1, z - 1).IsFluid();
+		bool topfront = !GetBlock(x + 1, y + 1, z + 1).IsSmooth();
+		bool topback = !GetBlock(x + 1, y + 1, z - 1).IsSmooth();
+		bool bottomfront = !GetBlock(x + 1, y - 1, z + 1).IsSmooth();
+		bool bottomback = !GetBlock(x + 1, y - 1, z - 1).IsSmooth();
 
-		bool top = !GetBlock(x + 1, y + 1, z).IsFluid();
-		bool bottom = !GetBlock(x + 1, y - 1, z).IsFluid();
-		bool front = !GetBlock(x + 1, y, z + 1).IsFluid();
-		bool back = !GetBlock(x + 1, y, z - 1).IsFluid();
+		bool top = !GetBlock(x + 1, y + 1, z).IsSmooth();
+		bool bottom = !GetBlock(x + 1, y - 1, z).IsSmooth();
+		bool front = !GetBlock(x + 1, y, z + 1).IsSmooth();
+		bool back = !GetBlock(x + 1, y, z - 1).IsSmooth();
 
 		//2비트로 하나의 점 표현가능
 		//1바이트면 한면 표현가능, 6바이트면 6면 다 표현가능
@@ -582,15 +632,15 @@ void Chunk::CaculateAO(int x, int y, int z, const glm::ivec3& dir)
 	//Left
 	else if (dir.x < 0)
 	{
-		bool topfront = !GetBlock(x - 1, y + 1, z + 1).IsFluid();
-		bool topback = !GetBlock(x - 1, y + 1, z - 1).IsFluid();
-		bool bottomfront = !GetBlock(x - 1, y - 1, z + 1).IsFluid();
-		bool bottomback = !GetBlock(x - 1, y - 1, z - 1).IsFluid();
+		bool topfront = !GetBlock(x - 1, y + 1, z + 1).IsSmooth();
+		bool topback = !GetBlock(x - 1, y + 1, z - 1).IsSmooth();
+		bool bottomfront = !GetBlock(x - 1, y - 1, z + 1).IsSmooth();
+		bool bottomback = !GetBlock(x - 1, y - 1, z - 1).IsSmooth();
 
-		bool top = !GetBlock(x - 1, y + 1, z).IsFluid();
-		bool bottom = !GetBlock(x - 1, y - 1, z).IsFluid();
-		bool front = !GetBlock(x - 1, y, z + 1).IsFluid();
-		bool back = !GetBlock(x - 1, y, z - 1).IsFluid();
+		bool top = !GetBlock(x - 1, y + 1, z).IsSmooth();
+		bool bottom = !GetBlock(x - 1, y - 1, z).IsSmooth();
+		bool front = !GetBlock(x - 1, y, z + 1).IsSmooth();
+		bool back = !GetBlock(x - 1, y, z - 1).IsSmooth();
 
 		auto& block = GetBlock(x, y, z);
 
@@ -602,15 +652,15 @@ void Chunk::CaculateAO(int x, int y, int z, const glm::ivec3& dir)
 	//Top
 	else if (dir.y > 0)
 	{
-		bool rightfront = !GetBlock(x + 1, y + 1, z + 1).IsFluid();
-		bool rightback = !GetBlock(x + 1, y + 1, z - 1).IsFluid();
-		bool leftfront = !GetBlock(x - 1, y + 1, z + 1).IsFluid();
-		bool leftback = !GetBlock(x - 1, y + 1, z - 1).IsFluid();
+		bool rightfront = !GetBlock(x + 1, y + 1, z + 1).IsSmooth();
+		bool rightback = !GetBlock(x + 1, y + 1, z - 1).IsSmooth();
+		bool leftfront = !GetBlock(x - 1, y + 1, z + 1).IsSmooth();
+		bool leftback = !GetBlock(x - 1, y + 1, z - 1).IsSmooth();
 
-		bool right = !GetBlock(x + 1, y + 1, z).IsFluid();
-		bool left = !GetBlock(x - 1, y + 1, z).IsFluid();
-		bool front = !GetBlock(x, y + 1, z + 1).IsFluid();
-		bool back = !GetBlock(x, y + 1, z - 1).IsFluid();
+		bool right = !GetBlock(x + 1, y + 1, z).IsSmooth();
+		bool left = !GetBlock(x - 1, y + 1, z).IsSmooth();
+		bool front = !GetBlock(x, y + 1, z + 1).IsSmooth();
+		bool back = !GetBlock(x, y + 1, z - 1).IsSmooth();
 
 		auto& block = GetBlock(x, y, z);
 
@@ -622,15 +672,15 @@ void Chunk::CaculateAO(int x, int y, int z, const glm::ivec3& dir)
 	//Bottom
 	else if (dir.y < 0)
 	{
-		bool rightfront = !GetBlock(x + 1, y - 1, z + 1).IsFluid();
-		bool rightback = !GetBlock(x + 1, y - 1, z - 1).IsFluid();
-		bool leftfront = !GetBlock(x - 1, y - 1, z + 1).IsFluid();
-		bool leftback = !GetBlock(x - 1, y - 1, z - 1).IsFluid();
+		bool rightfront = !GetBlock(x + 1, y - 1, z + 1).IsSmooth();
+		bool rightback = !GetBlock(x + 1, y - 1, z - 1).IsSmooth();
+		bool leftfront = !GetBlock(x - 1, y - 1, z + 1).IsSmooth();
+		bool leftback = !GetBlock(x - 1, y - 1, z - 1).IsSmooth();
 
-		bool right = !GetBlock(x + 1, y - 1, z).IsFluid();
-		bool left = !GetBlock(x - 1, y - 1, z).IsFluid();
-		bool front = !GetBlock(x, y - 1, z + 1).IsFluid();
-		bool back = !GetBlock(x, y - 1, z - 1).IsFluid();
+		bool right = !GetBlock(x + 1, y - 1, z).IsSmooth();
+		bool left = !GetBlock(x - 1, y - 1, z).IsSmooth();
+		bool front = !GetBlock(x, y - 1, z + 1).IsSmooth();
+		bool back = !GetBlock(x, y - 1, z - 1).IsSmooth();
 
 		auto& block = GetBlock(x, y, z);
 
@@ -642,15 +692,15 @@ void Chunk::CaculateAO(int x, int y, int z, const glm::ivec3& dir)
 	//Front
 	else if (dir.z > 0)
 	{
-		bool righttop = !GetBlock(x + 1, y + 1, z + 1).IsFluid();
-		bool rightbottom = !GetBlock(x + 1, y - 1, z + 1).IsFluid();
-		bool lefttop = !GetBlock(x - 1, y + 1, z + 1).IsFluid();
-		bool leftbottom = !GetBlock(x - 1, y - 1, z + 1).IsFluid();
+		bool righttop = !GetBlock(x + 1, y + 1, z + 1).IsSmooth();
+		bool rightbottom = !GetBlock(x + 1, y - 1, z + 1).IsSmooth();
+		bool lefttop = !GetBlock(x - 1, y + 1, z + 1).IsSmooth();
+		bool leftbottom = !GetBlock(x - 1, y - 1, z + 1).IsSmooth();
 
-		bool right = !GetBlock(x + 1, y, z + 1).IsFluid();
-		bool left = !GetBlock(x - 1, y, z + 1).IsFluid();
-		bool top = !GetBlock(x, y + 1, z + 1).IsFluid();
-		bool bottom = !GetBlock(x, y - 1, z + 1).IsFluid();
+		bool right = !GetBlock(x + 1, y, z + 1).IsSmooth();
+		bool left = !GetBlock(x - 1, y, z + 1).IsSmooth();
+		bool top = !GetBlock(x, y + 1, z + 1).IsSmooth();
+		bool bottom = !GetBlock(x, y - 1, z + 1).IsSmooth();
 
 		auto& block = GetBlock(x, y, z);
 
@@ -662,15 +712,15 @@ void Chunk::CaculateAO(int x, int y, int z, const glm::ivec3& dir)
 	//Back
 	else if (dir.z < 0)
 	{
-		bool righttop = !GetBlock(x + 1, y + 1, z - 1).IsFluid();
-		bool rightbottom = !GetBlock(x + 1, y - 1, z - 1).IsFluid();
-		bool lefttop = !GetBlock(x - 1, y + 1, z - 1).IsFluid();
-		bool leftbottom = !GetBlock(x - 1, y - 1, z - 1).IsFluid();
+		bool righttop = !GetBlock(x + 1, y + 1, z - 1).IsSmooth();
+		bool rightbottom = !GetBlock(x + 1, y - 1, z - 1).IsSmooth();
+		bool lefttop = !GetBlock(x - 1, y + 1, z - 1).IsSmooth();
+		bool leftbottom = !GetBlock(x - 1, y - 1, z - 1).IsSmooth();
 
-		bool right = !GetBlock(x + 1, y, z - 1).IsFluid();
-		bool left = !GetBlock(x - 1, y, z - 1).IsFluid();
-		bool top = !GetBlock(x, y + 1, z - 1).IsFluid();
-		bool bottom = !GetBlock(x, y - 1, z - 1).IsFluid();
+		bool right = !GetBlock(x + 1, y, z - 1).IsSmooth();
+		bool left = !GetBlock(x - 1, y, z - 1).IsSmooth();
+		bool top = !GetBlock(x, y + 1, z - 1).IsSmooth();
+		bool bottom = !GetBlock(x, y - 1, z - 1).IsSmooth();
 
 		auto& block = GetBlock(x, y, z);
 
