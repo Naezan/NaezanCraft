@@ -115,9 +115,17 @@ void World::AsyncLoadChunk(const ChunkLoadState& loadState)
 				if (!IsChunkCreatedByPos(x, z))
 				{
 					worldChunks[std::pair<int, int>(x, z)] = std::make_shared<Chunk>(glm::vec3(x, 0, z));
-					worldChunks[std::pair<int, int>(x, z)]->GenerateTerrain(worldGenerator);
 				}
 				loadChunks.emplace(std::pair<int, int>(x, z), worldChunks[std::pair<int, int>(x, z)]);
+			}
+		}
+
+		for (const auto& chunk : loadChunks)
+		{
+			if (chunk.second->chunkLoadState == loadState)
+			{
+				chunk.second->SetupChunkNeighbor();
+				chunk.second->GenerateTerrain(worldGenerator);
 			}
 		}
 
@@ -165,8 +173,6 @@ void World::CreateChunk(std::weak_ptr<Chunk> chunk)
 
 	std::unique_lock<std::mutex> lock(worldMutex);
 	chunk.lock()->CreateChunkMesh(false);
-
-	chunk.lock()->SetupChunkNeighbor();
 }
 
 void World::UpdateChunk()

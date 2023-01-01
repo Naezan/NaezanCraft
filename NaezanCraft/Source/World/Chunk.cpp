@@ -40,25 +40,25 @@ void Chunk::SetBlock(const glm::vec3& blockPos, BlockType type)
 	if (blockPos.x < 0)
 	{
 		if (!IsEmptyChunk(LeftChunk))
-			LeftChunk.lock()->SetBlock(CHUNK_X - 1, blockPos.y, blockPos.z, type);
+			LeftChunk.lock()->SetBlock(CHUNK_X  + blockPos.x, blockPos.y, blockPos.z, type);
 		return;
 	}
 	else if (blockPos.x >= CHUNK_X)
 	{
 		if (!IsEmptyChunk(RightChunk))
-			RightChunk.lock()->SetBlock(0, blockPos.y, blockPos.z, type);
+			RightChunk.lock()->SetBlock(blockPos.x - CHUNK_X, blockPos.y, blockPos.z, type);
 		return;
 	}
 	if (blockPos.z < 0)
 	{
 		if (!IsEmptyChunk(BackChunk))
-			BackChunk.lock()->SetBlock(blockPos.x, blockPos.y, CHUNK_Z - 1, type);
+			BackChunk.lock()->SetBlock(blockPos.x, blockPos.y, CHUNK_Z + blockPos.z, type);
 		return;
 	}
 	else if (blockPos.z >= CHUNK_Z)
 	{
 		if (!IsEmptyChunk(FrontChunk))
-			FrontChunk.lock()->SetBlock(blockPos.x, blockPos.y, 0, type);
+			FrontChunk.lock()->SetBlock(blockPos.x, blockPos.y, blockPos.z - CHUNK_Z, type);
 		return;
 	}
 
@@ -70,25 +70,25 @@ void Chunk::SetBlock(int x, int y, int z, BlockType type)
 	if (x < 0)
 	{
 		if (!IsEmptyChunk(LeftChunk))
-			LeftChunk.lock()->SetBlock(CHUNK_X - 1, y, z, type);
+			LeftChunk.lock()->SetBlock(CHUNK_X + x, y, z, type);
 		return;
 	}
 	else if (x >= CHUNK_X)
 	{
 		if (!IsEmptyChunk(RightChunk))
-			RightChunk.lock()->SetBlock(0, y, z, type);
+			RightChunk.lock()->SetBlock(x - CHUNK_X, y, z, type);
 		return;
 	}
 	if (z < 0)
 	{
 		if (!IsEmptyChunk(BackChunk))
-			BackChunk.lock()->SetBlock(x, y, CHUNK_Z - 1, type);
+			BackChunk.lock()->SetBlock(x, y, CHUNK_Z + z, type);
 		return;
 	}
 	else if (z >= CHUNK_Z)
 	{
 		if (!IsEmptyChunk(FrontChunk))
-			FrontChunk.lock()->SetBlock(x, y, 0, type);
+			FrontChunk.lock()->SetBlock(x, y, z - CHUNK_Z, type);
 		return;
 	}
 
@@ -109,28 +109,28 @@ Block& Chunk::GetBlock(const glm::vec3& blockPos)
 	if (x < 0)
 	{
 		if (!IsEmptyChunk(LeftChunk))
-			return LeftChunk.lock()->GetBlock(CHUNK_X - 1, y, z);
+			return LeftChunk.lock()->GetBlock(CHUNK_X + x, y, z);
 		else
 			return emptyBlock;
 	}
 	else if (x >= CHUNK_X)
 	{
 		if (!IsEmptyChunk(RightChunk))
-			return RightChunk.lock()->GetBlock(0, y, z);
+			return RightChunk.lock()->GetBlock(x - CHUNK_X, y, z);
 		else
 			return emptyBlock;
 	}
 	if (z < 0)
 	{
 		if (!IsEmptyChunk(BackChunk))
-			return BackChunk.lock()->GetBlock(x, z, CHUNK_Z - 1);
+			return BackChunk.lock()->GetBlock(x, y, CHUNK_Z + z);
 		else
 			return emptyBlock;
 	}
 	else if (z >= CHUNK_Z)
 	{
 		if (!IsEmptyChunk(FrontChunk))
-			return FrontChunk.lock()->GetBlock(x, y, 0);
+			return FrontChunk.lock()->GetBlock(x, y, z - CHUNK_Z);
 		else
 			return emptyBlock;
 	}
@@ -148,28 +148,28 @@ Block& Chunk::GetBlock(int x, int y, int z)
 	if (x < 0)
 	{
 		if (!IsEmptyChunk(LeftChunk))
-			return LeftChunk.lock()->GetBlock(CHUNK_X - 1, y, z);
+			return LeftChunk.lock()->GetBlock(CHUNK_X + x, y, z);
 		else
 			return emptyBlock;
 	}
 	else if (x >= CHUNK_X)
 	{
 		if (!IsEmptyChunk(RightChunk))
-			return RightChunk.lock()->GetBlock(0, y, z);
+			return RightChunk.lock()->GetBlock(x - CHUNK_X, y, z);
 		else
 			return emptyBlock;
 	}
 	if (z < 0)
 	{
 		if (!IsEmptyChunk(BackChunk))
-			return BackChunk.lock()->GetBlock(x, z, CHUNK_Z - 1);
+			return BackChunk.lock()->GetBlock(x, z, CHUNK_Z + z);
 		else
 			return emptyBlock;
 	}
 	else if (z >= CHUNK_Z)
 	{
 		if (!IsEmptyChunk(FrontChunk))
-			return FrontChunk.lock()->GetBlock(x, y, 0);
+			return FrontChunk.lock()->GetBlock(x, y, z - CHUNK_Z);
 		else
 			return emptyBlock;
 	}

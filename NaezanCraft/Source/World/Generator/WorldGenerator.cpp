@@ -93,7 +93,7 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 
 						//TODO Flower, Tree, Catus, Grass
 
-						std::uniform_int_distribution<int> dis(0, 50);
+						std::uniform_int_distribution<int> dis(0, 70);
 						if (dis(gen) == 0)
 						{
 							treePositions.emplace_back(x, y + 1, z);
@@ -161,6 +161,8 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 	//Generate Tree
 	for (auto& treePos : treePositions)
 	{
+		//위치범위밖에 청크가 없다면?
+
 		if (chunk.lock()->GetBlock(treePos).blockType == BlockType::Air)
 		{
 			if (chunk.lock()->GetBlock(treePos.x, treePos.y - 1, treePos.z).IsGrowable())
