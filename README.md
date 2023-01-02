@@ -34,7 +34,7 @@ MineCraft Copy Naezan's Engine
     - [x] ~~프러스텀컬링(AABB)~~
     - [ ] 오컬루전 컬링 + 옥트리(조금 더 추가적인 연산을 필요로 하기에 적절하게 써야함)
     - [x] ~~Chunk Object Rendering~~
-    - [ ] 블럭 방향에 따라 다른 텍스처 로드
+    - [x] ~~블럭 방향에 따라 다른 텍스처 로드~~
     - [x] ~~SkyBox~~
         * ~~Sun & Moon~~
         * ~~Cloud~~
@@ -74,8 +74,8 @@ MineCraft Copy Naezan's Engine
 
     - [x] ~~최적화중에 CPU가 Lock에 의해서 많은 시간 놀고있는것을 발견했다 아마 스레드분리하는 곳에서 문제가 발생했고 그 문제를 해결하기 위해서 유사 싱글 스레드를 사용하였다. 그리고 OpenGL에서는 스레드를 지원해주지 않기때문에 분리해서 처리해줘야한다.~~
       ![약80%의 속도를 향상시켰다 하지만 CPU가 논다](./Screenshot/Optimize1.PNG)
-    - [ ] 청크경계면에 블럭을 설치할때 fatal error 발생, 메모리릭이 있는듯하다
-    - [ ] SSAO의 렌더링이 다음 블럭 설치까지 딜레이가 생긴다
+    - [x] ~~청크경계면에 블럭을 설치할때 fatal error 발생, 메모리릭이 있는듯하다~~
+    - [x] ~~SSAO의 렌더링이 다음 블럭 설치까지 딜레이가 생긴다~~
 
 - 현재 최적화 상태
   ![현재 최적화 상태](./Screenshot/Optimize2.PNG)

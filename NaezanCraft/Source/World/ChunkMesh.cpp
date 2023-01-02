@@ -54,7 +54,6 @@ void ChunkMesh::CreateMesh()
 				if (block.blockType == BlockType::Air)
 					continue;
 
-				//GetBlockTypeAndGetTexCoord
 				auto texcord = GetTexCoord(block.blockType);
 				AddFaces(glm::uvec3(x, y, z), block.blockType, texcord);
 			}
@@ -96,7 +95,7 @@ void ChunkMesh::CreateBuffer()
 	}
 }
 
-void ChunkMesh::AddFaces(const glm::u8vec3& pos, BlockType& type, const glm::u16vec2& texcoord)
+void ChunkMesh::AddFaces(const glm::u8vec3& pos, BlockType& type, glm::u16vec2& texcoord)
 {
 	//Z Back
 	if (pos.z > 0)
@@ -172,8 +171,24 @@ void ChunkMesh::AddFaces(const glm::u8vec3& pos, BlockType& type, const glm::u16
 	}
 }
 
-void ChunkMesh::AddFace(const glm::u8vec3& pos, const BlockType& Blocktype, const FaceType& faceType, const glm::u16vec2& texcoord)
+void ChunkMesh::AddFace(const glm::u8vec3& pos, const BlockType& Blocktype, const FaceType& faceType, glm::u16vec2 texcoord)
 {
+	if ((Blocktype == OakLog || Blocktype == BirchLog) && (faceType == FaceType::Top || faceType == FaceType::Bottom))
+	{
+		texcoord = GetTexCoord(BlockType(Blocktype + 1));
+	}
+	else if (Blocktype == Grass)
+	{
+		if (faceType == FaceType::Bottom)
+		{
+			texcoord = GetTexCoord(Dirt);
+		}
+		else if (faceType != FaceType::Top)
+		{
+			texcoord = GetTexCoord(GrassSide);
+		}
+	}
+
 	const std::array<glm::u16vec2, 4> texcoords{
 		glm::u16vec2(SPRITE_WIDTH * texcoord.x, SPRITE_HEIGHT * (texcoord.y + 1.f)),
 		glm::u16vec2(SPRITE_WIDTH * (texcoord.x + 1.f), SPRITE_HEIGHT * (texcoord.y + 1.f)),
@@ -292,7 +307,7 @@ void ChunkMesh::DeleteChunkMesh()
 	meshVertices.clear();
 }
 
-glm::u16vec2 ChunkMesh::GetTexCoord(BlockType& type)
+glm::u16vec2 ChunkMesh::GetTexCoord(const BlockType& type)
 {
 	std::pair<int, int> coord = World::BlockCoordData[type];
 	return glm::u16vec2(coord.first, coord.second);

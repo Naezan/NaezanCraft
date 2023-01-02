@@ -30,11 +30,11 @@ public:
 
 	void CreateMesh();
 	void CreateBuffer();
-	void AddFaces(const glm::u8vec3& pos, BlockType& type, const glm::u16vec2& texcoord);
-	void AddFace(const glm::u8vec3& pos, const BlockType& Blocktype, const FaceType& faceType, const glm::u16vec2& texcoord);
+	void AddFaces(const glm::u8vec3& pos, BlockType& type, glm::u16vec2& texcoord);
+	void AddFace(const glm::u8vec3& pos, const BlockType& Blocktype, const FaceType& faceType, glm::u16vec2 texcoord);
 	void DeleteChunkMesh();
 
-	glm::u16vec2 GetTexCoord(BlockType& type);
+	glm::u16vec2 GetTexCoord(const BlockType& type);
 
 private:
 	static const std::array<glm::u8vec3, 4> vertices[];

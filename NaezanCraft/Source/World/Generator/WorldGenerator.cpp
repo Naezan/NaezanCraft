@@ -89,7 +89,7 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 					{
 						//Defualt set block by biome, stone(mountain) or dirt(forest) or sand(desert)
 						//TODO GetBiome(x, z).GetSurfaceBlockType();
-						chunk.lock()->SetBlock(x, y, z, BlockType::Dirt);
+						chunk.lock()->SetBlock(x, y, z, BlockType::Grass);
 
 						//TODO Flower, Tree, Catus, Grass
 
@@ -104,6 +104,32 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 						//RandomBaseMakeUnderWaterCluster(Mountain, Forest, Desert, Ocean) -> Circle?
 						//Defualt set block by biome, stone(mountain) or dirt(forest) or sand(desert)
 						//TODO GetBiome(x, z).GetInWaterBlockType();
+						chunk.lock()->SetBlock(x, y, z, BlockType::Sand);
+					}
+				}
+				else if (y >= h - 1)
+				{
+					if (y >= WATER_HEIGHT)
+					{
+						chunk.lock()->SetBlock(x, y, z, BlockType::Dirt);
+					}
+					else
+					{
+						chunk.lock()->SetBlock(x, y, z, BlockType::Sand);
+					}
+				}
+				else if (y >= h - 2)
+				{
+					if (y >= WATER_HEIGHT)
+					{
+						std::uniform_int_distribution<int> dis(0, 3);
+						if (dis(gen) < 3)
+							chunk.lock()->SetBlock(x, y, z, BlockType::Dirt);
+						else
+							chunk.lock()->SetBlock(x, y, z, BlockType::Stone);
+					}
+					else
+					{
 						chunk.lock()->SetBlock(x, y, z, BlockType::Sand);
 					}
 				}
