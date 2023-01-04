@@ -30,8 +30,8 @@ public:
 
 	void CreateMesh();
 	void CreateBuffer();
-	void AddFaces(const glm::u8vec3& pos, BlockType& type, glm::u16vec2& texcoord);
-	void AddFace(const glm::u8vec3& pos, const BlockType& Blocktype, const FaceType& faceType, glm::u16vec2 texcoord);
+	void AddFaces(const glm::u8vec3& pos, Block& block);
+	void AddFace(const glm::u8vec3& pos, Block& block, const FaceType& faceType);
 	void DeleteChunkMesh();
 
 	glm::u16vec2 GetTexCoord(const BlockType& type);

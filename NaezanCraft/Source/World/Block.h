@@ -59,6 +59,14 @@ struct Block
 		return (this->blockType == BlockType::Grass) || (this->blockType == BlockType::Dirt);
 	}
 
+	inline bool IsGround() {
+		return 
+		(this->blockType == BlockType::Grass) || 
+		(this->blockType == BlockType::Dirt) || 
+		(this->blockType == BlockType::Stone) || 
+		(this->blockType == BlockType::Sand);
+	}
+
 	bool operator==(Block rv) const
 	{
 		return this->blockType == rv.blockType;

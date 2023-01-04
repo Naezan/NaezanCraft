@@ -533,7 +533,7 @@ int Chunk::GetBlockMaxHeight(int x, int z)
 {
 	OPTICK_EVENT();
 	for (int y = CHUNK_Y - 1; y >= 0; --y) {
-		if (!GetBlock(x, y, z).IsTransparent()) return y;//TO DO
+		if (GetBlock(x, y, z).IsGround()) return y;//TO DO
 	}
 	return 0;
 }

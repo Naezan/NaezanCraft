@@ -119,7 +119,7 @@ void Player::Update()
 				position.z += PLAYER_SPEED * velocity.z;
 				break;
 			}
-			Collision(directions[i]);
+			//Collision(directions[i]);
 		}
 	}
 

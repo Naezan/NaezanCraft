@@ -54,8 +54,7 @@ void ChunkMesh::CreateMesh()
 				if (block.blockType == BlockType::Air)
 					continue;
 
-				auto texcord = GetTexCoord(block.blockType);
-				AddFaces(glm::uvec3(x, y, z), block.blockType, texcord);
+				AddFaces(glm::uvec3(x, y, z), block);
 			}
 		}
 	}
@@ -95,52 +94,75 @@ void ChunkMesh::CreateBuffer()
 	}
 }
 
-void ChunkMesh::AddFaces(const glm::u8vec3& pos, BlockType& type, glm::u16vec2& texcoord)
+void ChunkMesh::AddFaces(const glm::u8vec3& pos, Block& block)
 {
 	//Z Back
 	if (pos.z > 0)
 	{
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, pos.z - 1)).IsTransparent())
-			AddFace(pos, type, FaceType::Back, texcoord);
+			AddFace(pos, block, FaceType::Back);
 	}
-	else if (Chunk::IsEmptyChunk(parentChunk.lock()->BackChunk) || parentChunk.lock()->BackChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, CHUNK_Z - 1)).IsTransparent())
+	else if (!Chunk::IsEmptyChunk(parentChunk.lock()->BackChunk) && parentChunk.lock()->BackChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, CHUNK_Z - 1)).IsTransparent())
 	{
-		AddFace(pos, type, FaceType::Back, texcoord);
+		AddFace(pos, block, FaceType::Back);
+
+		int parentHeight = parentChunk.lock()->GetBlockMaxHeight(pos.x, 0);
+		int backHeight = parentChunk.lock()->BackChunk.lock()->GetBlockMaxHeight(pos.x, CHUNK_Z - 1);
+		if (parentHeight < backHeight)
+		{
+			for (int h = parentHeight + 1; h <= backHeight; ++h)
+			{
+				auto& b = parentChunk.lock()->BackChunk.lock()->GetBlock(pos.x, h, CHUNK_Z - 1);
+				AddFace(glm::u8vec3(pos.x, h, CHUNK_Z - 1), b, FaceType::Front);
+			}
+		}
 	}
 
 	//Z Front
 	if (pos.z < CHUNK_Z - 1)
 	{
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, pos.z + 1)).IsTransparent())
-			AddFace(pos, type, FaceType::Front, texcoord);
+			AddFace(pos, block, FaceType::Front);
 	}
-	else if (Chunk::IsEmptyChunk(parentChunk.lock()->FrontChunk) || parentChunk.lock()->FrontChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, 0)).IsTransparent())
+	else if (!Chunk::IsEmptyChunk(parentChunk.lock()->FrontChunk) && parentChunk.lock()->FrontChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, 0)).IsTransparent())
 	{
-		AddFace(pos, type, FaceType::Front, texcoord);
+		AddFace(pos, block, FaceType::Front);
+
+		//내높이 + 1부터 frontHeight(포함)까지 front청크의 0번의 back면에 블럭 추가
+		int parentHeight = parentChunk.lock()->GetBlockMaxHeight(pos.x, pos.z);
+		int frontHeight = parentChunk.lock()->FrontChunk.lock()->GetBlockMaxHeight(pos.x, 0);
+		if (parentHeight < frontHeight)
+		{
+			for (int h = parentHeight + 1; h <= frontHeight; ++h)
+			{
+				auto& b = parentChunk.lock()->FrontChunk.lock()->GetBlock(pos.x, h, 0);
+				AddFace(glm::u8vec3(pos.x, h, 0), b, FaceType::Back);
+			}
+		}
 	}
 
 	//Y Bottom
 	if (pos.y > 0)
 	{
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y - 1, pos.z)).IsTransparent())
-			AddFace(pos, type, FaceType::Bottom, texcoord);
+			AddFace(pos, block, FaceType::Bottom);
 	}
 	else
 	{
 		//Just add Bottom Face Once
-		AddFace(pos, type, FaceType::Bottom, texcoord);
+		AddFace(pos, block, FaceType::Bottom);
 	}
 
 	//Y Top
 	if (pos.y < CHUNK_Y - 1)
 	{
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y + 1, pos.z)).IsTransparent())
-			AddFace(pos, type, FaceType::Top, texcoord);
+			AddFace(pos, block, FaceType::Top);
 	}
 	else
 	{
 		//Just add Top Face Once
-		AddFace(pos, type, FaceType::Top, texcoord);
+		AddFace(pos, block, FaceType::Top);
 	}
 
 
@@ -149,12 +171,23 @@ void ChunkMesh::AddFaces(const glm::u8vec3& pos, BlockType& type, glm::u16vec2& 
 	{
 		//만약 이전박스가 없다면 비어있으면 안되므로 현재 왼쪽면의 정보를 추가해준다
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x - 1, pos.y, pos.z)).IsTransparent())
-			AddFace(pos, type, FaceType::Left, texcoord);
+			AddFace(pos, block, FaceType::Left);
 	}
-	else if (Chunk::IsEmptyChunk(parentChunk.lock()->LeftChunk) || parentChunk.lock()->LeftChunk.lock()->GetBlock(glm::vec3(CHUNK_X - 1, pos.y, pos.z)).IsTransparent())
+	else if (!Chunk::IsEmptyChunk(parentChunk.lock()->LeftChunk) && parentChunk.lock()->LeftChunk.lock()->GetBlock(glm::vec3(CHUNK_X - 1, pos.y, pos.z)).IsTransparent())
 	{
 		//만약 이전 청크의 마지막이 없다면 0번째위치 왼쪽면의 정보를 추가해준다
-		AddFace(pos, type, FaceType::Left, texcoord);
+		AddFace(pos, block, FaceType::Left);
+
+		int parentHeight = parentChunk.lock()->GetBlockMaxHeight(pos.x, pos.z);
+		int leftHeight = parentChunk.lock()->LeftChunk.lock()->GetBlockMaxHeight(CHUNK_X - 1, pos.z);
+		if (parentHeight < leftHeight)
+		{
+			for (int h = parentHeight + 1; h <= leftHeight; ++h)
+			{
+				auto& b = parentChunk.lock()->LeftChunk.lock()->GetBlock(CHUNK_X - 1, h, pos.z);
+				AddFace(glm::u8vec3(CHUNK_X - 1, h, pos.z), b, FaceType::Right);
+			}
+		}
 	}
 
 	//X Right
@@ -162,22 +195,34 @@ void ChunkMesh::AddFaces(const glm::u8vec3& pos, BlockType& type, glm::u16vec2& 
 	{
 		//만약 다음박스가 없다면 비어있으면 안되므로 현재 오른쪽면의 정보를 추가해준다
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x + 1, pos.y, pos.z)).IsTransparent())
-			AddFace(pos, type, FaceType::Right, texcoord);
+			AddFace(pos, block, FaceType::Right);
 	}
-	else if (Chunk::IsEmptyChunk(parentChunk.lock()->RightChunk) || parentChunk.lock()->RightChunk.lock()->GetBlock(glm::vec3(0, pos.y, pos.z)).IsTransparent())
+	else if (!Chunk::IsEmptyChunk(parentChunk.lock()->RightChunk) && parentChunk.lock()->RightChunk.lock()->GetBlock(glm::vec3(0, pos.y, pos.z)).IsTransparent())
 	{
 		//만약 다음 청크의 0번째가 없다면 CHUNK_X - 1위치 으론쪽면의 정보를 추가해준다
-		AddFace(pos, type, FaceType::Right, texcoord);
+		AddFace(pos, block, FaceType::Right);
+
+		int parentHeight = parentChunk.lock()->GetBlockMaxHeight(pos.x, pos.z);
+		int rightHeight = parentChunk.lock()->RightChunk.lock()->GetBlockMaxHeight(0, pos.z);
+		if (parentHeight < rightHeight)
+		{
+			for (int h = parentHeight + 1; h <= rightHeight; ++h)
+			{
+				auto& b = parentChunk.lock()->RightChunk.lock()->GetBlock(0, h, pos.z);
+				AddFace(glm::u8vec3(0, h, pos.z), b, FaceType::Left);
+			}
+		}
 	}
 }
 
-void ChunkMesh::AddFace(const glm::u8vec3& pos, const BlockType& Blocktype, const FaceType& faceType, glm::u16vec2 texcoord)
+void ChunkMesh::AddFace(const glm::u8vec3& pos, Block& block, const FaceType& faceType)
 {
-	if ((Blocktype == OakLog || Blocktype == BirchLog) && (faceType == FaceType::Top || faceType == FaceType::Bottom))
+	glm::u16vec2 texcoord = GetTexCoord(block.blockType);
+	if ((block.blockType == OakLog || block.blockType == BirchLog) && (faceType == FaceType::Top || faceType == FaceType::Bottom))
 	{
-		texcoord = GetTexCoord(BlockType(Blocktype + 1));
+		texcoord = GetTexCoord(BlockType(block.blockType + 1));
 	}
-	else if (Blocktype == Grass)
+	else if (block.blockType == Grass)
 	{
 		if (faceType == FaceType::Bottom)
 		{
@@ -195,8 +240,6 @@ void ChunkMesh::AddFace(const glm::u8vec3& pos, const BlockType& Blocktype, cons
 		glm::u16vec2(SPRITE_WIDTH * (texcoord.x + 1.f), SPRITE_HEIGHT * texcoord.y),
 		glm::u16vec2(SPRITE_WIDTH * texcoord.x, SPRITE_HEIGHT * texcoord.y)
 	};
-
-	Block& block = parentChunk.lock()->GetBlock(pos);
 
 	/*
 	//trb, tlb, tlf, trf
