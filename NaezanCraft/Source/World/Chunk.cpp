@@ -390,40 +390,24 @@ void Chunk::SetupChunkNeighbor()
 	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(position.x - 1), static_cast<int>(position.z)), LeftChunk))
 	{
 		LeftChunk.lock()->RightChunk = shared_from_this();
-		if (chunkLoadState == ChunkLoadState::MeshLoaded && LeftChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
-		{
-			//LeftChunk.lock()->CreateChunkMesh();
-		}
 	}
 	else
 		LeftChunk.reset();
 	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(position.x + 1), static_cast<int>(position.z)), RightChunk))
 	{
 		RightChunk.lock()->LeftChunk = shared_from_this();
-		if (chunkLoadState == ChunkLoadState::MeshLoaded && RightChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
-		{
-			//RightChunk.lock()->CreateChunkMesh();
-		}
 	}
 	else
 		RightChunk.reset();
 	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(position.x), static_cast<int>(position.z - 1)), BackChunk))
 	{
 		BackChunk.lock()->FrontChunk = shared_from_this();
-		if (chunkLoadState == ChunkLoadState::MeshLoaded && BackChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
-		{
-			//BackChunk.lock()->CreateChunkMesh();
-		}
 	}
 	else
 		BackChunk.reset();
 	if (GET_World()->GetChunkByPos(std::pair<int, int>(static_cast<int>(position.x), static_cast<int>(position.z + 1)), FrontChunk))
 	{
 		FrontChunk.lock()->BackChunk = shared_from_this();
-		if (chunkLoadState == ChunkLoadState::MeshLoaded && FrontChunk.lock()->chunkLoadState == ChunkLoadState::Builted)
-		{
-			//FrontChunk.lock()->CreateChunkMesh();
-		}
 	}
 	else
 		FrontChunk.reset();
@@ -452,6 +436,12 @@ void Chunk::CreateMeshBuffer()
 void Chunk::GenerateTerrain(std::unique_ptr<WorldGenerator>& worldGenerator)
 {
 	worldGenerator->GenerateTerrain(shared_from_this());
+}
+
+void Chunk::RebuildChunkMesh()
+{
+	//recreate vertexbuffer and indexbuffer
+	chunkMesh->RebuildBuffer(rebuildVertices);
 }
 
 void Chunk::CreateLightMap()
@@ -548,7 +538,7 @@ void Chunk::CreateSSAO()
 			for (int8_t y = 0; y <= h; ++y)
 			{
 				Block& block = GetBlock(x, h, z);
-				if (!block.IsSmooth())
+				if (!block.IsFluid())
 				{
 					for (auto& dir : nearFaces)
 					{
@@ -569,7 +559,7 @@ void Chunk::ReloadSSAO(int x, int y, int z)
 			for (int8_t dy = y - 1; dy <= y + 1; ++dy)
 			{
 				Block& block = GetBlock(dx, dy, dz);
-				if (!block.IsSmooth())
+				if (!block.IsFluid())
 				{
 					for (auto& dir : nearFaces)
 					{
@@ -593,7 +583,7 @@ void Chunk::ReloadSSAO(const glm::vec3& loadPos)
 			for (int8_t dy = y - 1; dy <= y + 1; ++dy)
 			{
 				Block& block = GetBlock(dx, dy, dz);
-				if (!block.IsSmooth())
+				if (!block.IsFluid())
 				{
 					for (auto& dir : nearFaces)
 					{
@@ -747,4 +737,9 @@ bool Chunk::IsEmptyChunk(std::weak_ptr<Chunk> const& chunk)
 		return true;
 	}
 	return !chunk.owner_before(std::weak_ptr<Chunk>()) && !std::weak_ptr<Chunk>().owner_before(chunk);
+}
+
+bool Chunk::AllDirectionChunkIsReady()
+{
+	return !IsEmptyChunk(LeftChunk) && !IsEmptyChunk(RightChunk) && !IsEmptyChunk(FrontChunk) && !IsEmptyChunk(BackChunk);
 }

@@ -8,10 +8,11 @@ using vector_3d = std::vector<std::vector<std::vector<unsigned char>>>;
 
 class ChunkMesh;
 class WorldGenerator;
+struct VertTexCoord;
 
 enum class ChunkLoadState
 {
-	Unloaded, MeshLoaded, Builted
+	Unloaded, TerrainGenerated, MeshLoaded, Builted
 };
 
 class Chunk : public std::enable_shared_from_this<Chunk>
@@ -39,6 +40,11 @@ public:
 	void CreateMeshBuffer();
 	void GenerateTerrain(std::unique_ptr<WorldGenerator>& worldGenerator);
 
+	//rebuild
+	void RebuildChunkMesh();
+
+	inline bool IsRebuild() { return !rebuildVertices.empty(); }
+
 	//Lighting
 	void CreateLightMap();
 	int GetBlockMaxHeight(int x, int z);
@@ -51,6 +57,7 @@ public:
 	uint8_t CacluateVertexAO(bool side1, bool side2, bool corner);
 
 	static bool IsEmptyChunk(std::weak_ptr<Chunk> const& chunk);
+	bool AllDirectionChunkIsReady();
 
 public:
 	//need to use heap memory? but pointer is heavy? 65,536 * 1 byte?
@@ -60,6 +67,7 @@ public:
 	glm::vec3 position;
 	ChunkLoadState chunkLoadState;
 	std::unique_ptr<ChunkMesh> chunkMesh;
+	std::vector<VertTexCoord> rebuildVertices;
 
 	AABox chunkBox;
 

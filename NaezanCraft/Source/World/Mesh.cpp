@@ -43,8 +43,9 @@ void Mesh::CreateIndexBuffer()
 {
 	indexBuffer = std::make_unique<IndexBuffer>(meshIndices.size() * sizeof(unsigned int), &meshIndices.front());
 	indicesCount = meshIndices.size();
-	meshIndices.clear();
-	meshIndices.shrink_to_fit();
+	lastIndex = meshIndices.back();
+	//meshIndices.clear();
+	//meshIndices.shrink_to_fit();
 }
 
 void Mesh::SetVertexBufferData(size_t size, const void* data)

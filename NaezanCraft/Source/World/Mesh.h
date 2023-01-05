@@ -41,5 +41,7 @@ protected:
 	std::unique_ptr<IndexBuffer> indexBuffer;
 
 	std::vector<unsigned int> meshIndices;
+	std::vector<unsigned int> rebuildIndices;
+	unsigned int lastIndex;
 	int indicesCount = 0;
 };

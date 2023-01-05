@@ -7,25 +7,25 @@
 
 #include <glad/glad.h>
 
-const std::array<glm::u8vec3, 4> ChunkMesh::vertices[]
+const std::array<glm::i8vec3, 4> ChunkMesh::vertices[]
 {
 	//trb, tlb, tlf, trf
-	{ glm::u8vec3(1.f, 1.f, 0.f),	glm::u8vec3(0.f, 1.f, 0.f),	glm::u8vec3(0.f, 1.f, 1.f),	glm::u8vec3(1.f, 1.f, 1.f) },
+	{ glm::i8vec3(1.f, 1.f, 0.f),	glm::i8vec3(0.f, 1.f, 0.f),	glm::i8vec3(0.f, 1.f, 1.f),	glm::i8vec3(1.f, 1.f, 1.f) },
 	//Brf, Blf, Blb, Brb
-	{ glm::u8vec3(1.f, 0.f, 1.f),	glm::u8vec3(0.f, 0.f, 1.f),	glm::u8vec3(0.f, 0.f, 0.f),	glm::u8vec3(1.f, 0.f, 0.f) },
+	{ glm::i8vec3(1.f, 0.f, 1.f),	glm::i8vec3(0.f, 0.f, 1.f),	glm::i8vec3(0.f, 0.f, 0.f),	glm::i8vec3(1.f, 0.f, 0.f) },
 	//flB, frB, frt, flt
-	{ glm::u8vec3(0.f, 0.f, 1.f),	glm::u8vec3(1.f, 0.f, 1.f),	glm::u8vec3(1.f, 1.f, 1.f),	glm::u8vec3(0.f, 1.f, 1.f) },
+	{ glm::i8vec3(0.f, 0.f, 1.f),	glm::i8vec3(1.f, 0.f, 1.f),	glm::i8vec3(1.f, 1.f, 1.f),	glm::i8vec3(0.f, 1.f, 1.f) },
 	//brB, blB, blt, brt
-	{ glm::u8vec3(1.f, 0.f, 0.f),	glm::u8vec3(0.f, 0.f, 0.f),	glm::u8vec3(0.f, 1.f, 0.f),	glm::u8vec3(1.f, 1.f, 0.f) },
+	{ glm::i8vec3(1.f, 0.f, 0.f),	glm::i8vec3(0.f, 0.f, 0.f),	glm::i8vec3(0.f, 1.f, 0.f),	glm::i8vec3(1.f, 1.f, 0.f) },
 	//rBf, rBb, rtb, rtf
-	{ glm::u8vec3(1.f, 0.f, 1.f),	glm::u8vec3(1.f, 0.f, 0.f),	glm::u8vec3(1.f, 1.f, 0.f),	glm::u8vec3(1.f, 1.f, 1.f) },
+	{ glm::i8vec3(1.f, 0.f, 1.f),	glm::i8vec3(1.f, 0.f, 0.f),	glm::i8vec3(1.f, 1.f, 0.f),	glm::i8vec3(1.f, 1.f, 1.f) },
 	//lBb, lBf, ltf, ltb
-	{ glm::u8vec3(0.f, 0.f, 0.f),	glm::u8vec3(0.f, 0.f, 1.f),	glm::u8vec3(0.f, 1.f, 1.f),	glm::u8vec3(0.f, 1.f, 0.f) }
+	{ glm::i8vec3(0.f, 0.f, 0.f),	glm::i8vec3(0.f, 0.f, 1.f),	glm::i8vec3(0.f, 1.f, 1.f),	glm::i8vec3(0.f, 1.f, 0.f) }
 };
 
-const std::array<glm::u8vec3, 2> ChunkMesh::indices
+const std::array<glm::i8vec3, 2> ChunkMesh::indices
 {
-	glm::u8vec3(0, 1, 2) , glm::u8vec3(2, 3, 0)
+	glm::i8vec3(0, 1, 2) , glm::i8vec3(2, 3, 0)
 };
 
 ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>&& chunk)
@@ -94,27 +94,55 @@ void ChunkMesh::CreateBuffer()
 	}
 }
 
-void ChunkMesh::AddFaces(const glm::u8vec3& pos, Block& block)
+void ChunkMesh::RebuildBuffer(std::vector<VertTexCoord>& _rebuildVertices)
+{
+	vertexArray->Bind();
+	indexBuffer->Bind();
+
+	float rebuildBlockCount = (_rebuildVertices.size() / 4.f);
+	rebuildIndices.resize(rebuildBlockCount * 6);//추가 생성 개수
+	for (int i = 0; i < rebuildBlockCount; ++i)
+	{
+		rebuildIndices[i * 6 + 0] = indices[0].x + 4 * (i + 1) + lastIndex;
+		rebuildIndices[i * 6 + 1] = indices[0].y + 4 * (i + 1) + lastIndex;
+		rebuildIndices[i * 6 + 2] = indices[0].z + 4 * (i + 1) + lastIndex;
+		rebuildIndices[i * 6 + 3] = indices[1].x + 4 * (i + 1) + lastIndex;
+		rebuildIndices[i * 6 + 4] = indices[1].y + 4 * (i + 1) + lastIndex;
+		rebuildIndices[i * 6 + 5] = indices[1].z + 4 * (i + 1) + lastIndex;
+	}
+
+	meshIndices.insert(meshIndices.end(), rebuildIndices.begin(), rebuildIndices.end());
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, meshIndices.size() * sizeof(unsigned int), meshIndices.data(), GL_STATIC_DRAW);
+	indicesCount = meshIndices.size();
+	lastIndex = rebuildIndices.back();
+	rebuildIndices.clear();
+	rebuildIndices.shrink_to_fit();
+
+	vertexBuffer->Bind();
+
+	meshVertices.insert(meshVertices.end(), _rebuildVertices.begin(), _rebuildVertices.end());
+	glBufferData(GL_ARRAY_BUFFER, meshVertices.size() * sizeof(VertTexCoord), meshVertices.data(), GL_STATIC_DRAW);
+	_rebuildVertices.clear();
+	_rebuildVertices.shrink_to_fit();
+
+	vertexBuffer->UnBind();
+	vertexArray->UnBind();
+}
+
+void ChunkMesh::AddFaces(const glm::i8vec3& pos, Block& block)
 {
 	//Z Back
 	if (pos.z > 0)
 	{
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, pos.z - 1)).IsTransparent())
-			AddFace(pos, block, FaceType::Back);
+			AddFace(pos, block, FaceType::Back, meshVertices);
 	}
-	else if (!Chunk::IsEmptyChunk(parentChunk.lock()->BackChunk) && parentChunk.lock()->BackChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, CHUNK_Z - 1)).IsTransparent())
+	else if (!Chunk::IsEmptyChunk(parentChunk.lock()->BackChunk))
 	{
-		AddFace(pos, block, FaceType::Back);
-
-		int parentHeight = parentChunk.lock()->GetBlockMaxHeight(pos.x, 0);
-		int backHeight = parentChunk.lock()->BackChunk.lock()->GetBlockMaxHeight(pos.x, CHUNK_Z - 1);
-		if (parentHeight < backHeight)
+		if (parentChunk.lock()->BackChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, CHUNK_Z - 1)).IsTransparent())
+			AddFace(pos, block, FaceType::Back, meshVertices);
+		else
 		{
-			for (int h = parentHeight + 1; h <= backHeight; ++h)
-			{
-				auto& b = parentChunk.lock()->BackChunk.lock()->GetBlock(pos.x, h, CHUNK_Z - 1);
-				AddFace(glm::u8vec3(pos.x, h, CHUNK_Z - 1), b, FaceType::Front);
-			}
 		}
 	}
 
@@ -122,22 +150,15 @@ void ChunkMesh::AddFaces(const glm::u8vec3& pos, Block& block)
 	if (pos.z < CHUNK_Z - 1)
 	{
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, pos.z + 1)).IsTransparent())
-			AddFace(pos, block, FaceType::Front);
+			AddFace(pos, block, FaceType::Front, meshVertices);
 	}
-	else if (!Chunk::IsEmptyChunk(parentChunk.lock()->FrontChunk) && parentChunk.lock()->FrontChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, 0)).IsTransparent())
+	else if (!Chunk::IsEmptyChunk(parentChunk.lock()->FrontChunk))
 	{
-		AddFace(pos, block, FaceType::Front);
-
-		//내높이 + 1부터 frontHeight(포함)까지 front청크의 0번의 back면에 블럭 추가
-		int parentHeight = parentChunk.lock()->GetBlockMaxHeight(pos.x, pos.z);
-		int frontHeight = parentChunk.lock()->FrontChunk.lock()->GetBlockMaxHeight(pos.x, 0);
-		if (parentHeight < frontHeight)
+		auto& frontChunk = parentChunk.lock()->FrontChunk.lock();
+		if (frontChunk->GetBlock(glm::vec3(pos.x, pos.y, 0)).IsTransparent())
+			AddFace(pos, block, FaceType::Front, meshVertices);
+		else
 		{
-			for (int h = parentHeight + 1; h <= frontHeight; ++h)
-			{
-				auto& b = parentChunk.lock()->FrontChunk.lock()->GetBlock(pos.x, h, 0);
-				AddFace(glm::u8vec3(pos.x, h, 0), b, FaceType::Back);
-			}
 		}
 	}
 
@@ -145,24 +166,24 @@ void ChunkMesh::AddFaces(const glm::u8vec3& pos, Block& block)
 	if (pos.y > 0)
 	{
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y - 1, pos.z)).IsTransparent())
-			AddFace(pos, block, FaceType::Bottom);
+			AddFace(pos, block, FaceType::Bottom, meshVertices);
 	}
 	else
 	{
 		//Just add Bottom Face Once
-		AddFace(pos, block, FaceType::Bottom);
+		AddFace(pos, block, FaceType::Bottom, meshVertices);
 	}
 
 	//Y Top
 	if (pos.y < CHUNK_Y - 1)
 	{
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y + 1, pos.z)).IsTransparent())
-			AddFace(pos, block, FaceType::Top);
+			AddFace(pos, block, FaceType::Top, meshVertices);
 	}
 	else
 	{
 		//Just add Top Face Once
-		AddFace(pos, block, FaceType::Top);
+		AddFace(pos, block, FaceType::Top, meshVertices);
 	}
 
 
@@ -171,22 +192,15 @@ void ChunkMesh::AddFaces(const glm::u8vec3& pos, Block& block)
 	{
 		//만약 이전박스가 없다면 비어있으면 안되므로 현재 왼쪽면의 정보를 추가해준다
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x - 1, pos.y, pos.z)).IsTransparent())
-			AddFace(pos, block, FaceType::Left);
+			AddFace(pos, block, FaceType::Left, meshVertices);
 	}
-	else if (!Chunk::IsEmptyChunk(parentChunk.lock()->LeftChunk) && parentChunk.lock()->LeftChunk.lock()->GetBlock(glm::vec3(CHUNK_X - 1, pos.y, pos.z)).IsTransparent())
+	else if (!Chunk::IsEmptyChunk(parentChunk.lock()->LeftChunk))
 	{
 		//만약 이전 청크의 마지막이 없다면 0번째위치 왼쪽면의 정보를 추가해준다
-		AddFace(pos, block, FaceType::Left);
-
-		int parentHeight = parentChunk.lock()->GetBlockMaxHeight(pos.x, pos.z);
-		int leftHeight = parentChunk.lock()->LeftChunk.lock()->GetBlockMaxHeight(CHUNK_X - 1, pos.z);
-		if (parentHeight < leftHeight)
+		if (parentChunk.lock()->LeftChunk.lock()->GetBlock(glm::vec3(CHUNK_X - 1, pos.y, pos.z)).IsTransparent())
+			AddFace(pos, block, FaceType::Left, meshVertices);
+		else
 		{
-			for (int h = parentHeight + 1; h <= leftHeight; ++h)
-			{
-				auto& b = parentChunk.lock()->LeftChunk.lock()->GetBlock(CHUNK_X - 1, h, pos.z);
-				AddFace(glm::u8vec3(CHUNK_X - 1, h, pos.z), b, FaceType::Right);
-			}
 		}
 	}
 
@@ -195,27 +209,20 @@ void ChunkMesh::AddFaces(const glm::u8vec3& pos, Block& block)
 	{
 		//만약 다음박스가 없다면 비어있으면 안되므로 현재 오른쪽면의 정보를 추가해준다
 		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x + 1, pos.y, pos.z)).IsTransparent())
-			AddFace(pos, block, FaceType::Right);
+			AddFace(pos, block, FaceType::Right, meshVertices);
 	}
-	else if (!Chunk::IsEmptyChunk(parentChunk.lock()->RightChunk) && parentChunk.lock()->RightChunk.lock()->GetBlock(glm::vec3(0, pos.y, pos.z)).IsTransparent())
+	else if (!Chunk::IsEmptyChunk(parentChunk.lock()->RightChunk))
 	{
 		//만약 다음 청크의 0번째가 없다면 CHUNK_X - 1위치 으론쪽면의 정보를 추가해준다
-		AddFace(pos, block, FaceType::Right);
-
-		int parentHeight = parentChunk.lock()->GetBlockMaxHeight(pos.x, pos.z);
-		int rightHeight = parentChunk.lock()->RightChunk.lock()->GetBlockMaxHeight(0, pos.z);
-		if (parentHeight < rightHeight)
+		if (parentChunk.lock()->RightChunk.lock()->GetBlock(glm::vec3(0, pos.y, pos.z)).IsTransparent())
+			AddFace(pos, block, FaceType::Right, meshVertices);
+		else
 		{
-			for (int h = parentHeight + 1; h <= rightHeight; ++h)
-			{
-				auto& b = parentChunk.lock()->RightChunk.lock()->GetBlock(0, h, pos.z);
-				AddFace(glm::u8vec3(0, h, pos.z), b, FaceType::Left);
-			}
 		}
 	}
 }
 
-void ChunkMesh::AddFace(const glm::u8vec3& pos, Block& block, const FaceType& faceType)
+void ChunkMesh::AddFace(const glm::i8vec3& pos, Block& block, const FaceType& faceType, std::vector<VertTexCoord>& _meshVertices)
 {
 	glm::u16vec2 texcoord = GetTexCoord(block.blockType);
 	if ((block.blockType == OakLog || block.blockType == BirchLog) && (faceType == FaceType::Top || faceType == FaceType::Bottom))
@@ -252,40 +259,40 @@ void ChunkMesh::AddFace(const glm::u8vec3& pos, Block& block, const FaceType& fa
 	switch (faceType)
 	{
 	case Top:
-		meshVertices.push_back({ pos + vertices[Top][0],texcoords[0],15,(uint8_t)block.Get_trb_AO() });
-		meshVertices.push_back({ pos + vertices[Top][1],texcoords[1],15,(uint8_t)block.Get_tlb_AO() });
-		meshVertices.push_back({ pos + vertices[Top][2],texcoords[2],15,(uint8_t)block.Get_tlf_AO() });
-		meshVertices.push_back({ pos + vertices[Top][3],texcoords[3],15,(uint8_t)block.Get_trf_AO() });
+		_meshVertices.push_back({ pos + vertices[Top][0],texcoords[0],15,(uint8_t)block.Get_trb_AO() });
+		_meshVertices.push_back({ pos + vertices[Top][1],texcoords[1],15,(uint8_t)block.Get_tlb_AO() });
+		_meshVertices.push_back({ pos + vertices[Top][2],texcoords[2],15,(uint8_t)block.Get_tlf_AO() });
+		_meshVertices.push_back({ pos + vertices[Top][3],texcoords[3],15,(uint8_t)block.Get_trf_AO() });
 		break;
 	case Bottom:
-		meshVertices.push_back({ pos + vertices[Bottom][0],texcoords[0],15,(uint8_t)block.Get_Brf_AO() });
-		meshVertices.push_back({ pos + vertices[Bottom][1],texcoords[1],15,(uint8_t)block.Get_Blf_AO() });
-		meshVertices.push_back({ pos + vertices[Bottom][2],texcoords[2],15,(uint8_t)block.Get_Blb_AO() });
-		meshVertices.push_back({ pos + vertices[Bottom][3],texcoords[3],15,(uint8_t)block.Get_Brb_AO() });
+		_meshVertices.push_back({ pos + vertices[Bottom][0],texcoords[0],15,(uint8_t)block.Get_Brf_AO() });
+		_meshVertices.push_back({ pos + vertices[Bottom][1],texcoords[1],15,(uint8_t)block.Get_Blf_AO() });
+		_meshVertices.push_back({ pos + vertices[Bottom][2],texcoords[2],15,(uint8_t)block.Get_Blb_AO() });
+		_meshVertices.push_back({ pos + vertices[Bottom][3],texcoords[3],15,(uint8_t)block.Get_Brb_AO() });
 		break;
 	case Front:
-		meshVertices.push_back({ pos + vertices[Front][0],texcoords[0],15,(uint8_t)block.Get_flB_AO() });
-		meshVertices.push_back({ pos + vertices[Front][1],texcoords[1],15,(uint8_t)block.Get_frB_AO() });
-		meshVertices.push_back({ pos + vertices[Front][2],texcoords[2],15,(uint8_t)block.Get_frt_AO() });
-		meshVertices.push_back({ pos + vertices[Front][3],texcoords[3],15,(uint8_t)block.Get_flt_AO() });
+		_meshVertices.push_back({ pos + vertices[Front][0],texcoords[0],15,(uint8_t)block.Get_flB_AO() });
+		_meshVertices.push_back({ pos + vertices[Front][1],texcoords[1],15,(uint8_t)block.Get_frB_AO() });
+		_meshVertices.push_back({ pos + vertices[Front][2],texcoords[2],15,(uint8_t)block.Get_frt_AO() });
+		_meshVertices.push_back({ pos + vertices[Front][3],texcoords[3],15,(uint8_t)block.Get_flt_AO() });
 		break;
 	case Back:
-		meshVertices.push_back({ pos + vertices[Back][0],texcoords[0],15,(uint8_t)block.Get_brB_AO() });
-		meshVertices.push_back({ pos + vertices[Back][1],texcoords[1],15,(uint8_t)block.Get_blB_AO() });
-		meshVertices.push_back({ pos + vertices[Back][2],texcoords[2],15,(uint8_t)block.Get_blt_AO() });
-		meshVertices.push_back({ pos + vertices[Back][3],texcoords[3],15,(uint8_t)block.Get_brt_AO() });
+		_meshVertices.push_back({ pos + vertices[Back][0],texcoords[0],15,(uint8_t)block.Get_brB_AO() });
+		_meshVertices.push_back({ pos + vertices[Back][1],texcoords[1],15,(uint8_t)block.Get_blB_AO() });
+		_meshVertices.push_back({ pos + vertices[Back][2],texcoords[2],15,(uint8_t)block.Get_blt_AO() });
+		_meshVertices.push_back({ pos + vertices[Back][3],texcoords[3],15,(uint8_t)block.Get_brt_AO() });
 		break;
 	case Right:
-		meshVertices.push_back({ pos + vertices[Right][0],texcoords[0],15,(uint8_t)block.Get_rBf_AO() });
-		meshVertices.push_back({ pos + vertices[Right][1],texcoords[1],15,(uint8_t)block.Get_rBb_AO() });
-		meshVertices.push_back({ pos + vertices[Right][2],texcoords[2],15,(uint8_t)block.Get_rtb_AO() });
-		meshVertices.push_back({ pos + vertices[Right][3],texcoords[3],15,(uint8_t)block.Get_rtf_AO() });
+		_meshVertices.push_back({ pos + vertices[Right][0],texcoords[0],15,(uint8_t)block.Get_rBf_AO() });
+		_meshVertices.push_back({ pos + vertices[Right][1],texcoords[1],15,(uint8_t)block.Get_rBb_AO() });
+		_meshVertices.push_back({ pos + vertices[Right][2],texcoords[2],15,(uint8_t)block.Get_rtb_AO() });
+		_meshVertices.push_back({ pos + vertices[Right][3],texcoords[3],15,(uint8_t)block.Get_rtf_AO() });
 		break;
 	case Left:
-		meshVertices.push_back({ pos + vertices[Left][0],texcoords[0],15,(uint8_t)block.Get_lBb_AO() });
-		meshVertices.push_back({ pos + vertices[Left][1],texcoords[1],15,(uint8_t)block.Get_lBf_AO() });
-		meshVertices.push_back({ pos + vertices[Left][2],texcoords[2],15,(uint8_t)block.Get_ltf_AO() });
-		meshVertices.push_back({ pos + vertices[Left][3],texcoords[3],15,(uint8_t)block.Get_ltb_AO() });
+		_meshVertices.push_back({ pos + vertices[Left][0],texcoords[0],15,(uint8_t)block.Get_lBb_AO() });
+		_meshVertices.push_back({ pos + vertices[Left][1],texcoords[1],15,(uint8_t)block.Get_lBf_AO() });
+		_meshVertices.push_back({ pos + vertices[Left][2],texcoords[2],15,(uint8_t)block.Get_ltf_AO() });
+		_meshVertices.push_back({ pos + vertices[Left][3],texcoords[3],15,(uint8_t)block.Get_ltb_AO() });
 		break;
 	}
 

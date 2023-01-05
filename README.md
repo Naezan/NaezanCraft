@@ -68,7 +68,8 @@ MineCraft Copy Naezan's Engine
 - BUG
   - 
     - [x] ~~16 * 16 Chunk is 15 * 15 Chunk~~
-    - [ ] 새로운 청크가 생성될때 SSAO와 Face면 리로드
+    - [x] 새로운 청크가 생성될때 Face면 리로드
+    - [ ] 새로운 청크가 생성될때 SSAO 리로드
     - [x] ~~라이팅 맵 생성중 프레임 드랍 발생~~
       ![라이팅맵 프로파일링 결과](./Screenshot/LightMapOptimize.PNG)
 

@@ -25,7 +25,7 @@ World::World()
 
 	//CreateChunk memory
 	//worldChunks.reserve(LOOK_CHUNK_SIZE * LOOK_CHUNK_SIZE);
-	updateFutures.push_back(std::future<void>(std::async(std::launch::async, &World::AsyncLoadChunk, this, ChunkLoadState::Unloaded)));
+	updateFutures.push_back(std::future<void>(std::async(std::launch::async, &World::AsyncLoadChunk, this)));
 }
 
 World::~World()
@@ -86,6 +86,10 @@ void World::Render()
 			}
 			if (chunk.second->chunkLoadState == ChunkLoadState::Builted)
 			{
+				if (chunk.second->IsRebuild())
+				{
+					chunk.second->RebuildChunkMesh();
+				}
 				renderer->RenderChunk(chunk.second);//이미 렌더링 된 녀석은 제외 시켜야함
 				++ChunkCount;
 			}
@@ -106,7 +110,7 @@ void World::Shutdown()
 	worldChunks.clear();
 }
 
-void World::AsyncLoadChunk(const ChunkLoadState& loadState)
+void World::AsyncLoadChunk()
 {
 	while (Application::IsRunning())
 	{
@@ -125,19 +129,21 @@ void World::AsyncLoadChunk(const ChunkLoadState& loadState)
 
 		for (const auto& chunk : loadChunks)
 		{
-			if (chunk.second->chunkLoadState == loadState)
+			if (chunk.second->chunkLoadState == ChunkLoadState::Unloaded)
 			{
 				chunk.second->SetupChunkNeighbor();
 				chunk.second->GenerateTerrain(worldGenerator);
+				chunk.second->SetLoadState(ChunkLoadState::TerrainGenerated);
 			}
 		}
 
 		//LoadChunkList에 있는 녀석들만 렌더링하고 삭제하고 등 처리
 		for (const auto chunk : loadChunks)
 		{
-			if (chunk.second->chunkLoadState == loadState)
+			if (chunk.second->chunkLoadState == ChunkLoadState::TerrainGenerated)
 			{
-				CreateChunk(chunk.second);
+				if (chunk.second->AllDirectionChunkIsReady())
+					CreateChunk(chunk.second);
 			}
 		}
 

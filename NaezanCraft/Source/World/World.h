@@ -38,7 +38,7 @@ public:
 	void Render();
 	void Shutdown();
 
-	void AsyncLoadChunk(const ChunkLoadState& loadState);
+	void AsyncLoadChunk();
 	void RemoveChunk();
 	void CreateChunk(std::weak_ptr<Chunk> chunk);
 	void UpdateChunk();
