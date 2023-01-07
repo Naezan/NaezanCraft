@@ -25,6 +25,8 @@ public:
 	void CreateVertexBuffer(int vertexStride, const void* vertexPointer,
 		int texcoordStride, const void* texcoordPointer,
 		unsigned int posType, unsigned int texType);
+	void CreateVertexBuffer(int vertexStride, const void* vertexPointer,
+		unsigned int posType = GL_FLOAT, int size = 4);
 	virtual void CreateIndexBuffer();
 	virtual void SetVertexBufferData(size_t size, const void* data);
 	virtual void SetIndexBufferVector(std::vector<unsigned int>& indexData);

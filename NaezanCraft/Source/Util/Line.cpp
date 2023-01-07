@@ -1,9 +1,6 @@
 #include "../pch.h"
 #include "Line.h"
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 Line::Line(glm::vec3 start, glm::vec3 end)
 {
     startPoint = start;

@@ -6,6 +6,7 @@
 using array_3d = std::array<std::array<std::array<Block, CHUNK_Z>, CHUNK_Y>, CHUNK_X>;
 using vector_3d = std::vector<std::vector<std::vector<unsigned char>>>;
 
+class Mesh;
 class ChunkMesh;
 class WorldGenerator;
 struct VertTexCoord;
@@ -80,4 +81,8 @@ public:
 	vector_3d LightMap;
 	static const std::array <glm::ivec3, 6> nearFaces;
 	Block emptyBlock;
+	
+	//Query
+	unsigned int queryID;
+	std::unique_ptr<Mesh> chunkBoxMesh;
 };

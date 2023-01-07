@@ -1,6 +1,7 @@
 #include "../pch.h"
 #include "Chunk.h"
 #include "ChunkMesh.h"
+#include "Mesh.h"
 #include "../Application.h"
 #include "../Renderer/Renderer.h"
 #include "../World/Generator/WorldGenerator.h"

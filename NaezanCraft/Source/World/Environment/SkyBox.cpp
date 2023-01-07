@@ -8,9 +8,6 @@
 #include "../Mesh.h"
 #include "Cloud.h"
 
-
-#include <glad/glad.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -110,7 +107,7 @@ SkyBox::SkyBox()
 		indexBuffer = std::make_unique<IndexBuffer>(indices.size() * sizeof(GLuint), &indices.front());
 		skyIndicesSize = sizeof(indices);
 
-		vertexBuffer = std::make_unique<VertexBuffer>(0, (void*)0);
+		vertexBuffer = std::make_unique<VertexBuffer>(0, (void*)0, GL_FLOAT, 4);
 		vertexBuffer->SetBufferData(vertexCoords.size() * sizeof(GLfloat), &vertexCoords.front());
 
 		vertexBuffer->UnBind();

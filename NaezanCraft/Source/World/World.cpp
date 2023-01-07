@@ -9,10 +9,22 @@
 #include "../World/Generator/WorldGenerator.h"
 #include "../World/Environment/SkyBox.h"
 
+
 std::unordered_map<BlockType, std::pair<int, int>> World::BlockCoordData;
 std::mutex World::worldMutex;
+int World::drawCall;
 
-World::World()
+const std::array<glm::i8vec3, 4> World::cubeVertices[]
+{
+	{ glm::i8vec3(1.f, 1.f, 0.f),	glm::i8vec3(0.f, 1.f, 0.f),	glm::i8vec3(0.f, 1.f, 1.f),	glm::i8vec3(1.f, 1.f, 1.f) },
+	{ glm::i8vec3(1.f, 0.f, 1.f),	glm::i8vec3(0.f, 0.f, 1.f),	glm::i8vec3(0.f, 0.f, 0.f),	glm::i8vec3(1.f, 0.f, 0.f) },
+	{ glm::i8vec3(0.f, 0.f, 1.f),	glm::i8vec3(1.f, 0.f, 1.f),	glm::i8vec3(1.f, 1.f, 1.f),	glm::i8vec3(0.f, 1.f, 1.f) },
+	{ glm::i8vec3(1.f, 0.f, 0.f),	glm::i8vec3(0.f, 0.f, 0.f),	glm::i8vec3(0.f, 1.f, 0.f),	glm::i8vec3(1.f, 1.f, 0.f) },
+	{ glm::i8vec3(1.f, 0.f, 1.f),	glm::i8vec3(1.f, 0.f, 0.f),	glm::i8vec3(1.f, 1.f, 0.f),	glm::i8vec3(1.f, 1.f, 1.f) },
+	{ glm::i8vec3(0.f, 0.f, 0.f),	glm::i8vec3(0.f, 0.f, 1.f),	glm::i8vec3(0.f, 1.f, 1.f),	glm::i8vec3(0.f, 1.f, 0.f) }
+};
+
+World::World() : occlusionCull(true)
 {
 	renderer = std::make_unique<Renderer>();
 	scene = std::make_unique<Scene>();
@@ -22,6 +34,9 @@ World::World()
 	playerPosition = scene->GetPlayerPosition();
 
 	SetBlockDatas();
+
+	//Load HiZ Shader
+	//LoadCullingShader();
 
 	//CreateChunk memory
 	//worldChunks.reserve(LOOK_CHUNK_SIZE * LOOK_CHUNK_SIZE);
@@ -54,6 +69,105 @@ void World::SetBlockDatas()
 	BlockCoordData[Bedrock] = std::make_pair(7, 4);
 }
 
+void World::LoadCullingShader()
+{
+	hiZmapShaders.emplace(ShaderType::VERTEX, std::make_unique<Shader>("../Assets/Shaders/HiZmapVert.vs", ShaderType::VERTEX));
+	hiZmapShaders.emplace(ShaderType::FRAGMENT, std::make_unique<Shader>("../Assets/Shaders/HiZmapFrag.fs", ShaderType::FRAGMENT));
+	hiZmapShaders.emplace(ShaderType::GEOMETRY, std::make_unique<Shader>("../Assets/Shaders/HiZmapGeo.gs", ShaderType::GEOMETRY));
+
+	cullingShaders.emplace(ShaderType::VERTEX, std::make_unique<Shader>("../Assets/Shaders/HiZOcclusionVert.vs", ShaderType::VERTEX));
+	cullingShaders.emplace(ShaderType::GEOMETRY, std::make_unique<Shader>("../Assets/Shaders/HiZOcclusionGeo.gs", ShaderType::GEOMETRY));
+
+	hiZmapShaderProgram = glCreateProgram();
+	for (auto& shader : hiZmapShaders)
+	{
+		glAttachShader(hiZmapShaderProgram, shader.second->GetShaderID());
+	}
+	glLinkProgram(hiZmapShaderProgram);
+	for (auto& shader : hiZmapShaders)
+	{
+		shader.second->LinkComplete(hiZmapShaderProgram);
+	}
+	//SetUniform
+	glUniform1i(glGetUniformLocation(this->hiZmapShaderProgram, "LastMip"), 0);
+
+	cullingShaderProgram = glCreateProgram();
+	for (auto& shader : cullingShaders)
+	{
+		glAttachShader(cullingShaderProgram, shader.second->GetShaderID());
+	}
+	glLinkProgram(cullingShaderProgram);
+	for (auto& shader : cullingShaders)
+	{
+		shader.second->LinkComplete(cullingShaderProgram);
+	}
+	//SetUniform
+	glUniform1i(glGetUniformLocation(cullingShaderProgram, "HiZBuffer"), 0);
+
+	// create color buffer texture
+	glGenTextures(1, &colorTexID);
+	glBindTexture(GL_TEXTURE_2D, colorTexID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, SCREEN_WIDTH, SCREEN_HEIGHT, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	// create depth buffer texture
+	glGenTextures(1, &depthTexID);
+	glBindTexture(GL_TEXTURE_2D, depthTexID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, SCREEN_WIDTH, SCREEN_HEIGHT, 0,
+		GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+	// depth texture is gonna be a mipmap so we have to establish the mipmap chain
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// create framebuffer object
+	glGenFramebuffers(1, &frameBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+	// setup color and depth buffer texture
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexID, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexID, 0);
+
+	GLenum status;
+	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	switch (status) {
+		\
+	case GL_FRAMEBUFFER_COMPLETE:
+		break;
+	case GL_FRAMEBUFFER_UNSUPPORTED:
+		/* choose different formats */
+		std::cout << "Unsupported framebuffer format!" << std::endl;
+		break;
+	default:
+		/* programming error; will fail on all hardware */
+		std::cout << "Invalid framebuffer format!" << std::endl;
+		exit(0);
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void World::LoadSimpleCubeShader()
+{
+	simpleCubeShaders.emplace(ShaderType::VERTEX, std::make_unique<Shader>("../Assets/Shaders/SimpleCube.vs", ShaderType::VERTEX));
+	simpleCubeShaders.emplace(ShaderType::FRAGMENT, std::make_unique<Shader>("../Assets/Shaders/SimpleCube.fs", ShaderType::FRAGMENT));
+
+	simpleCubeShaderProgram = glCreateProgram();
+	for (auto& shader : simpleCubeShaders)
+	{
+		glAttachShader(simpleCubeShaderProgram, shader.second->GetShaderID());
+	}
+	glLinkProgram(simpleCubeShaderProgram);
+	for (auto& shader : simpleCubeShaders)
+	{
+		shader.second->LinkComplete(simpleCubeShaderProgram);
+	}
+}
+
 void World::Update()
 {
 	OPTICK_EVENT();
@@ -73,7 +187,11 @@ void World::Render()
 
 	renderer->BeginRender(scene->GetCamera().lock()->GetViewProjectionMatrix());
 
-	int ChunkCount = 0;
+	scene->Render();
+	sky->Render(scene->GetCamera());
+
+	int chunkCount = 0;
+	drawCall = 8;
 	std::unique_lock<std::mutex> lock(worldMutex);
 	for (auto& chunk : worldChunks)
 	{
@@ -82,25 +200,193 @@ void World::Render()
 			if (chunk.second->chunkLoadState == ChunkLoadState::MeshLoaded)
 			{
 				chunk.second->CreateMeshBuffer();
+
+				glGenQueries(1, &chunk.second->queryID);
+
+				chunk.second->chunkBoxMesh = std::make_unique<Mesh>();
+				chunk.second->chunkBoxMesh->CreateVertexArray();
+				chunk.second->chunkBoxMesh->CreateVertexBuffer(0, (GLvoid*)0, GL_FLOAT, 3);
+				chunk.second->chunkBoxMesh->SetVertexBufferData(sizeof(glm::i8vec3) * cubeVertices->size(), cubeVertices->data());
+				chunk.second->chunkBoxMesh->UnBindVertexBuffer();
+				chunk.second->chunkBoxMesh->UnBindVertexArray();
 				chunk.second->SetLoadState(ChunkLoadState::Builted);
 			}
 			if (chunk.second->chunkLoadState == ChunkLoadState::Builted)
 			{
-				if (chunk.second->IsRebuild())
+				/*
+				if (occlusionCull)
 				{
-					chunk.second->RebuildChunkMesh();
+					//BindFrameBuffer
+					glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+					glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+					glUseProgram(hiZmapShaderProgram);
+					glUniform1i(glGetUniformLocation(this->hiZmapShaderProgram, "LastMip"), 0);
+
+					// 뎁스 이미지만을 렌더링 하기 위해서 컬러 버퍼를 모두 끈다
+					glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_2D, depthTexID);
+					// 뎁스 검사를 끄고 뎁스를 쓸 수 있도록 변경
+					glDepthFunc(GL_ALWAYS);
+
+					// calculate the number of mipmap levels for NPOT texture
+					int numLevels = 1 + (int)floorf(log2f(fmaxf(SCREEN_WIDTH, SCREEN_HEIGHT)));
+					int currentWidth = SCREEN_WIDTH;
+					int currentHeight = SCREEN_HEIGHT;
+					for (int i = 1; i < numLevels; i++)
+					{
+						glUniform2i(glGetUniformLocation(hiZmapShaderProgram, "LastMipSize"), currentWidth, currentHeight);
+
+						// 다음 뷰포트 사이즈 계산
+						currentWidth /= 2;
+						currentHeight /= 2;
+						// ensure that the viewport size is always at least 1x1
+						currentWidth = currentWidth > 0 ? currentWidth : 1;
+						currentHeight = currentHeight > 0 ? currentHeight : 1;
+
+						glViewport(0, 0, currentWidth, currentHeight);
+						// bind next level for rendering but first restrict fetches only to previous level
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, i - 1);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, i - 1);
+
+						glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexID, i);
+						// dummy draw command as the full screen quad is generated completely by a geometry shader
+						glDrawArrays(GL_POINTS, 0, 1);
+						drawCall++;
+					}
+
+					// reset mipmap level range for the depth image
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, numLevels - 1);
+					// reset the framebuffer configuration
+					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexID, 0);
+					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexID, 0);
+					// reenable color buffer writes, reset viewport and reenable depth test
+					glDepthFunc(GL_LEQUAL);
+					glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 				}
+				*/
+
+				/*
+				//render objects and apply culling
+				glUseProgram(cullingShaderProgram);
+				glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &this->subIndexVS[this->cullMode]);
+				glUniformSubroutinesuiv(GL_GEOMETRY_SHADER, 1, &this->subIndexGS[this->LODMode ? 1 : 0]);
+
+				glGenQueries(1, );
+
+				glGenBuffers(1, &TFBO);
+				glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, TFBO);
+				glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, TFBO);
+				glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, size, newData, GL_DYNAMIC_COPY);
+				//TODO TransformFeedback->SetOutVisible();
+
+				//SetColor
+				//SetClear
+
+				glEnable(GL_RASTERIZER_DISCARD);
+
+				glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, TFBO);
+				glBeginTransformFeedback(GL_POINTS);
+
+				glBeginQuery(GL_PRIMITIVES_GENERATED, QueryId);
+
+				for (int i = -3; i <= 3; i++)
+					for (int j = -3; j <= 3; j++)
+						if (visible[i + 3][j + 3])
+						{
+							glUniform2f(glGetUniformLocation(this->cullPO, "Offset"), TERRAIN_OBJECT_SIZE * (i - x), TERRAIN_OBJECT_SIZE * (j - z));
+							glDrawArrays(GL_POINTS, 0, this->instanceCount);
+						}
+
+				glEndQuery(GL_PRIMITIVES_GENERATED);
+				glEndTransformFeedback();
+
+				glDisable(GL_RASTERIZER_DISCARD);
+
+				// draw trees
+				glUseProgram(this->treePO);
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D_ARRAY, this->treeTex);
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, this->terrainTex);
+
+				glBindVertexArray(this->treeVA);
+				glGetQueryObjectiv(this->cullQuery, GL_QUERY_RESULT, &visible);
+				if (visible > 0)
+				{
+					// draw
+				}
+
+				//UnBindFrameBuffer
+				glBindFramebuffer(GL_FRAMEBUFFER, 0);
+				glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+				*/
+
+				//glShadeModel(GL_FLAT);
+				//glDisable(GL_LIGHTING);
+				//glDisable(GL_COLOR_MATERIAL);
+				//glDisable(GL_NORMALIZE);
+				glColorMask(false, false, false, false);
+				glDisable(GL_TEXTURE);
+				glDepthMask(GL_FALSE);
+
+				//DrawBoundingBox
+				RenderBoundingBox(chunk.second->chunkBox, chunk.second->chunkBoxMesh);
+				glBeginQuery(GL_SAMPLES_PASSED, chunk.second->queryID);
+				//DrawBoundingBox
+				glEnable(GL_DEPTH_TEST);
+				RenderBoundingBox(chunk.second->chunkBox, chunk.second->chunkBoxMesh);
+				glEndQuery(GL_SAMPLES_PASSED);
+
+				glColorMask(true, true, true, true);
+				glEnable(GL_TEXTURE);
+				glDepthMask(GL_TRUE);
+
+				glClear(GL_DEPTH_BUFFER_BIT);
+
+
+				GLint iPassingSamples = 0;
+				glGetQueryObjectiv(chunk.second->queryID, GL_QUERY_RESULT, &iPassingSamples);
+
+				if (iPassingSamples > 0)
+				{
+					//++chunkCount;
+					++drawCall;
+				}
+
 				renderer->RenderChunk(chunk.second);//이미 렌더링 된 녀석은 제외 시켜야함
-				++ChunkCount;
 			}
 		}
 	}
 
-	scene->Render();
-	sky->Render(scene->GetCamera());
-
 	RemoveChunk();
+
 	//std::cout << ChunkCount << std::endl;
+	NC_LOG_DEBUG("drawCall : {0}", drawCall);
+}
+
+void World::RenderBoundingBox(AABox& boundbox, std::unique_ptr<Mesh>& boxMesh)
+{
+	static const glm::vec3 color = glm::vec3(1.f, 1.f, 1.f);
+	const glm::vec3 halfDiagonal = (boundbox.maxcorner - boundbox.corner) * 0.5f;
+	const glm::vec3 position = boundbox.corner + halfDiagonal;
+	glm::mat4 transform = glm::mat4(1.f);
+	transform = glm::translate(transform, position);
+	transform = glm::scale(transform, halfDiagonal);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	glUseProgram(simpleCubeShaderProgram);
+	glUniformMatrix4fv(glGetUniformLocation(simpleCubeShaderProgram, "projectionview"), 1, GL_FALSE, glm::value_ptr(scene->GetCamera().lock()->GetViewProjectionMatrix()));
+	glUniform3fv(glGetUniformLocation(simpleCubeShaderProgram, "model"), 1, glm::value_ptr(transform));
+	glUniformMatrix4fv(glGetUniformLocation(simpleCubeShaderProgram, "color"), 1, GL_FALSE, glm::value_ptr(color));
+	boxMesh->BindVertexArray();
+	glDrawArrays(GL_TRIANGLES, 0, 24);
+	boxMesh->UnBindVertexArray();
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 void World::Shutdown()
@@ -207,7 +493,13 @@ void World::RemoveWorldChunk(std::vector<decltype(worldChunks)::key_type>& _dele
 	for (auto key : _deletableKey)
 	{
 		if (worldChunks[key]->chunkMesh != nullptr)
+		{
 			worldChunks[key]->chunkMesh->DeleteChunkMesh();
+			if (glIsQuery(worldChunks[key]->queryID) == TRUE)
+			{
+				glDeleteQueries(1, &worldChunks[key]->queryID);
+			}
+		}
 		worldChunks[key].reset();
 		worldChunks.erase(key);
 	}

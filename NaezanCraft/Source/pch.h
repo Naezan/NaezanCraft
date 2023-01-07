@@ -22,6 +22,9 @@
 
 #include <Windows.h>
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include "Constant.h"
 
 #include "Optick/optick.h"

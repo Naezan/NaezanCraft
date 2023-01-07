@@ -6,8 +6,6 @@
 #include "../Scene.h"
 #include "../Camera.h"
 
-#include <glad/glad.h>
-
 Cloud::Cloud(glm::vec3 _position) : renderPosition(_position), updatePosition(_position), isStartRender(false), deltaPos(0.f)
 {
 	//Shader

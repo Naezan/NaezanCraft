@@ -1,7 +1,5 @@
 #include "CloudShader.h"
 
-#include <glad/glad.h>
-
 CloudShader::CloudShader(const std::string& path, ShaderType shadertype) :
 	Shader(path, shadertype)
 {

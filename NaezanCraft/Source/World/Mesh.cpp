@@ -39,6 +39,12 @@ void Mesh::CreateVertexBuffer(int vertexStride, const void* vertexPointer, int t
 		posType, texType);
 }
 
+void Mesh::CreateVertexBuffer(int vertexStride, const void* vertexPointer, unsigned int posType, int size)
+{
+	vertexBuffer = std::make_unique<VertexBuffer>(
+		static_cast<int>(vertexStride), vertexPointer, posType, size);
+}
+
 void Mesh::CreateIndexBuffer()
 {
 	indexBuffer = std::make_unique<IndexBuffer>(meshIndices.size() * sizeof(unsigned int), &meshIndices.front());

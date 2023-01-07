@@ -2,8 +2,6 @@
 #include "Shader.h"
 #include "../MessageLog.h"
 
-#include <glad/glad.h>
-
 Shader::Shader(const std::string& path, ShaderType shadertype)
 {
 	std::string ShaderCode;

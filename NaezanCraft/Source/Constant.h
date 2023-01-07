@@ -16,3 +16,6 @@ constexpr int WATER_HEIGHT = 60;
 
 constexpr float PLAYER_SPEED = 0.2f;
 constexpr float CLOUD_SPEED = 0.1f;
+
+constexpr int SCREEN_WIDTH = 1280;
+constexpr int SCREEN_HEIGHT = 720;

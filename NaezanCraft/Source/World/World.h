@@ -5,12 +5,15 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Block.h"
+#include "../../Renderer/Shader.h"
 
 class Renderer;
 class Scene;
 class SkyBox;
 class Chunk;
 class WorldGenerator;
+class Mesh;
+struct AABox;
 enum class ChunkLoadState;
 
 struct Pair_IntHash
@@ -34,8 +37,11 @@ public:
 	~World();
 
 	void SetBlockDatas();
+	void LoadCullingShader();
+	void LoadSimpleCubeShader();
 	void Update();
 	void Render();
+	void RenderBoundingBox(AABox& boundbox, std::unique_ptr<Mesh>& boxMesh);
 	void Shutdown();
 
 	void AsyncLoadChunk();
@@ -60,6 +66,7 @@ public:
 public:
 	static std::unordered_map<BlockType, std::pair<int, int>> BlockCoordData;
 	static std::mutex worldMutex;
+	static int drawCall;
 
 private:
 	std::unique_ptr<Renderer> renderer;
@@ -75,4 +82,18 @@ private:
 
 	std::unique_ptr<WorldGenerator> worldGenerator;
 	std::vector<std::future<void>> updateFutures;
+
+	//culling
+	uint32_t hiZmapShaderProgram;
+	uint32_t cullingShaderProgram;
+	uint32_t colorTexID;
+	uint32_t depthTexID;
+	uint32_t frameBuffer;
+	std::map<ShaderType, std::unique_ptr<Shader>> hiZmapShaders;
+	std::map<ShaderType, std::unique_ptr<Shader>> cullingShaders;
+	bool occlusionCull;
+
+	uint32_t simpleCubeShaderProgram;
+	std::map<ShaderType, std::unique_ptr<Shader>> simpleCubeShaders;
+	static const std::array <glm::i8vec3, 4> cubeVertices[];
 };

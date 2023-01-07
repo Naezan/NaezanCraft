@@ -3,8 +3,6 @@
 #include "../../World/Camera.h"
 #include "../../World/Scene.h"
 
-#include <glad/glad.h>
-
 SunMoonShader::SunMoonShader(const std::string& path, ShaderType shadertype) :
 	Shader(path, shadertype)
 {

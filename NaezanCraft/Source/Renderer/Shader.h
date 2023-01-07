@@ -9,7 +9,7 @@
 
 enum class ShaderType
 {
-	VERTEX, FRAGMENT
+	VERTEX, FRAGMENT, GEOMETRY
 };
 
 class Shader

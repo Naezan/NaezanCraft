@@ -5,8 +5,6 @@
 #include "../Renderer/VertexArray.h"
 #include "../Renderer/Buffer.h"
 
-#include <glad/glad.h>
-
 const std::array<glm::i8vec3, 4> ChunkMesh::vertices[]
 {
 	//trb, tlb, tlf, trf
@@ -38,6 +36,7 @@ ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>&& chunk)
 
 ChunkMesh::~ChunkMesh()
 {
+	//glDeleteQueries(1, &parentChunk.lock()->queryID);
 }
 
 void ChunkMesh::CreateMesh()

@@ -4,7 +4,6 @@
 #include "../../World/Scene.h"
 #include "../../Util/Math.h"
 
-#include <glad/glad.h>
 #include "../../Input/InputSystem.h"
 
 SkyBoxShader::SkyBoxShader(const std::string& path, ShaderType shadertype) :

@@ -27,6 +27,7 @@ void WorldGenerator::GenerateTerrain(std::weak_ptr<Chunk> chunk)
 	{
 		maxHeight = std::max(maxHeight, *std::max_element(heightMap[i].begin(), heightMap[i].end()));
 	}
+	chunk.lock()->chunkBox.y = maxHeight;//SetBoxHeight
 	SetChunkBlocks(maxHeight, chunk);
 }
 
@@ -43,8 +44,8 @@ void WorldGenerator::SetHeightMap(std::weak_ptr<Chunk> chunk)
 		{
 			//GetBiome->GetNoiseArea();
 			int h = GetBlockHeight(pos.x + static_cast<float>(x), pos.z + static_cast<float>(z));
-			if (h > 128)
-				h = 128;
+			if (h > 127)
+				h = 127;
 			heightMap[x][z] = h;
 		}
 	}

@@ -1,5 +1,4 @@
 #include "pch.h"
-#include <glad/glad.h>
 #include "Window.h"
 #include "Input/InputSystem.h"
 

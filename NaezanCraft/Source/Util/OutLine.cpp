@@ -1,9 +1,6 @@
 #include "../pch.h"
 #include "OutLine.h"
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 OutLine::OutLine(const glm::vec3& _position) : position(_position)
 {
     lineColor = glm::vec3(0, 1, 0);

@@ -1,8 +1,6 @@
 #include "../pch.h"
 #include "Buffer.h"
 
-#include <glad/glad.h>
-
 Buffer::Buffer()
 {
 	glGenBuffers(1, &bufferID);
@@ -11,12 +9,12 @@ Buffer::Buffer()
 Buffer::~Buffer() = default;
 
 
-VertexBuffer::VertexBuffer(int vertexStride, const void* vertexPointer)
+VertexBuffer::VertexBuffer(int vertexStride, const void* vertexPointer, unsigned int posType, int size)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, vertexStride, vertexPointer);
+	glVertexAttribPointer(0, size, posType, GL_FALSE, vertexStride, vertexPointer);
 }
 
 VertexBuffer::VertexBuffer(
