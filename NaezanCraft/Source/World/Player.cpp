@@ -126,7 +126,7 @@ void Player::Update()
 	mainCamera->GetPosition() = position;
 	mainCamera->Update();
 
-	//raycast 0.5칸정도 에러가 보인다
+	//raycast
 	rayBlock = Ray::BlockTraversal(position, mainCamera->GetForwadDir(), outBlockPosition, outFaceBlockPosition);
 }
 
@@ -134,10 +134,10 @@ void Player::Render()
 {
 	if (rayBlock.blockType != Air)
 	{
-		OutLine outlineblock(outBlockPosition);
+		/*OutLine outlineblock(outBlockPosition);
 		outlineblock.SetPV(mainCamera->GetViewProjectionMatrix());
 		outlineblock.SetColor(glm::vec3(1, 0, 0));
-		outlineblock.Render();
+		outlineblock.Render();*/
 
 		OutLine outlinefaceblock(outFaceBlockPosition);
 		outlinefaceblock.SetPV(mainCamera->GetViewProjectionMatrix());

@@ -359,36 +359,37 @@ void World::Render()
 				//glDisable(GL_LIGHTING);
 				//glDisable(GL_COLOR_MATERIAL);
 				//glDisable(GL_NORMALIZE);
-				glColorMask(false, false, false, false);
-				glDisable(GL_TEXTURE);
-				glDepthMask(GL_FALSE);
+				//glColorMask(false, false, false, false);
+				//glDisable(GL_TEXTURE);
+				//glDepthMask(GL_FALSE);
 
-				//DrawBoundingBox
-				RenderBoundingBox(chunk.second->chunkBox, chunk.second->chunkBoxMesh);
-				glBeginQuery(GL_SAMPLES_PASSED, chunk.second->queryID);
-				//DrawBoundingBox
-				glEnable(GL_DEPTH_TEST);
-				RenderBoundingBox(chunk.second->chunkBox, chunk.second->chunkBoxMesh);
-				glEndQuery(GL_SAMPLES_PASSED);
+				////DrawBoundingBox
+				//RenderBoundingBox(chunk.second->chunkBox, chunk.second->chunkBoxMesh);
+				//glBeginQuery(GL_SAMPLES_PASSED, chunk.second->queryID);
+				////DrawBoundingBox
+				//glEnable(GL_DEPTH_TEST);
+				//RenderBoundingBox(chunk.second->chunkBox, chunk.second->chunkBoxMesh);
+				//glEndQuery(GL_SAMPLES_PASSED);
 
-				glColorMask(true, true, true, true);
-				glEnable(GL_TEXTURE);
-				glDepthMask(GL_TRUE);
+				//glColorMask(true, true, true, true);
+				//glEnable(GL_TEXTURE);
+				//glDepthMask(GL_TRUE);
 
-				glClear(GL_DEPTH_BUFFER_BIT);
+				//glClear(GL_DEPTH_BUFFER_BIT);
 
 
-				GLint iPassingSamples = 0;
-				glGetQueryObjectiv(chunk.second->queryID, GL_QUERY_RESULT, &iPassingSamples);
+				//GLint iPassingSamples = 0;
+				//glGetQueryObjectiv(chunk.second->queryID, GL_QUERY_RESULT, &iPassingSamples);
 
-				if (iPassingSamples > 0)
-				{
-					//RenderBoundingBox(chunk.second->chunkBox, chunk.second->chunkBoxMesh);
-					renderer->RenderChunk(chunk.second);//이미 렌더링 된 녀석은 제외 시켜야함
-					//++chunkCount;
-					++drawCall;
-				}
+				//if (iPassingSamples > 0)
+				//{
+				//	//RenderBoundingBox(chunk.second->chunkBox, chunk.second->chunkBoxMesh);
+				//	renderer->RenderChunk(chunk.second);//이미 렌더링 된 녀석은 제외 시켜야함
+				//	//++chunkCount;
+				//	++drawCall;
+				//}
 
+				renderer->RenderChunk(chunk.second);//이미 렌더링 된 녀석은 제외 시켜야함
 				//RenderBoundingBox(chunk.second->chunkBox, chunk.second->chunkBoxMesh);
 			}
 		}

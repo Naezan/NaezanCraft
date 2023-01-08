@@ -161,16 +161,32 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 			blockPos.x += ((faceDirInfo >> 2) & 0b00000001);
 			blockPos.y += ((faceDirInfo >> 1) & 0b00000001);
 			blockPos.z += ((faceDirInfo) & 0b00000001);
-			blockPos.x = blockPos.x >= CHUNK_X ? 0 : blockPos.x;
-			blockPos.z = blockPos.z >= CHUNK_Z ? 0 : blockPos.z;
+			if (blockPos.x >= CHUNK_X)
+			{
+				blockPos.x = 0;
+				curChunk = curChunk.lock()->RightChunk;
+			}
+			if (blockPos.z >= CHUNK_Z)
+			{
+				blockPos.z = 0;
+				curChunk = curChunk.lock()->FrontChunk;
+			}
 		}
 		else
 		{
 			blockPos.x += ((faceDirInfo >> 2) & 0b00000001) * -1;
 			blockPos.y += ((faceDirInfo >> 1) & 0b00000001) * -1;
 			blockPos.z += ((faceDirInfo) & 0b00000001) * -1;
-			blockPos.x = blockPos.x < 0 ? 15 : blockPos.x;
-			blockPos.z = blockPos.z < 0 ? 15 : blockPos.z;
+			if (blockPos.x < 0)
+			{
+				blockPos.x = 15;
+				curChunk = curChunk.lock()->LeftChunk;
+			}
+			if (blockPos.z < 0)
+			{
+				blockPos.z = 15;
+				curChunk = curChunk.lock()->BackChunk;
+			}
 		}
 		outBlockFacePosition = glm::vec3(blockPos.x + curChunk.lock()->position.x * CHUNK_X, blockPos.y, blockPos.z + curChunk.lock()->position.z * CHUNK_Z);
 	}
