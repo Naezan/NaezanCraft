@@ -95,5 +95,5 @@ private:
 
 	uint32_t simpleCubeShaderProgram;
 	std::map<ShaderType, std::unique_ptr<Shader>> simpleCubeShaders;
-	static const std::array <glm::i8vec3, 4> cubeVertices[];
+	//static const std::array <glm::i8vec3, 4> cubeVertices[];
 };

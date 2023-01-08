@@ -14,14 +14,43 @@ std::unordered_map<BlockType, std::pair<int, int>> World::BlockCoordData;
 std::mutex World::worldMutex;
 int World::drawCall;
 
-const std::array<glm::i8vec3, 4> World::cubeVertices[]
-{
-	{ glm::i8vec3(1.f, 1.f, 0.f),	glm::i8vec3(0.f, 1.f, 0.f),	glm::i8vec3(0.f, 1.f, 1.f),	glm::i8vec3(1.f, 1.f, 1.f) },
-	{ glm::i8vec3(1.f, 0.f, 1.f),	glm::i8vec3(0.f, 0.f, 1.f),	glm::i8vec3(0.f, 0.f, 0.f),	glm::i8vec3(1.f, 0.f, 0.f) },
-	{ glm::i8vec3(0.f, 0.f, 1.f),	glm::i8vec3(1.f, 0.f, 1.f),	glm::i8vec3(1.f, 1.f, 1.f),	glm::i8vec3(0.f, 1.f, 1.f) },
-	{ glm::i8vec3(1.f, 0.f, 0.f),	glm::i8vec3(0.f, 0.f, 0.f),	glm::i8vec3(0.f, 1.f, 0.f),	glm::i8vec3(1.f, 1.f, 0.f) },
-	{ glm::i8vec3(1.f, 0.f, 1.f),	glm::i8vec3(1.f, 0.f, 0.f),	glm::i8vec3(1.f, 1.f, 0.f),	glm::i8vec3(1.f, 1.f, 1.f) },
-	{ glm::i8vec3(0.f, 0.f, 0.f),	glm::i8vec3(0.f, 0.f, 1.f),	glm::i8vec3(0.f, 1.f, 1.f),	glm::i8vec3(0.f, 1.f, 0.f) }
+static const GLfloat cubeVertices[] = {
+	-1.0f,-1.0f,-1.0f, // triangle 1 : begin
+	-1.0f,-1.0f, 1.0f,
+	-1.0f, 1.0f, 1.0f, // triangle 1 : end
+	1.0f, 1.0f,-1.0f, // triangle 2 : begin
+	-1.0f,-1.0f,-1.0f,
+	-1.0f, 1.0f,-1.0f, // triangle 2 : end
+	1.0f,-1.0f, 1.0f,
+	-1.0f,-1.0f,-1.0f,
+	1.0f,-1.0f,-1.0f,
+	1.0f, 1.0f,-1.0f,
+	1.0f,-1.0f,-1.0f,
+	-1.0f,-1.0f,-1.0f,
+	-1.0f,-1.0f,-1.0f,
+	-1.0f, 1.0f, 1.0f,
+	-1.0f, 1.0f,-1.0f,
+	1.0f,-1.0f, 1.0f,
+	-1.0f,-1.0f, 1.0f,
+	-1.0f,-1.0f,-1.0f,
+	-1.0f, 1.0f, 1.0f,
+	-1.0f,-1.0f, 1.0f,
+	1.0f,-1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f,-1.0f,-1.0f,
+	1.0f, 1.0f,-1.0f,
+	1.0f,-1.0f,-1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f,-1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f,-1.0f,
+	-1.0f, 1.0f,-1.0f,
+	1.0f, 1.0f, 1.0f,
+	-1.0f, 1.0f,-1.0f,
+	-1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	-1.0f, 1.0f, 1.0f,
+	1.0f,-1.0f, 1.0f
 };
 
 World::World() : occlusionCull(true)
@@ -37,6 +66,7 @@ World::World() : occlusionCull(true)
 
 	//Load HiZ Shader
 	//LoadCullingShader();
+	LoadSimpleCubeShader();
 
 	//CreateChunk memory
 	//worldChunks.reserve(LOOK_CHUNK_SIZE * LOOK_CHUNK_SIZE);
@@ -206,9 +236,10 @@ void World::Render()
 				chunk.second->chunkBoxMesh = std::make_unique<Mesh>();
 				chunk.second->chunkBoxMesh->CreateVertexArray();
 				chunk.second->chunkBoxMesh->CreateVertexBuffer(0, (GLvoid*)0, GL_FLOAT, 3);
-				chunk.second->chunkBoxMesh->SetVertexBufferData(sizeof(glm::i8vec3) * cubeVertices->size(), cubeVertices->data());
+				chunk.second->chunkBoxMesh->SetVertexBufferData(sizeof(cubeVertices), cubeVertices);
 				chunk.second->chunkBoxMesh->UnBindVertexBuffer();
 				chunk.second->chunkBoxMesh->UnBindVertexArray();
+
 				chunk.second->SetLoadState(ChunkLoadState::Builted);
 			}
 			if (chunk.second->chunkLoadState == ChunkLoadState::Builted)
@@ -352,11 +383,13 @@ void World::Render()
 
 				if (iPassingSamples > 0)
 				{
+					//RenderBoundingBox(chunk.second->chunkBox, chunk.second->chunkBoxMesh);
+					renderer->RenderChunk(chunk.second);//이미 렌더링 된 녀석은 제외 시켜야함
 					//++chunkCount;
 					++drawCall;
 				}
 
-				renderer->RenderChunk(chunk.second);//이미 렌더링 된 녀석은 제외 시켜야함
+				//RenderBoundingBox(chunk.second->chunkBox, chunk.second->chunkBoxMesh);
 			}
 		}
 	}
@@ -380,10 +413,10 @@ void World::RenderBoundingBox(AABox& boundbox, std::unique_ptr<Mesh>& boxMesh)
 
 	glUseProgram(simpleCubeShaderProgram);
 	glUniformMatrix4fv(glGetUniformLocation(simpleCubeShaderProgram, "projectionview"), 1, GL_FALSE, glm::value_ptr(scene->GetCamera().lock()->GetViewProjectionMatrix()));
-	glUniform3fv(glGetUniformLocation(simpleCubeShaderProgram, "model"), 1, glm::value_ptr(transform));
+	glUniformMatrix4fv(glGetUniformLocation(simpleCubeShaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(transform));
 	glUniformMatrix4fv(glGetUniformLocation(simpleCubeShaderProgram, "color"), 1, GL_FALSE, glm::value_ptr(color));
 	boxMesh->BindVertexArray();
-	glDrawArrays(GL_TRIANGLES, 0, 24);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 	boxMesh->UnBindVertexArray();
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

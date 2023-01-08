@@ -27,7 +27,7 @@ void WorldGenerator::GenerateTerrain(std::weak_ptr<Chunk> chunk)
 	{
 		maxHeight = std::max(maxHeight, *std::max_element(heightMap[i].begin(), heightMap[i].end()));
 	}
-	chunk.lock()->chunkBox.y = maxHeight;//SetBoxHeight
+	//chunk.lock()->chunkBox.y = maxHeight;//SetBoxHeight
 	SetChunkBlocks(maxHeight, chunk);
 }
 
