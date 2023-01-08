@@ -134,10 +134,10 @@ void Player::Render()
 {
 	if (rayBlock.blockType != Air)
 	{
-		/*OutLine outlineblock(outBlockPosition);
+		OutLine outlineblock(outBlockPosition);
 		outlineblock.SetPV(mainCamera->GetViewProjectionMatrix());
 		outlineblock.SetColor(glm::vec3(1, 0, 0));
-		outlineblock.Render();*/
+		outlineblock.Render();
 
 		OutLine outlinefaceblock(outFaceBlockPosition);
 		outlinefaceblock.SetPV(mainCamera->GetViewProjectionMatrix());

@@ -163,7 +163,7 @@ Block& Chunk::GetBlock(int x, int y, int z)
 	if (z < 0)
 	{
 		if (!IsEmptyChunk(BackChunk))
-			return BackChunk.lock()->GetBlock(x, z, CHUNK_Z + z);
+			return BackChunk.lock()->GetBlock(x, y, CHUNK_Z + z);
 		else
 			return emptyBlock;
 	}

@@ -7,17 +7,22 @@
 
 const std::array<glm::i8vec3, 4> ChunkMesh::vertices[]
 {
-	//trb, tlb, tlf, trf
+	//trb, tlb, tlf, trf (Top)
 	{ glm::i8vec3(1.f, 1.f, 0.f),	glm::i8vec3(0.f, 1.f, 0.f),	glm::i8vec3(0.f, 1.f, 1.f),	glm::i8vec3(1.f, 1.f, 1.f) },
-	//Brf, Blf, Blb, Brb
+
+	//Brf, Blf, Blb, Brb (Bottom)
 	{ glm::i8vec3(1.f, 0.f, 1.f),	glm::i8vec3(0.f, 0.f, 1.f),	glm::i8vec3(0.f, 0.f, 0.f),	glm::i8vec3(1.f, 0.f, 0.f) },
-	//flB, frB, frt, flt
+
+	//flB, frB, frt, flt (Front)
 	{ glm::i8vec3(0.f, 0.f, 1.f),	glm::i8vec3(1.f, 0.f, 1.f),	glm::i8vec3(1.f, 1.f, 1.f),	glm::i8vec3(0.f, 1.f, 1.f) },
-	//brB, blB, blt, brt
+
+	//brB, blB, blt, brt (Back)
 	{ glm::i8vec3(1.f, 0.f, 0.f),	glm::i8vec3(0.f, 0.f, 0.f),	glm::i8vec3(0.f, 1.f, 0.f),	glm::i8vec3(1.f, 1.f, 0.f) },
-	//rBf, rBb, rtb, rtf
+
+	//rBf, rBb, rtb, rtf (Right)
 	{ glm::i8vec3(1.f, 0.f, 1.f),	glm::i8vec3(1.f, 0.f, 0.f),	glm::i8vec3(1.f, 1.f, 0.f),	glm::i8vec3(1.f, 1.f, 1.f) },
-	//lBb, lBf, ltf, ltb
+
+	//lBb, lBf, ltf, ltb (Left)
 	{ glm::i8vec3(0.f, 0.f, 0.f),	glm::i8vec3(0.f, 0.f, 1.f),	glm::i8vec3(0.f, 1.f, 1.f),	glm::i8vec3(0.f, 1.f, 0.f) }
 };
 
