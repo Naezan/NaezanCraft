@@ -43,7 +43,7 @@ MineCraft Copy Naezan's Engine
         * ~~청크 랜덤 블록 렌더링~~
         * 세이브 로드 청크, 월드(SaveWorld, LoadWorld, SaveChunk, LoadChunk)
         * ~~World Objects(like tree, catus etc..)~~
-        * 그리디 메싱 + 비등방성문제
+        * 그리디 메싱 + 비등방성문제(reference : https://0fps.net/2013/07/03/ambient-occlusion-for-minecraft-like-worlds/ + https://bbtarzan12.github.io/Voxel-Part-3/)
         * *Instancing(메모리관리 후 검토)*
         * *BSP(Maybe Cave? or Town? but i am not implement cave and town)*
         * *Region Weather System(later if possible)*

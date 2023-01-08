@@ -263,40 +263,106 @@ void ChunkMesh::AddFace(const glm::i8vec3& pos, Block& block, const FaceType& fa
 	switch (faceType)
 	{
 	case Top:
-		_meshVertices.push_back({ pos + vertices[Top][0],texcoords[0],15,(uint8_t)block.Get_trb_AO() });
-		_meshVertices.push_back({ pos + vertices[Top][1],texcoords[1],15,(uint8_t)block.Get_tlb_AO() });
-		_meshVertices.push_back({ pos + vertices[Top][2],texcoords[2],15,(uint8_t)block.Get_tlf_AO() });
-		_meshVertices.push_back({ pos + vertices[Top][3],texcoords[3],15,(uint8_t)block.Get_trf_AO() });
+		//0 + 2 < 1 + 3
+		/*
+		1 -- 0
+		| \  |
+		2 -- 3
+		*/
+		if (block.Get_trb_AO() + block.Get_tlf_AO() < block.Get_tlb_AO() + block.Get_trf_AO())
+		{
+			_meshVertices.push_back({ pos + vertices[Top][1],texcoords[1],15,(uint8_t)block.Get_tlb_AO() });
+			_meshVertices.push_back({ pos + vertices[Top][2],texcoords[2],15,(uint8_t)block.Get_tlf_AO() });
+			_meshVertices.push_back({ pos + vertices[Top][3],texcoords[3],15,(uint8_t)block.Get_trf_AO() });
+			_meshVertices.push_back({ pos + vertices[Top][0],texcoords[0],15,(uint8_t)block.Get_trb_AO() });
+		}
+		else
+		{
+			_meshVertices.push_back({ pos + vertices[Top][0],texcoords[0],15,(uint8_t)block.Get_trb_AO() });
+			_meshVertices.push_back({ pos + vertices[Top][1],texcoords[1],15,(uint8_t)block.Get_tlb_AO() });
+			_meshVertices.push_back({ pos + vertices[Top][2],texcoords[2],15,(uint8_t)block.Get_tlf_AO() });
+			_meshVertices.push_back({ pos + vertices[Top][3],texcoords[3],15,(uint8_t)block.Get_trf_AO() });
+		}
 		break;
 	case Bottom:
-		_meshVertices.push_back({ pos + vertices[Bottom][0],texcoords[0],15,(uint8_t)block.Get_Brf_AO() });
-		_meshVertices.push_back({ pos + vertices[Bottom][1],texcoords[1],15,(uint8_t)block.Get_Blf_AO() });
-		_meshVertices.push_back({ pos + vertices[Bottom][2],texcoords[2],15,(uint8_t)block.Get_Blb_AO() });
-		_meshVertices.push_back({ pos + vertices[Bottom][3],texcoords[3],15,(uint8_t)block.Get_Brb_AO() });
+		if (block.Get_Brf_AO() + block.Get_Blb_AO() < block.Get_Blf_AO() + block.Get_Brb_AO())
+		{
+			_meshVertices.push_back({ pos + vertices[Bottom][1],texcoords[1],15,(uint8_t)block.Get_Blf_AO() });
+			_meshVertices.push_back({ pos + vertices[Bottom][2],texcoords[2],15,(uint8_t)block.Get_Blb_AO() });
+			_meshVertices.push_back({ pos + vertices[Bottom][3],texcoords[3],15,(uint8_t)block.Get_Brb_AO() });
+			_meshVertices.push_back({ pos + vertices[Bottom][0],texcoords[0],15,(uint8_t)block.Get_Brf_AO() });
+		}
+		else
+		{
+			_meshVertices.push_back({ pos + vertices[Bottom][0],texcoords[0],15,(uint8_t)block.Get_Brf_AO() });
+			_meshVertices.push_back({ pos + vertices[Bottom][1],texcoords[1],15,(uint8_t)block.Get_Blf_AO() });
+			_meshVertices.push_back({ pos + vertices[Bottom][2],texcoords[2],15,(uint8_t)block.Get_Blb_AO() });
+			_meshVertices.push_back({ pos + vertices[Bottom][3],texcoords[3],15,(uint8_t)block.Get_Brb_AO() });
+		}
 		break;
 	case Front:
-		_meshVertices.push_back({ pos + vertices[Front][0],texcoords[0],15,(uint8_t)block.Get_flB_AO() });
-		_meshVertices.push_back({ pos + vertices[Front][1],texcoords[1],15,(uint8_t)block.Get_frB_AO() });
-		_meshVertices.push_back({ pos + vertices[Front][2],texcoords[2],15,(uint8_t)block.Get_frt_AO() });
-		_meshVertices.push_back({ pos + vertices[Front][3],texcoords[3],15,(uint8_t)block.Get_flt_AO() });
+		if (block.Get_flB_AO() + block.Get_frt_AO() < block.Get_frB_AO() + block.Get_flt_AO())
+		{
+			_meshVertices.push_back({ pos + vertices[Front][1],texcoords[1],15,(uint8_t)block.Get_frB_AO() });
+			_meshVertices.push_back({ pos + vertices[Front][2],texcoords[2],15,(uint8_t)block.Get_frt_AO() });
+			_meshVertices.push_back({ pos + vertices[Front][3],texcoords[3],15,(uint8_t)block.Get_flt_AO() });
+			_meshVertices.push_back({ pos + vertices[Front][0],texcoords[0],15,(uint8_t)block.Get_flB_AO() });
+		}
+		else
+		{
+			_meshVertices.push_back({ pos + vertices[Front][0],texcoords[0],15,(uint8_t)block.Get_flB_AO() });
+			_meshVertices.push_back({ pos + vertices[Front][1],texcoords[1],15,(uint8_t)block.Get_frB_AO() });
+			_meshVertices.push_back({ pos + vertices[Front][2],texcoords[2],15,(uint8_t)block.Get_frt_AO() });
+			_meshVertices.push_back({ pos + vertices[Front][3],texcoords[3],15,(uint8_t)block.Get_flt_AO() });
+		}
 		break;
 	case Back:
-		_meshVertices.push_back({ pos + vertices[Back][0],texcoords[0],15,(uint8_t)block.Get_brB_AO() });
-		_meshVertices.push_back({ pos + vertices[Back][1],texcoords[1],15,(uint8_t)block.Get_blB_AO() });
-		_meshVertices.push_back({ pos + vertices[Back][2],texcoords[2],15,(uint8_t)block.Get_blt_AO() });
-		_meshVertices.push_back({ pos + vertices[Back][3],texcoords[3],15,(uint8_t)block.Get_brt_AO() });
+		if (block.Get_brB_AO() + block.Get_blt_AO() < block.Get_blB_AO() + block.Get_brt_AO())
+		{
+			_meshVertices.push_back({ pos + vertices[Back][1],texcoords[1],15,(uint8_t)block.Get_blB_AO() });
+			_meshVertices.push_back({ pos + vertices[Back][2],texcoords[2],15,(uint8_t)block.Get_blt_AO() });
+			_meshVertices.push_back({ pos + vertices[Back][3],texcoords[3],15,(uint8_t)block.Get_brt_AO() });
+			_meshVertices.push_back({ pos + vertices[Back][0],texcoords[0],15,(uint8_t)block.Get_brB_AO() });
+		}
+		else
+		{
+			_meshVertices.push_back({ pos + vertices[Back][0],texcoords[0],15,(uint8_t)block.Get_brB_AO() });
+			_meshVertices.push_back({ pos + vertices[Back][1],texcoords[1],15,(uint8_t)block.Get_blB_AO() });
+			_meshVertices.push_back({ pos + vertices[Back][2],texcoords[2],15,(uint8_t)block.Get_blt_AO() });
+			_meshVertices.push_back({ pos + vertices[Back][3],texcoords[3],15,(uint8_t)block.Get_brt_AO() });
+		}
 		break;
 	case Right:
-		_meshVertices.push_back({ pos + vertices[Right][0],texcoords[0],15,(uint8_t)block.Get_rBf_AO() });
-		_meshVertices.push_back({ pos + vertices[Right][1],texcoords[1],15,(uint8_t)block.Get_rBb_AO() });
-		_meshVertices.push_back({ pos + vertices[Right][2],texcoords[2],15,(uint8_t)block.Get_rtb_AO() });
-		_meshVertices.push_back({ pos + vertices[Right][3],texcoords[3],15,(uint8_t)block.Get_rtf_AO() });
+		if (block.Get_rBf_AO() + block.Get_rtb_AO() < block.Get_rBb_AO() + block.Get_rtf_AO())
+		{
+			_meshVertices.push_back({ pos + vertices[Right][1],texcoords[1],15,(uint8_t)block.Get_rBb_AO() });
+			_meshVertices.push_back({ pos + vertices[Right][2],texcoords[2],15,(uint8_t)block.Get_rtb_AO() });
+			_meshVertices.push_back({ pos + vertices[Right][3],texcoords[3],15,(uint8_t)block.Get_rtf_AO() });
+			_meshVertices.push_back({ pos + vertices[Right][0],texcoords[0],15,(uint8_t)block.Get_rBf_AO() });
+		}
+		else
+		{
+			_meshVertices.push_back({ pos + vertices[Right][0],texcoords[0],15,(uint8_t)block.Get_rBf_AO() });
+			_meshVertices.push_back({ pos + vertices[Right][1],texcoords[1],15,(uint8_t)block.Get_rBb_AO() });
+			_meshVertices.push_back({ pos + vertices[Right][2],texcoords[2],15,(uint8_t)block.Get_rtb_AO() });
+			_meshVertices.push_back({ pos + vertices[Right][3],texcoords[3],15,(uint8_t)block.Get_rtf_AO() });
+		}
 		break;
 	case Left:
-		_meshVertices.push_back({ pos + vertices[Left][0],texcoords[0],15,(uint8_t)block.Get_lBb_AO() });
-		_meshVertices.push_back({ pos + vertices[Left][1],texcoords[1],15,(uint8_t)block.Get_lBf_AO() });
-		_meshVertices.push_back({ pos + vertices[Left][2],texcoords[2],15,(uint8_t)block.Get_ltf_AO() });
-		_meshVertices.push_back({ pos + vertices[Left][3],texcoords[3],15,(uint8_t)block.Get_ltb_AO() });
+		if (block.Get_lBb_AO() + block.Get_ltf_AO() < block.Get_lBf_AO() + block.Get_ltb_AO())
+		{
+			_meshVertices.push_back({ pos + vertices[Left][1],texcoords[1],15,(uint8_t)block.Get_lBf_AO() });
+			_meshVertices.push_back({ pos + vertices[Left][2],texcoords[2],15,(uint8_t)block.Get_ltf_AO() });
+			_meshVertices.push_back({ pos + vertices[Left][3],texcoords[3],15,(uint8_t)block.Get_ltb_AO() });
+			_meshVertices.push_back({ pos + vertices[Left][0],texcoords[0],15,(uint8_t)block.Get_lBb_AO() });
+		}
+		else
+		{
+			_meshVertices.push_back({ pos + vertices[Left][0],texcoords[0],15,(uint8_t)block.Get_lBb_AO() });
+			_meshVertices.push_back({ pos + vertices[Left][1],texcoords[1],15,(uint8_t)block.Get_lBf_AO() });
+			_meshVertices.push_back({ pos + vertices[Left][2],texcoords[2],15,(uint8_t)block.Get_ltf_AO() });
+			_meshVertices.push_back({ pos + vertices[Left][3],texcoords[3],15,(uint8_t)block.Get_ltb_AO() });
+		}
 		break;
 	}
 
