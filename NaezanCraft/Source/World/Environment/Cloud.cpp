@@ -59,7 +59,7 @@ Cloud::Cloud(glm::vec3 _position) : renderPosition(_position), updatePosition(_p
 			static_cast<int>(sizeof(CloudVertexCoord)), (void*)offsetof(CloudVertexCoord, texcoord),
 			GL_FLOAT, GL_FLOAT);
 		cloudMesh->SetVertexBufferData(cloudVertexCoords.size() * sizeof(CloudVertexCoord), &cloudVertexCoords.front());
-		cloudIndicesSize = IndexCoords.size();
+		cloudMesh->SetIndicesCount(IndexCoords.size());
 
 		cloudMesh->UnBindVertexBuffer();
 		cloudMesh->UnBindVertexArray();
@@ -112,20 +112,20 @@ void Cloud::Render(std::weak_ptr<Camera>& camera, glm::mat4& transformMatrix)
 	glUniformMatrix4fv(glGetUniformLocation(cloudShaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(backmodel));
 
 	cloudMesh->BindVertexArray();
-	glDrawElements(GL_TRIANGLES, cloudIndicesSize, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_TRIANGLES, cloudMesh->GetIndicesCount(), GL_UNSIGNED_INT, nullptr);
 	cloudMesh->UnBindVertexArray();
 
 	glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(renderPosition.x, 0, renderPosition.z + deltaPos));
 	glUniformMatrix4fv(glGetUniformLocation(cloudShaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 
 	cloudMesh->BindVertexArray();
-	glDrawElements(GL_TRIANGLES, cloudIndicesSize, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_TRIANGLES, cloudMesh->GetIndicesCount(), GL_UNSIGNED_INT, nullptr);
 	cloudMesh->UnBindVertexArray();
 
 	glm::mat4 frontmodel = glm::translate(glm::mat4(1.0f), glm::vec3(renderPosition.x, 0, renderPosition.z + deltaPos + 4096));
 	glUniformMatrix4fv(glGetUniformLocation(cloudShaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(frontmodel));
 
 	cloudMesh->BindVertexArray();
-	glDrawElements(GL_TRIANGLES, cloudIndicesSize, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_TRIANGLES, cloudMesh->GetIndicesCount(), GL_UNSIGNED_INT, nullptr);
 	cloudMesh->UnBindVertexArray();
 }

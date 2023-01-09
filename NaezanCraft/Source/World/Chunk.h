@@ -7,6 +7,7 @@ using array_3d = std::array<std::array<std::array<Block, CHUNK_Z>, CHUNK_Y>, CHU
 using vector_3d = std::vector<std::vector<std::vector<unsigned char>>>;
 
 class Mesh;
+class Water;
 class ChunkMesh;
 class WorldGenerator;
 struct VertTexCoord;
@@ -30,6 +31,8 @@ public:
 	Block& GetWorldBlock(const glm::vec3& blockPos);
 	Block& GetWorldBlock(int wx, int wy, int wz);
 	void SetLoadState(const ChunkLoadState& state);
+
+	std::unique_ptr<Mesh>& GetWaterMesh();
 
 	void SetLightLevel(int x, int y, int z, int level);
 	unsigned char GetLightLevel(int x, int y, int z);
@@ -81,6 +84,9 @@ public:
 	vector_3d LightMap;
 	static const std::array <glm::ivec3, 6> nearFaces;
 	Block emptyBlock;
+
+	//Water
+	std::unique_ptr<Water> water;
 	
 	//Query
 	unsigned int queryID;

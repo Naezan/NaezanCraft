@@ -8,6 +8,7 @@
 
 class Camera;
 class Chunk;
+class Mesh;
 
 class Renderer
 {
@@ -17,7 +18,10 @@ public:
 
 	void BeginRender(const glm::mat4& matrix);
 	void RenderChunk(std::weak_ptr<Chunk> chunk);
+	void RenderWater(std::weak_ptr<Chunk> chunk);
 	void Shutdown();
+
+	inline uint32_t GetRenderShader() { return shaderProgram; }
 
 private:
 	std::map<ShaderType, std::unique_ptr<Shader>> renderShaders;

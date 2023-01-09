@@ -18,7 +18,6 @@ private:
 	uint32_t cloudShaderProgram;
 	std::map<ShaderType, std::unique_ptr<CloudShader>> cloudShaders;
 	std::unique_ptr<Mesh> cloudMesh;
-	int cloudIndicesSize;
 	bool isStartRender;
 	glm::vec3 renderPosition;
 	glm::vec3 updatePosition;

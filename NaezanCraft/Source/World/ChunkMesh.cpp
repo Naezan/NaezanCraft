@@ -2,6 +2,8 @@
 #include "ChunkMesh.h"
 #include "Chunk.h"
 #include "World.h"
+#include "Water.h"
+
 #include "../Renderer/VertexArray.h"
 #include "../Renderer/Buffer.h"
 
@@ -26,11 +28,6 @@ const std::array<glm::i8vec3, 4> ChunkMesh::vertices[]
 	{ glm::i8vec3(0.f, 0.f, 0.f),	glm::i8vec3(0.f, 0.f, 1.f),	glm::i8vec3(0.f, 1.f, 1.f),	glm::i8vec3(0.f, 1.f, 0.f) }
 };
 
-const std::array<glm::i8vec3, 2> ChunkMesh::indices
-{
-	glm::i8vec3(0, 1, 2) , glm::i8vec3(2, 3, 0)
-};
-
 ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>&& chunk)
 {
 	parentChunk = chunk;
@@ -41,26 +38,43 @@ ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>&& chunk)
 
 ChunkMesh::~ChunkMesh()
 {
-	//glDeleteQueries(1, &parentChunk.lock()->queryID);
 }
 
 void ChunkMesh::CreateMesh()
 {
 	meshVertices.clear();//size to zero
+	std::vector<glm::vec3> waterPositions;
 
 	for (int x = 0; x < CHUNK_X; ++x)
 	{
-		for (int y = 0; y < CHUNK_Y; ++y)
+		for (int z = 0; z < CHUNK_Z; ++z)
 		{
-			for (int z = 0; z < CHUNK_Z; ++z)
+			bool isWater = false;
+			for (int y = CHUNK_Y - 1; y >= 0; --y)
 			{
 				Block& block = parentChunk.lock()->chunkBlocks[x][y][z];
 				if (block.blockType == BlockType::Air)
 					continue;
 
+				if (block.blockType == BlockType::WaterT)
+				{
+					if (!isWater)
+					{
+						isWater = true;
+						waterPositions.push_back(glm::vec3(x, y, z));
+					}
+					continue;
+				}
+
 				AddFaces(glm::uvec3(x, y, z), block);
 			}
 		}
+	}
+
+	for (auto& pos : waterPositions)
+	{
+		auto& b = parentChunk.lock()->GetBlock(pos);
+		AddFace(pos, parentChunk.lock()->GetBlock(pos), FaceType::Top, waterVertices);
 	}
 }
 
@@ -95,6 +109,9 @@ void ChunkMesh::CreateBuffer()
 
 		vertexBuffer->UnBind();
 		vertexArray->UnBind();
+
+		if (!waterVertices.empty())
+			parentChunk.lock()->water->CreateBuffer(waterVertices);
 	}
 }
 
@@ -138,55 +155,56 @@ void ChunkMesh::AddFaces(const glm::i8vec3& pos, Block& block)
 	//Z Back
 	if (pos.z > 0)
 	{
-		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, pos.z - 1)).IsTransparent())
+		Block& backBlock = parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, pos.z - 1));
+		if (backBlock.IsTransparent() && !block.IsSameFluid(backBlock.blockType))
 			AddFace(pos, block, FaceType::Back, meshVertices);
 	}
 	else if (!Chunk::IsEmptyChunk(parentChunk.lock()->BackChunk))
 	{
-		if (parentChunk.lock()->BackChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, CHUNK_Z - 1)).IsTransparent())
+		auto& backChunk = parentChunk.lock()->BackChunk.lock();
+		Block& backBlock = backChunk->GetBlock(glm::vec3(pos.x, pos.y, CHUNK_Z - 1));
+		if (backBlock.IsTransparent() && !block.IsSameFluid(backBlock.blockType))
 			AddFace(pos, block, FaceType::Back, meshVertices);
-		else
-		{
-		}
 	}
 
 	//Z Front
 	if (pos.z < CHUNK_Z - 1)
 	{
-		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, pos.z + 1)).IsTransparent())
+		Block& frontBlock = parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y, pos.z + 1));
+		if (frontBlock.IsTransparent() && !block.IsSameFluid(frontBlock.blockType))
 			AddFace(pos, block, FaceType::Front, meshVertices);
 	}
 	else if (!Chunk::IsEmptyChunk(parentChunk.lock()->FrontChunk))
 	{
 		auto& frontChunk = parentChunk.lock()->FrontChunk.lock();
-		if (frontChunk->GetBlock(glm::vec3(pos.x, pos.y, 0)).IsTransparent())
+		Block& frontBlock = frontChunk->GetBlock(glm::vec3(pos.x, pos.y, 0));
+		if (frontBlock.IsTransparent() && !block.IsSameFluid(frontBlock.blockType))
 			AddFace(pos, block, FaceType::Front, meshVertices);
-		else
-		{
-		}
 	}
 
 	//Y Bottom
 	if (pos.y > 0)
 	{
-		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y - 1, pos.z)).IsTransparent())
+		Block& bottomBlock = parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y - 1, pos.z));
+		if (bottomBlock.IsTransparent() && !block.IsSameFluid(bottomBlock.blockType))
 			AddFace(pos, block, FaceType::Bottom, meshVertices);
 	}
 	else
 	{
-		//Just add Bottom Face Once
+		//Y == 0, Just add Bottom Face Once
 		AddFace(pos, block, FaceType::Bottom, meshVertices);
 	}
 
 	//Y Top
 	if (pos.y < CHUNK_Y - 1)
 	{
-		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y + 1, pos.z)).IsTransparent())
+		Block& topBlock = parentChunk.lock()->GetBlock(glm::vec3(pos.x, pos.y + 1, pos.z));
+		if (topBlock.IsTransparent() && !block.IsSameFluid(topBlock.blockType))
 			AddFace(pos, block, FaceType::Top, meshVertices);
 	}
 	else
 	{
-		//Just add Top Face Once
+		//Y == 127, Just add Top Face Once
 		AddFace(pos, block, FaceType::Top, meshVertices);
 	}
 
@@ -195,34 +213,34 @@ void ChunkMesh::AddFaces(const glm::i8vec3& pos, Block& block)
 	if (pos.x > 0)
 	{
 		//만약 이전박스가 없다면 비어있으면 안되므로 현재 왼쪽면의 정보를 추가해준다
-		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x - 1, pos.y, pos.z)).IsTransparent())
+		Block& leftBlock = parentChunk.lock()->GetBlock(glm::vec3(pos.x - 1, pos.y, pos.z));
+		if (leftBlock.IsTransparent() && !block.IsSameFluid(leftBlock.blockType))
 			AddFace(pos, block, FaceType::Left, meshVertices);
 	}
 	else if (!Chunk::IsEmptyChunk(parentChunk.lock()->LeftChunk))
 	{
 		//만약 이전 청크의 마지막이 없다면 0번째위치 왼쪽면의 정보를 추가해준다
-		if (parentChunk.lock()->LeftChunk.lock()->GetBlock(glm::vec3(CHUNK_X - 1, pos.y, pos.z)).IsTransparent())
+		auto& leftChunk = parentChunk.lock()->LeftChunk.lock();
+		Block& leftBlock = leftChunk->GetBlock(glm::vec3(CHUNK_X - 1, pos.y, pos.z));
+		if (leftBlock.IsTransparent() && !block.IsSameFluid(leftBlock.blockType))
 			AddFace(pos, block, FaceType::Left, meshVertices);
-		else
-		{
-		}
 	}
 
 	//X Right
 	if (pos.x < CHUNK_X - 1)
 	{
 		//만약 다음박스가 없다면 비어있으면 안되므로 현재 오른쪽면의 정보를 추가해준다
-		if (parentChunk.lock()->GetBlock(glm::vec3(pos.x + 1, pos.y, pos.z)).IsTransparent())
+		Block& rightBlock = parentChunk.lock()->GetBlock(glm::vec3(pos.x + 1, pos.y, pos.z));
+		if (rightBlock.IsTransparent() && !block.IsSameFluid(rightBlock.blockType))
 			AddFace(pos, block, FaceType::Right, meshVertices);
 	}
 	else if (!Chunk::IsEmptyChunk(parentChunk.lock()->RightChunk))
 	{
 		//만약 다음 청크의 0번째가 없다면 CHUNK_X - 1위치 으론쪽면의 정보를 추가해준다
-		if (parentChunk.lock()->RightChunk.lock()->GetBlock(glm::vec3(0, pos.y, pos.z)).IsTransparent())
+		auto& rightChunk = parentChunk.lock()->RightChunk.lock();
+		Block& rightBlock = rightChunk->GetBlock(glm::vec3(0, pos.y, pos.z));
+		if (rightBlock.IsTransparent() && !block.IsSameFluid(rightBlock.blockType))
 			AddFace(pos, block, FaceType::Right, meshVertices);
-		else
-		{
-		}
 	}
 }
 
@@ -431,4 +449,9 @@ glm::u16vec2 ChunkMesh::GetTexCoord(const BlockType& type)
 {
 	std::pair<int, int> coord = World::BlockCoordData[type];
 	return glm::u16vec2(coord.first, coord.second);
+}
+
+bool ChunkMesh::IsValidWaterMesh()
+{
+	return !waterVertices.empty();
 }

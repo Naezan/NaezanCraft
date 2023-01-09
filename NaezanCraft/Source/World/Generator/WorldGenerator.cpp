@@ -80,7 +80,7 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 					if (y <= WATER_HEIGHT)
 					{
 						//Water
-						chunk.lock()->SetBlock(x, y, z, BlockType::Water);
+						chunk.lock()->SetBlock(x, y, z, BlockType::WaterT);
 					}
 				}
 				//°æ°è¸é

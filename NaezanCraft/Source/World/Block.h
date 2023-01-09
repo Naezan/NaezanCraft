@@ -17,7 +17,7 @@ enum BlockType : uint8_t
 	BirchLog,
 	BirchLogTB,
 	BirchLeaves,
-	Water,
+	WaterT,
 	Lava,
 	Iron,
 	Gold,
@@ -41,15 +41,15 @@ struct Block
 
 	inline bool IsTransparent() {
 		return (this->blockType == BlockType::Air) || (this->blockType == BlockType::OakLeaves) ||
-			(this->blockType == BlockType::BirchLeaves);
+			(this->blockType == BlockType::BirchLeaves) || (this->blockType == BlockType::WaterT);
 	}
 	inline bool IsFluid() {
-		return (this->blockType == BlockType::Air) || (this->blockType == BlockType::Water) || (this->blockType == BlockType::Lava);
+		return (this->blockType == BlockType::Air) || (this->blockType == BlockType::WaterT) || (this->blockType == BlockType::Lava);
 	}
 	inline bool IsSmooth() {
 		return 
 		(this->blockType == BlockType::Air) || 
-		(this->blockType == BlockType::Water) || 
+		(this->blockType == BlockType::WaterT) ||
 		(this->blockType == BlockType::Lava) || 
 		(this->blockType == BlockType::OakLeaves) ||
 		(this->blockType == BlockType::BirchLeaves);
@@ -65,6 +65,15 @@ struct Block
 		(this->blockType == BlockType::Dirt) || 
 		(this->blockType == BlockType::Stone) || 
 		(this->blockType == BlockType::Sand);
+	}
+
+	inline bool IsSameFluid(BlockType& neighborBlocktype) {
+		if (neighborBlocktype == BlockType::WaterT || neighborBlocktype == BlockType::Lava)
+		{
+			return neighborBlocktype == blockType;
+		}
+
+		return false;
 	}
 
 	bool operator==(Block rv) const

@@ -4,6 +4,11 @@
 #include "../Renderer/VertexArray.h"
 #include "../Renderer/Buffer.h"
 
+const std::array<glm::i8vec3, 2> Mesh::indices
+{
+	glm::i8vec3(0, 1, 2) , glm::i8vec3(2, 3, 0)
+};
+
 Mesh::Mesh()
 {
 }
@@ -50,8 +55,8 @@ void Mesh::CreateIndexBuffer()
 	indexBuffer = std::make_unique<IndexBuffer>(meshIndices.size() * sizeof(unsigned int), &meshIndices.front());
 	indicesCount = meshIndices.size();
 	lastIndex = meshIndices.back();
-	//meshIndices.clear();
-	//meshIndices.shrink_to_fit();
+	meshIndices.clear();
+	meshIndices.shrink_to_fit();
 }
 
 void Mesh::SetVertexBufferData(size_t size, const void* data)

@@ -2,6 +2,7 @@
 #include "Chunk.h"
 #include "ChunkMesh.h"
 #include "Mesh.h"
+#include "Water.h"
 #include "../Application.h"
 #include "../Renderer/Renderer.h"
 #include "../World/Generator/WorldGenerator.h"
@@ -26,6 +27,7 @@ Chunk::Chunk(const glm::vec3& pos) :
 	//TO DO change blocktype
 	//memset(&chunkBlocks[0][0][0], BlockType::Diamond, CHUNK_X * CHUNK_Y * CHUNK_Z * sizeof(Block));
 	//std::fill(&chunkBlocks[0][0][0], &chunkBlocks[0][0][0] + CHUNK_SIZE, BlockType::Air);
+	water = std::make_unique<Water>();
 }
 
 Chunk::~Chunk()
@@ -34,6 +36,7 @@ Chunk::~Chunk()
 	RightChunk.reset();
 	FrontChunk.reset();
 	BackChunk.reset();
+	water.reset();
 }
 
 void Chunk::SetBlock(const glm::vec3& blockPos, BlockType type)
@@ -260,6 +263,11 @@ Block& Chunk::GetWorldBlock(int wx, int wy, int wz)
 void Chunk::SetLoadState(const ChunkLoadState& state)
 {
 	chunkLoadState = state;
+}
+
+std::unique_ptr<Mesh>& Chunk::GetWaterMesh()
+{
+	return water->GetMesh();
 }
 
 void Chunk::SetLightLevel(int x, int y, int z, int level)

@@ -64,6 +64,33 @@ void Renderer::RenderChunk(std::weak_ptr<Chunk> chunk)
 	chunk.lock()->chunkMesh->UnBindVertexArray();
 }
 
+void Renderer::RenderWater(std::weak_ptr<Chunk> chunk)
+{
+	if(!chunk.lock()->chunkMesh->IsValidWaterMesh())
+		return;
+
+	glEnable(GL_BLEND);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glUseProgram(shaderProgram);
+
+	TextureManager::BindTexture("CubeAtlas");
+	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
+
+	glUniform1f(glGetUniformLocation(shaderProgram, "lightIntensity"), sunIntensity);
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionview"), 1, GL_FALSE, glm::value_ptr(ViewProjectionMatrix));
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(chunk.lock()->position.x * (CHUNK_X), chunk.lock()->position.y * (CHUNK_Y), chunk.lock()->position.z * (CHUNK_Z)));
+	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+
+	chunk.lock()->GetWaterMesh()->BindVertexArray();
+	glDrawElements(GL_TRIANGLES, chunk.lock()->GetWaterMesh()->GetIndicesCount(), GL_UNSIGNED_INT, 0);
+	chunk.lock()->GetWaterMesh()->UnBindVertexArray();
+}
+
 void Renderer::Shutdown()
 {
 	glDeleteProgram(shaderProgram);

@@ -10,17 +10,10 @@ enum FaceType
 };
 
 class Chunk;
+class Water;
 class VertexArray;
 class VertexBuffer;
 class IndexBuffer;
-
-struct VertTexCoord
-{
-	glm::i8vec3 pos;
-	glm::u16vec2 texcoord;
-	uint8_t lightlevel;
-	uint8_t AO;
-};
 
 class ChunkMesh : public Mesh
 {
@@ -37,11 +30,14 @@ public:
 
 	glm::u16vec2 GetTexCoord(const BlockType& type);
 
+	bool IsValidWaterMesh();
+
 private:
 	static const std::array<glm::i8vec3, 4> vertices[];
-	static const std::array<glm::i8vec3, 2> indices;
 	//청크 하나의 모든 점이 여기에 저장된다. 65,536 보다 큰 수의 점들이 저장된다.
 	std::vector<VertTexCoord> meshVertices;
 
 	std::weak_ptr<Chunk> parentChunk;
+
+	std::vector<VertTexCoord> waterVertices;
 };

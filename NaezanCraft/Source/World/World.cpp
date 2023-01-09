@@ -4,6 +4,8 @@
 #include "Camera.h"
 #include "Chunk.h"
 #include "ChunkMesh.h"
+#include "Water.h"
+
 #include "../Application.h"
 #include "../Renderer/Renderer.h"
 #include "../World/Generator/WorldGenerator.h"
@@ -58,6 +60,7 @@ World::World() : occlusionCull(true)
 	renderer = std::make_unique<Renderer>();
 	scene = std::make_unique<Scene>();
 	sky = std::make_unique<SkyBox>();
+
 	worldGenerator = std::make_unique<WorldGenerator>();
 
 	playerPosition = scene->GetPlayerPosition();
@@ -91,7 +94,7 @@ void World::SetBlockDatas()
 	BlockCoordData[BirchLog] = std::make_pair(16, 11);
 	BlockCoordData[BirchLogTB] = std::make_pair(16, 12);
 	BlockCoordData[BirchLeaves] = std::make_pair(16, 1);
-	BlockCoordData[Water] = std::make_pair(4, 2);
+	BlockCoordData[WaterT] = std::make_pair(4, 2);
 	BlockCoordData[Lava] = std::make_pair(4, 0);
 	BlockCoordData[Iron] = std::make_pair(6, 15);
 	BlockCoordData[Gold] = std::make_pair(4, 13);
@@ -216,9 +219,6 @@ void World::Render()
 	OPTICK_EVENT();
 
 	renderer->BeginRender(scene->GetCamera().lock()->GetViewProjectionMatrix());
-
-	scene->Render();
-	sky->Render(scene->GetCamera());
 
 	int chunkCount = 0;
 	drawCall = 8;
@@ -395,10 +395,21 @@ void World::Render()
 		}
 	}
 
+	for (auto& waterchunk : worldChunks)
+	{
+		if (waterchunk.second->chunkLoadState == ChunkLoadState::Builted)
+		{
+			renderer->RenderWater(waterchunk.second);
+		}
+	}
+
+	scene->Render();
+	sky->Render(scene->GetCamera());
+
 	RemoveChunk();
 
 	//std::cout << ChunkCount << std::endl;
-	NC_LOG_DEBUG("drawCall : {0}", drawCall);
+	//NC_LOG_DEBUG("drawCall : {0}", drawCall);
 }
 
 void World::RenderBoundingBox(AABox& boundbox, std::unique_ptr<Mesh>& boxMesh)

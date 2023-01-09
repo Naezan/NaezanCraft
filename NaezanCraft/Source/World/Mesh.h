@@ -8,6 +8,14 @@ class VertexArray;
 class VertexBuffer;
 class IndexBuffer;
 
+struct VertTexCoord
+{
+	glm::i8vec3 pos;
+	glm::u16vec2 texcoord;
+	uint8_t lightlevel;
+	uint8_t AO;
+};
+
 class Mesh
 {
 public:
@@ -15,6 +23,7 @@ public:
 	virtual ~Mesh();
 
 	inline size_t GetIndicesCount() { return indicesCount; }
+	inline void SetIndicesCount(int count) { indicesCount = count; }
 
 	void CreateVertexArray();
 	void CreateVertexBuffer(int vertexStride, const void* vertexPointer,
@@ -38,6 +47,8 @@ public:
 	void DeleteMesh();
 
 protected:
+	static const std::array<glm::i8vec3, 2> indices;
+
 	std::unique_ptr<VertexArray> vertexArray;
 	std::unique_ptr<VertexBuffer> vertexBuffer;
 	std::unique_ptr<IndexBuffer> indexBuffer;
