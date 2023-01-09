@@ -15,6 +15,13 @@
 std::unordered_map<BlockType, std::pair<int, int>> World::BlockCoordData;
 std::mutex World::worldMutex;
 int World::drawCall;
+const std::array <glm::vec2, 32> World::animOffsets
+{
+	glm::vec2(0, 0),glm::vec2(1, 0),glm::vec2(2, 0), glm::vec2(3, 0), glm::vec2(4, 0), glm::vec2(5, 0), glm::vec2(6, 0), glm::vec2(7, 0),
+	glm::vec2(8, 0),glm::vec2(9, 0),glm::vec2(10,0), glm::vec2(11,0), glm::vec2(12,0), glm::vec2(13,0), glm::vec2(14,0), glm::vec2(15,0),
+	glm::vec2(0, 1),glm::vec2(1, 1),glm::vec2(2, 1), glm::vec2(3, 1), glm::vec2(4, 1), glm::vec2(5, 1), glm::vec2(6, 1), glm::vec2(7, 1),
+	glm::vec2(8, 1),glm::vec2(9, 1),glm::vec2(10,1), glm::vec2(11,1), glm::vec2(12,1), glm::vec2(13,1), glm::vec2(14,1), glm::vec2(15,1)
+};
 
 static const GLfloat cubeVertices[] = {
 	-1.0f,-1.0f,-1.0f, // triangle 1 : begin
@@ -55,12 +62,14 @@ static const GLfloat cubeVertices[] = {
 	1.0f,-1.0f, 1.0f
 };
 
+
 World::World() : occlusionCull(true)
 {
+	waterAnimIndex = 0;
+
 	renderer = std::make_unique<Renderer>();
 	scene = std::make_unique<Scene>();
 	sky = std::make_unique<SkyBox>();
-
 	worldGenerator = std::make_unique<WorldGenerator>();
 
 	playerPosition = scene->GetPlayerPosition();
@@ -94,7 +103,7 @@ void World::SetBlockDatas()
 	BlockCoordData[BirchLog] = std::make_pair(16, 11);
 	BlockCoordData[BirchLogTB] = std::make_pair(16, 12);
 	BlockCoordData[BirchLeaves] = std::make_pair(16, 1);
-	BlockCoordData[WaterT] = std::make_pair(4, 2);
+	BlockCoordData[WaterT] = std::make_pair(0, 0);
 	BlockCoordData[Lava] = std::make_pair(4, 0);
 	BlockCoordData[Iron] = std::make_pair(6, 15);
 	BlockCoordData[Gold] = std::make_pair(4, 13);
@@ -399,9 +408,13 @@ void World::Render()
 	{
 		if (waterchunk.second->chunkLoadState == ChunkLoadState::Builted)
 		{
-			renderer->RenderWater(waterchunk.second);
+			renderer->RenderWater(waterchunk.second, animOffsets[waterAnimIndex]);
 		}
 	}
+	//change water offset
+	//0, 0 -> 1, 0 -> 0, 1 -> 1, 1
+	waterAnimIndex += 0.1f;
+	waterAnimIndex = waterAnimIndex >= 32 ? 0 : waterAnimIndex;
 
 	scene->Render();
 	sky->Render(scene->GetCamera());

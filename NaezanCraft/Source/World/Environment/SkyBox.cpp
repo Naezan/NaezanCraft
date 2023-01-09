@@ -14,10 +14,6 @@
 
 SkyBox::SkyBox()
 {
-	TextureManager::AddTexture("Sun", "../Assets/Textures/Sun.png");
-	TextureManager::AddTexture("Moon", "../Assets/Textures/moon_phases.png");
-	TextureManager::AddTexture("Cloud", "../Assets/Textures/clouds.png");
-
 	//SkyShader
 	{
 		skyBoxShaders.emplace(ShaderType::VERTEX, std::make_unique<SkyBoxShader>("../Assets/Shaders/ProcSky.vs", ShaderType::VERTEX));

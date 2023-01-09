@@ -11,8 +11,17 @@ Renderer::Renderer()
 {
 	//텍스쳐 Atlas
 	TextureManager::AddTexture("CubeAtlas", "../Assets/Textures/AtlasEdit.png");
+	TextureManager::AddTexture("Sun", "../Assets/Textures/Sun.png");
+	TextureManager::AddTexture("Moon", "../Assets/Textures/moon_phases.png");
+	TextureManager::AddTexture("Cloud", "../Assets/Textures/clouds.png");
+	TextureManager::AddTexture("Water", "../Assets/Textures/water.png");
 
 	//쉐이더
+	CreateRenderShader();
+}
+
+void Renderer::CreateRenderShader()
+{
 	renderShaders.emplace(ShaderType::VERTEX, Shader::CreateShader<ShaderType::VERTEX>("../Assets/Shaders/CubeVert.vs"));
 	renderShaders.emplace(ShaderType::FRAGMENT, Shader::CreateShader<ShaderType::FRAGMENT>("../Assets/Shaders/CubeFrag.fs"));
 
@@ -50,6 +59,8 @@ void Renderer::RenderChunk(std::weak_ptr<Chunk> chunk)
 
 	TextureManager::BindTexture("CubeAtlas");
 	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
+	glm::vec2 animOffset = glm::vec2(0, 0);
+	glUniform2fv(glGetUniformLocation(shaderProgram, "animTexCoord"), 1, glm::value_ptr(animOffset));
 
 	glUniform1f(glGetUniformLocation(shaderProgram, "lightIntensity"), sunIntensity);
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionview"), 1, GL_FALSE, glm::value_ptr(ViewProjectionMatrix));
@@ -64,7 +75,7 @@ void Renderer::RenderChunk(std::weak_ptr<Chunk> chunk)
 	chunk.lock()->chunkMesh->UnBindVertexArray();
 }
 
-void Renderer::RenderWater(std::weak_ptr<Chunk> chunk)
+void Renderer::RenderWater(std::weak_ptr<Chunk> chunk, const glm::vec2& animOffset)
 {
 	if(!chunk.lock()->chunkMesh->IsValidWaterMesh())
 		return;
@@ -76,13 +87,16 @@ void Renderer::RenderWater(std::weak_ptr<Chunk> chunk)
 
 	glUseProgram(shaderProgram);
 
-	TextureManager::BindTexture("CubeAtlas");
+	TextureManager::BindTexture("Water");
 	glUniform1i(glGetUniformLocation(shaderProgram, "cubeTexture"), 0);
+	glUniform2fv(glGetUniformLocation(shaderProgram, "animTexCoord"), 1, glm::value_ptr(animOffset));
 
 	glUniform1f(glGetUniformLocation(shaderProgram, "lightIntensity"), sunIntensity);
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionview"), 1, GL_FALSE, glm::value_ptr(ViewProjectionMatrix));
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(chunk.lock()->position.x * (CHUNK_X), chunk.lock()->position.y * (CHUNK_Y), chunk.lock()->position.z * (CHUNK_Z)));
+	//temporary value for water height -> 0.125f
+	//TODO change cube vertexpoint
+	model = glm::translate(model, glm::vec3(chunk.lock()->position.x * (CHUNK_X), chunk.lock()->position.y * (CHUNK_Y) - .125f, chunk.lock()->position.z * (CHUNK_Z)));
 	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 

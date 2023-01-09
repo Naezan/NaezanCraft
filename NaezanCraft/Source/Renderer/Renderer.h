@@ -16,9 +16,10 @@ public:
 	Renderer();
 	~Renderer() = default;
 
+	void CreateRenderShader();
 	void BeginRender(const glm::mat4& matrix);
 	void RenderChunk(std::weak_ptr<Chunk> chunk);
-	void RenderWater(std::weak_ptr<Chunk> chunk);
+	void RenderWater(std::weak_ptr<Chunk> chunk, const glm::vec2& animOffset);
 	void Shutdown();
 
 	inline uint32_t GetRenderShader() { return shaderProgram; }

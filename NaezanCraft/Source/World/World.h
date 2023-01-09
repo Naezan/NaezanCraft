@@ -67,6 +67,7 @@ public:
 	static std::unordered_map<BlockType, std::pair<int, int>> BlockCoordData;
 	static std::mutex worldMutex;
 	static int drawCall;
+	static const std::array <glm::vec2, 32> animOffsets;
 
 private:
 	std::unique_ptr<Renderer> renderer;
@@ -95,5 +96,7 @@ private:
 
 	uint32_t simpleCubeShaderProgram;
 	std::map<ShaderType, std::unique_ptr<Shader>> simpleCubeShaders;
-	//static const std::array <glm::i8vec3, 4> cubeVertices[];
+
+	//water
+	float waterAnimIndex;
 };
