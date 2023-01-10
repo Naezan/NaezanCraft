@@ -521,8 +521,9 @@ void World::RemoveChunk()
 
 void World::CreateChunk(std::weak_ptr<Chunk> chunk)
 {
-	//chunk.lock()->CreateLightMap();
 	chunk.lock()->CreateSSAO();
+
+	chunk.lock()->CreateLightMap();
 
 	std::unique_lock<std::mutex> lock(worldMutex);
 	chunk.lock()->CreateChunkMesh(false);

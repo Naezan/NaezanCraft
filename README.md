@@ -43,7 +43,9 @@ MineCraft Copy Naezan's Engine
         * ~~청크 랜덤 블록 렌더링~~
         * 세이브 로드 청크, 월드(SaveWorld, LoadWorld, SaveChunk, LoadChunk)
         * ~~World Objects(like tree, catus etc..)~~
-        * 그리디 메싱 + 비등방성문제(reference : https://0fps.net/2013/07/03/ambient-occlusion-for-minecraft-like-worlds/ + https://bbtarzan12.github.io/Voxel-Part-3/)
+        * 그리디 메싱(X) + ~~비등방성문제~~(reference : https://0fps.net/2013/07/03/ambient-occlusion-for-minecraft-like-worlds/ + https://bbtarzan12.github.io/Voxel-Part-3/)
+        * ~~Water~~
+        * *Water Physics*
         * *Instancing(메모리관리 후 검토)*
         * *BSP(Maybe Cave? or Town? but i am not implement cave and town)*
         * *Region Weather System(later if possible)*
@@ -53,14 +55,14 @@ MineCraft Copy Naezan's Engine
         * ~~Object Light(Flood fill Algorithm)~~
         * *레이 트레이싱*
         * *DotProduct*
-    - [?] ECS
-    - [?] Object Pool(*다른 사이드 프로젝트로 할까 생각중*)
+    - [N] ECS(X)
+    - [N] Object Pool(*다른 사이드 프로젝트로 할까 생각중*)
     - [x] ~~Collision~~
         * ~~레이케스트~~(reference : https://github.com/cgyurgyik/fast-voxel-traversal-algorithm/blob/master/overview/FastVoxelTraversalOverview.md)
         * ~~delete and emplace Block~~
         * *(AABB-> OOBB, 내가 이전에 사용한 AABB방법을 이용하려면 엔티티 컴포넌트 시스템을 이용했어야 했다 하지만 이번 프로젝트에선 ECS를 사용하지 않을 것이기때문에 AABB나 OBB가 적절하지 않아 보였다. 그럼에도 다른방법으로 사용할 수 있다는것을 알고있고 고려해볼만한 사항이라고 생각해두고 있다.)*
         * *(쿼드 트리 -> 옥트리, 청크 기반 충돌을 사용했다 옥트리를 사용하고 싶었지만 적절하진 않았다)*
-    - [?] AI(Too Much, if i can, i do)
+    - [N] AI(Too Much, if i can, i do)
         * A* or JPS
         * 브레젠험
         * FSM(상태머신)

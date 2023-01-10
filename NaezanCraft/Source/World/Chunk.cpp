@@ -27,6 +27,8 @@ Chunk::Chunk(const glm::vec3& pos) :
 	//TO DO change blocktype
 	//memset(&chunkBlocks[0][0][0], BlockType::Diamond, CHUNK_X * CHUNK_Y * CHUNK_Z * sizeof(Block));
 	//std::fill(&chunkBlocks[0][0][0], &chunkBlocks[0][0][0] + CHUNK_SIZE, BlockType::Air);
+	//Y는 최대높이부터 86번 인덱스까지는 전부 Air로 들어가 있다
+	std::fill(&LightMap[0][0][0], &LightMap[0][0][0] + CHUNK_SIZE, 15);
 	water = std::make_unique<Water>();
 }
 
@@ -44,7 +46,7 @@ void Chunk::SetBlock(const glm::vec3& blockPos, BlockType type)
 	if (blockPos.x < 0)
 	{
 		if (!IsEmptyChunk(LeftChunk))
-			LeftChunk.lock()->SetBlock(CHUNK_X  + blockPos.x, blockPos.y, blockPos.z, type);
+			LeftChunk.lock()->SetBlock(CHUNK_X + blockPos.x, blockPos.y, blockPos.z, type);
 		return;
 	}
 	else if (blockPos.x >= CHUNK_X)
@@ -270,18 +272,15 @@ std::unique_ptr<Mesh>& Chunk::GetWaterMesh()
 	return water->GetMesh();
 }
 
-void Chunk::SetLightLevel(int x, int y, int z, int level)
+void Chunk::SetSunLight(int x, int y, int z, int level)
 {
-	LightMap[x][y][z] = level;
+	LightMap[x][y][z] = (LightMap[x][y][z] & 0xF) | (level << 4);
 }
 
-unsigned char Chunk::GetLightLevel(int x, int y, int z)
+unsigned char Chunk::GetSunLight(int x, int y, int z)
 {
 	//TODO 범위를 넘어가게 되면 다른방향 청크 검사
-	if (x < 0 || x >= CHUNK_X || y < 0 || y >= CHUNK_Y || z < 0 || z >= CHUNK_Z)
-	{
-		return 15;
-	}
+
 	/*if (y >= CHUNK_Y || y < 0)
 	{
 		return 15;
@@ -312,86 +311,17 @@ unsigned char Chunk::GetLightLevel(int x, int y, int z)
 		else return 15;
 	}*/
 
-	return LightMap[x][y][z];
+	return (LightMap[x][y][z] >> 4) & 0xF;
 }
 
-unsigned char Chunk::GetWorldLightLevel(int wx, int wy, int wz)
+void Chunk::SetTorchLight(int x, int y, int z, int level)
 {
-	// 범위밖이면 15를 리턴 그외의 경우엔 특정 청크 블록의 라이트맵의 값을 가져옴
-	int dx = wx - position.x;
-	int dy = wy;
-	int dz = wz - position.z;
-
-	if (dy >= CHUNK_Y)
-	{
-		return 15;
-	}
-
-	if (dx < 0)
-	{
-		if (!IsEmptyChunk(LeftChunk))
-			return LeftChunk.lock()->GetLightLevel(CHUNK_X - 1, dy, dz);
-		else return 15;
-	}
-	else if (dx >= CHUNK_X)
-	{
-		if (!IsEmptyChunk(RightChunk))
-			return RightChunk.lock()->GetLightLevel(0, dy, dz);
-		else return 15;
-	}
-	if (dz < 0)
-	{
-		if (!IsEmptyChunk(BackChunk))
-			return BackChunk.lock()->GetLightLevel(dx, dy, CHUNK_Z - 1);
-		else return 15;
-	}
-	else if (dz >= CHUNK_Z)
-	{
-		if (!IsEmptyChunk(FrontChunk))
-			return FrontChunk.lock()->GetLightLevel(dx, dy, 0);
-		else return 15;
-	}
-
-	return GetLightLevel(dx, dy, dz);
+	LightMap[x][y][z] = (LightMap[x][y][z] & 0xF0) | level;
 }
 
-void Chunk::SetWorldLightLevel(int wx, int wy, int wz, int level)
+unsigned char Chunk::GetTorchLight(int x, int y, int z)
 {
-	int dx = wx - position.x;
-	int dy = wy;
-	int dz = wz - position.z;
-
-	if (dy >= CHUNK_Y)
-	{
-		return;
-	}
-
-	if (dx < 0)
-	{
-		if (!IsEmptyChunk(LeftChunk))
-			LeftChunk.lock()->SetLightLevel(CHUNK_X - 1, dy, dz, level);
-		return;
-	}
-	else if (dx >= CHUNK_X)
-	{
-		if (!IsEmptyChunk(RightChunk))
-			RightChunk.lock()->SetLightLevel(0, dy, dz, level);
-		return;
-	}
-	if (dz < 0)
-	{
-		if (!IsEmptyChunk(BackChunk))
-			BackChunk.lock()->SetLightLevel(dx, dy, CHUNK_Z - 1, level);
-		return;
-	}
-	else if (dz >= CHUNK_Z)
-	{
-		if (!IsEmptyChunk(FrontChunk))
-			FrontChunk.lock()->SetLightLevel(dx, dy, 0, level);
-		return;
-	}
-
-	SetLightLevel(dx, dy, dz, level);
+	return LightMap[x][y][z] & 0xF;
 }
 
 void Chunk::SetupChunkNeighbor()
@@ -456,83 +386,87 @@ void Chunk::RebuildChunkMesh()
 void Chunk::CreateLightMap()
 {
 	OPTICK_EVENT();
-	std::queue<glm::ivec3> blockPosQue;
+
 	//맨위의 벽들을 모두 15로 만든다
 	for (int x = 0; x < CHUNK_X; ++x)
 	{
 		for (int z = 0; z < CHUNK_Z; ++z)
 		{
-			glm::ivec3 pos(x, CHUNK_Y - 1, z);
-			blockPosQue.push(pos);
-			LightMap[x][CHUNK_Y - 1][z] = 15;
+			LightNode node;
+			node.SetXYZ(x, CHUNK_Y - 1, z);
+			sunlightBfsQueue.emplace(node);
 		}
 	}
 
-	//맨위에서 아래부분들을 검사하면서 표면부분의 라이팅을 셋팅
-	while (!blockPosQue.empty())
+	while (!sunlightBfsQueue.empty())
 	{
-		glm::ivec3 localPos = blockPosQue.front();
-		unsigned char lightLevel = LightMap[localPos.x][localPos.y][localPos.z];
-		glm::ivec3 worldPos =
-		{
-			localPos.x + position.x,
-			localPos.y,
-			localPos.z + position.z
-		};
+		LightNode& node = sunlightBfsQueue.front();
 
-		blockPosQue.pop();
+		int x = node.GetX();
+		int y = node.GetY();
+		int z = node.GetZ();
 
-		//TODO setting world chunk lighting
+		int sunLight = GetSunLight(x, y, z);
+
+		sunlightBfsQueue.pop();
+
 		for (int i = 0; i < 6; ++i)
 		{
-			int dx = worldPos.x + nearFaces[i].x;
-			int dy = worldPos.y + nearFaces[i].y;
-			int dz = worldPos.z + nearFaces[i].z;
-			if (dy < 0) continue;
+			int dx = x + nearFaces[i].x;
+			int dy = y + nearFaces[i].y;
+			int dz = z + nearFaces[i].z;
+			if (dy < 0 || dy >= CHUNK_Y) continue;
 
 			Block& block = GetWorldBlock(dx, dy, dz);
-			if (block.IsSmooth())
+			if (block.IsTransparent())
 			{
 				bool isChangeLight = false;
-				int maxHeight = GetBlockMaxHeight(localPos.x, localPos.z);
-				//상하 좌우 위아래가 투명인 경우
-				if (nearFaces[i].y == 0 || dy < maxHeight)
+				//좌우 앞뒤
+				if (nearFaces[i].y == 0)
 				{
 					//현재의 라이팅보다 한단계 낮은 빛 적용
-					if (GetWorldLightLevel(dx, dy, dz) < lightLevel - 1)
+					if (GetSunLight(dx, dy, dz) < sunLight - 1)
 					{
 						isChangeLight = true;
-						SetWorldLightLevel(dx, dy, dz, lightLevel - 1);
+						SetSunLight(dx, dy, dz, sunLight - 1);
 					}
 				}
-				//최대높이 이상의 블럭들
+				//위아래
 				else
 				{
-					//셋팅이 안되어 있다면 웬만해선 15로 설정
-					if (GetWorldLightLevel(dx, dy, dz) < lightLevel)
+					if (GetSunLight(dx, dy, dz) < sunLight)
 					{
 						isChangeLight = true;
-						SetWorldLightLevel(dx, dy, dz, lightLevel);
+						SetSunLight(dx, dy, dz, sunLight);
 					}
 				}
 
 				if (isChangeLight)
 				{
-					int localdx = dx - position.x;
-					int localdz = dz - position.z;
-					if (localdx >= 0 && localdx < CHUNK_X && localdz >= 0 && localdz < CHUNK_Z)
-						blockPosQue.emplace(dx - position.x, dy, dz - position.z);
+					if (dx >= 0 && dx < CHUNK_X && dz >= 0 && dz < CHUNK_Z)
+					{
+						LightNode node;
+						node.SetXYZ(dx, dy, dz);
+						sunlightBfsQueue.emplace(node);
+					}
 				}
 			}
 		}
 	}
 }
 
-int Chunk::GetBlockMaxHeight(int x, int z)
+int Chunk::GetBlockMaxGroundHeight(int x, int z)
 {
-	OPTICK_EVENT();
 	for (int y = CHUNK_Y - 1; y >= 0; --y) {
-		if (GetBlock(x, y, z).IsGround()) return y;//TO DO
+		if (GetBlock(x, y, z).IsGround()) return y;
+	}
+	return 0;
+}
+
+int Chunk::GetBlockMaxSolidHeight(int x, int z)
+{
+	for (int y = CHUNK_Y - 1; y >= 0; --y) {
+		if (!GetBlock(x, y, z).IsTransparent()) return y;
 	}
 	return 0;
 }
@@ -543,7 +477,7 @@ void Chunk::CreateSSAO()
 	{
 		for (int8_t z = 0; z < CHUNK_Z; ++z)
 		{
-			int h = GetBlockMaxHeight(x, z);
+			int h = GetBlockMaxGroundHeight(x, z);
 			for (int8_t y = 0; y <= h; ++y)
 			{
 				Block& block = GetBlock(x, h, z);
