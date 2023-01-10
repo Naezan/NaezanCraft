@@ -51,10 +51,9 @@ MineCraft Copy Naezan's Engine
         * *Region Weather System(later if possible)*
     - [x] ~~Lighting~~
         * ~~Ambient Occlusion(+라이트컬링)~~
-        * ~~Sun Light~~
+        * ~~Sun Light Flood fill algorithm~~
         * ~~Object Light(Flood fill Algorithm)~~
-        * *레이 트레이싱*
-        * *DotProduct*
+        * *레이 트레이싱(X)*
     - [N] ECS(X)
     - [N] Object Pool(*다른 사이드 프로젝트로 할까 생각중*)
     - [x] ~~Collision~~
