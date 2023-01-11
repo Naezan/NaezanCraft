@@ -39,6 +39,10 @@ struct Block
 	unsigned char FrontAO = 0xff;
 	unsigned char BackAO = 0xff;
 
+	inline bool IsNotShadow() {
+		return (this->blockType == BlockType::Air) || (this->blockType == BlockType::WaterT);
+	}
+
 	inline bool IsTransparent() {
 		return (this->blockType == BlockType::Air) || (this->blockType == BlockType::OakLeaves) ||
 			(this->blockType == BlockType::BirchLeaves) || (this->blockType == BlockType::WaterT);

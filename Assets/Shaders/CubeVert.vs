@@ -24,7 +24,7 @@ void main(){
     gl_Position = projectionview * model * vec4(in_Pos.xyz, 1.0);
     TexCoord = vec2(in_TexCoord.x + animTexCoord.x * TEXTURE_SIZE, in_TexCoord.y + animTexCoord.y * TEXTURE_SIZE);
     Light = in_lightLevel * lightIntensity;
-    Light = (Light * LIGHT_COEF + MIN_LIGHT_VALUE) * (in_AO * 0.33);
+    Light = (Light * LIGHT_COEF + MIN_LIGHT_VALUE);// * (in_AO * 0.33);
     //Light = (Light * LIGHT_COEF + MIN_LIGHT_VALUE);
 }
 

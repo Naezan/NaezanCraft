@@ -95,7 +95,8 @@ void World::SetBlockDatas()
 	BlockCoordData[Dirt] = std::make_pair(13, 2);
 	BlockCoordData[Sand] = std::make_pair(22, 13);
 	BlockCoordData[Stone] = std::make_pair(23, 15);
-	BlockCoordData[Grass] = std::make_pair(9, 24);
+	BlockCoordData[Grass] = std::make_pair(7, 24);
+	//BlockCoordData[Grass] = std::make_pair(9, 24);
 	BlockCoordData[GrassSide] = std::make_pair(8, 13);
 	BlockCoordData[OakLog] = std::make_pair(16, 15);
 	BlockCoordData[OakLogTB] = std::make_pair(17, 0);
@@ -521,9 +522,8 @@ void World::RemoveChunk()
 
 void World::CreateChunk(std::weak_ptr<Chunk> chunk)
 {
-	chunk.lock()->CreateSSAO();
-
 	chunk.lock()->CreateLightMap();
+	chunk.lock()->CreateSSAO();
 
 	std::unique_lock<std::mutex> lock(worldMutex);
 	chunk.lock()->CreateChunkMesh(false);
@@ -539,6 +539,7 @@ void World::UpdateChunk()
 		{
 			if (chunk->second->chunkLoadState == ChunkLoadState::Builted)
 			{
+				chunk->second->CreateLightMap();
 				chunk->second->ReloadSSAO(loadinfo.second);
 				chunk->second->CreateChunkMesh(true);
 			}
@@ -672,6 +673,8 @@ bool World::SetBlockByWorldPos(int x, int y, int z, BlockType blocktype)
 			z %= CHUNK_Z;
 		}
 		outChunk.lock()->SetBlock(x, y, z, blocktype);
+
+		outChunk.lock()->SetSunLight(x, y, z, 0);
 
 		//리로드할 청크 추가
 		RegisterReloadChunk(key, glm::vec3(x, y, z));

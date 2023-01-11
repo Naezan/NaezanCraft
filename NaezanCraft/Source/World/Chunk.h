@@ -70,6 +70,7 @@ public:
 
 	//Lighting
 	void CreateLightMap();
+	void ReloadLightMap();//TODO change Reload Code
 	int GetBlockMaxGroundHeight(int x, int z);
 	int GetBlockMaxSolidHeight(int x, int z);
 
@@ -103,6 +104,7 @@ public:
 	//Lighting
 	vector_3d LightMap;//0xF(torch), 0xF0(sun)
 	std::queue <LightNode> sunlightBfsQueue;
+	std::queue <LightNode> sunlightReloadBfsQueue;
 	std::queue <LightNode> lightBfsQueue;
 
 	static const std::array <glm::ivec3, 6> nearFaces;
