@@ -20,18 +20,25 @@ enum class ChunkLoadState
 
 struct LightNode {
 
-	LightNode(short _index = 0) : index(_index) {}
+	LightNode(short _index = 0, signed char _in = 0) : index(_index), indexnegative(_in) {}
 
 	//최상위 1바이트는 y 다음 4비트는 x, 마지막 4비트는 z
 	short index; //this is the x y z coordinate!
-
+	signed char indexnegative;//0x00x-xy-yz-z
+	
 	inline int GetX() { return (index >> 4) & 0xF; }
 	inline int GetY() { return (index >> 8); }
 	inline int GetZ() { return index & 0xF; }
+	inline int GetXN() { return (indexnegative >> 4) & 0b00000011; }
+	inline int GetYN() { return (indexnegative >> 2) & 0b00000011; }
+	inline int GetZN() { return indexnegative & 0b00000011; }
 
 	inline void SetX(int val) { index = (index & 0xFF0F) | (val << 4); }
 	inline void SetY(int val) { index = (index & 0xFF) | (val << 8); }
 	inline void SetZ(int val) { index = (index & 0xFFF0) | val; }
+	inline void SetXN(int val) { indexnegative = (indexnegative & 0b00001111) | (val << 4); }
+	inline void SetYN(int val) { indexnegative = (indexnegative & 0b00110011) | (val << 2); }
+	inline void SetZN(int val) { indexnegative = (indexnegative & 0b00111100) | (val); }
 
 	inline void SetXYZ(int x, int y, int z) { SetX(x); SetY(y); SetZ(z); }
 };

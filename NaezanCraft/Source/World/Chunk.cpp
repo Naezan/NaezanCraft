@@ -281,26 +281,26 @@ void Chunk::SetSunLight(int x, int y, int z, int level)
 	{
 		if (!IsEmptyChunk(LeftChunk))
 		{
-			LeftChunk.lock()->SetSunLight(CHUNK_X - 1, y, z, (LeftChunk.lock()->GetSunLight(CHUNK_X - 1, y, z) & 0xF) | (level << 4));
+			LeftChunk.lock()->SetSunLight(CHUNK_X - 1, y, z, level);
 		}
 		return;
 	}
 	else if (x >= CHUNK_X)
 	{
 		if (!IsEmptyChunk(RightChunk))
-			RightChunk.lock()->SetSunLight(0, y, z, (RightChunk.lock()->GetSunLight(0, y, z) & 0xF) | (level << 4));
+			RightChunk.lock()->SetSunLight(0, y, z, level);
 		return;
 	}
 	if (z < 0)
 	{
 		if (!IsEmptyChunk(BackChunk))
-			BackChunk.lock()->SetSunLight(x, y, CHUNK_Z - 1, (BackChunk.lock()->GetSunLight(x, y, CHUNK_Z - 1) & 0xF) | (level << 4));
+			BackChunk.lock()->SetSunLight(x, y, CHUNK_Z - 1, level);
 		return;
 	}
 	else if (z >= CHUNK_Z)
 	{
 		if (!IsEmptyChunk(FrontChunk))
-			FrontChunk.lock()->SetSunLight(x, y, 0, (FrontChunk.lock()->GetSunLight(x, y, 0) & 0xF) | (level << 4));
+			FrontChunk.lock()->SetSunLight(x, y, 0, level);
 		return;
 	}
 
@@ -477,42 +477,48 @@ void Chunk::CreateLightMap()
 {
 	OPTICK_EVENT();
 
-	unsigned char lightMask[CHUNK_X][CHUNK_Z];
+	unsigned char lightMask[CHUNK_X + 2][CHUNK_Z + 2];
 
-	memset(lightMask, 0xF, CHUNK_X * CHUNK_Z);
+	memset(lightMask, 0xF, (CHUNK_X + 2) * (CHUNK_Z + 2));
 
 	//맨위의 벽들을 모두 15로 만든다
 	for (int y = CHUNK_Y - 1; y >= 0; --y)
 	{
-		for (int x = 0; x < CHUNK_X; ++x)
+		for (int x = -1; x <= CHUNK_X; ++x)
 		{
-			for (int z = 0; z < CHUNK_Z; ++z)
+			for (int z = -1; z <= CHUNK_Z; ++z)
 			{
-				//그림자 생성이 안되는 블럭들이라면
 				if (GetBlock(x, y, z).IsNotShadow())
 				{
-					//15셋팅
-					SetSunLight(x, y, z, lightMask[x][z]);
+					//Y축 위 상태가 모두 IsNotShadow라면 15 아니면 0
+					SetSunLight(x, y, z, lightMask[x + 1][z + 1]);
 
-					if (lightMask[x][z] == 0)
+					if (lightMask[x + 1][z + 1] == 0)
 					{
-						if ((x > 0 && lightMask[x - 1][z] == 0xF) ||
-							(x < CHUNK_X - 1 && lightMask[x + 1][z] == 0xF) ||
-							(z > 0 && lightMask[x][z - 1] == 0xF) ||
-							(z < CHUNK_Z - 1 && lightMask[x][z + 1] == 0xF))
+						if ((x >= 0 && lightMask[x][z + 1] == 0xF) ||
+							(x <= CHUNK_X - 1 && lightMask[x + 2][z + 1] == 0xF) ||
+							(z >= 0 && lightMask[x + 1][z] == 0xF) ||
+							(z <= CHUNK_Z - 1 && lightMask[x + 1][z + 2] == 0xF))
 						{
 							SetSunLight(x, y, z, 0xF - 1);
 
+							//-1이면0 16이면15
 							LightNode node;
-							node.SetXYZ(x, y, z);
+							node.SetXN(x < 0 ? 1 : (x > CHUNK_X - 1 ? 2 : 0));
+							node.SetZN(z < 0 ? 1 : (z > CHUNK_Z - 1 ? 2 : 0));
+
+							int tempX = x < 0 ? 0 : (x > CHUNK_X - 1 ? CHUNK_X - 1 : x);
+							int tempZ = z < 0 ? 0 : (z > CHUNK_Z - 1 ? CHUNK_Z - 1 : z);
+							node.SetXYZ(tempX, y, tempZ);
+
 							sunlightBfsQueue.emplace(node);
 						}
 					}
 				}
 				else
 				{
-					//블럭이라면 다음에 만날 transparent의 값은 모두 0
-					lightMask[x][z] = 0;
+					//Solid한 블럭
+					lightMask[x + 1][z + 1] = 0;
 				}
 			}
 		}
@@ -523,8 +529,16 @@ void Chunk::CreateLightMap()
 		LightNode& node = sunlightBfsQueue.front();
 
 		int x = node.GetX();
+		if (node.GetXN() == 1)
+			++x;
+		else if (node.GetXN() == 2)
+			--x;
 		int y = node.GetY();
 		int z = node.GetZ();
+		if (node.GetZN() == 1)
+			++z;
+		else if (node.GetZN() == 2)
+			--z;
 		int sunLight = GetSunLight(x, y, z);
 
 		sunlightBfsQueue.pop();
@@ -546,9 +560,13 @@ void Chunk::CreateLightMap()
 				SetSunLight(dx, dy, dz, sunLight - 1);
 
 				//TODO 사이드 처리
-				if (dx >= 0 && dx < CHUNK_X && dz >= 0 && dz < CHUNK_Z)
+				if (dx >= -1 && dx <= CHUNK_X && dz >= -1 && dz <= CHUNK_Z)
 				{
 					LightNode node;
+					node.SetXN(dx < 0 ? 1 : (dx > CHUNK_X - 1 ? 2 : 0));
+					node.SetZN(dz < 0 ? 1 : (dz > CHUNK_Z - 1 ? 2 : 0));
+					int tempX = dx < 0 ? 0 : (dx > CHUNK_X - 1 ? CHUNK_X - 1 : dx);
+					int tempZ = dz < 0 ? 0 : (dz > CHUNK_Z - 1 ? CHUNK_Z - 1 : dz);
 					node.SetXYZ(dx, dy, dz);
 					sunlightBfsQueue.emplace(node);
 				}
