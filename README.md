@@ -38,10 +38,9 @@ MineCraft Copy Naezan's Engine
     - [x] ~~SkyBox~~
         * ~~Sun & Moon~~
         * ~~Cloud~~
-    - [ ] Map Generator
+    - [X] Map Generator
         * ~~Render Chunk When Player Move~~
         * ~~청크 랜덤 블록 렌더링~~
-        * 세이브 로드 청크, 월드(SaveWorld, LoadWorld, SaveChunk, LoadChunk)
         * ~~World Objects(like tree, catus etc..)~~
         * 그리디 메싱(X) + ~~비등방성문제~~(reference : https://0fps.net/2013/07/03/ambient-occlusion-for-minecraft-like-worlds/ + https://bbtarzan12.github.io/Voxel-Part-3/)
         * ~~Water~~
@@ -51,9 +50,12 @@ MineCraft Copy Naezan's Engine
         * *Region Weather System(later if possible)*
     - [x] ~~Lighting~~
         * ~~Ambient Occlusion(+라이트컬링)~~
-        * ~~Sun Light Flood fill algorithm~~
+        * ~~Sun Light Flood fill algorithm~~(reference : https://codepen.io/xgundam05/pen/nydzXE?editors=100)
         * ~~Object Light(Flood fill Algorithm)~~
         * *레이 트레이싱(X)*
+    - [ ] 세이브 로드 청크 & 월드(SaveWorld, LoadWorld, SaveChunk, LoadChunk)
+    - [ ] Inventory
+    - [ ] BGM & Sound
     - [N] ECS(X)
     - [N] Object Pool(*다른 사이드 프로젝트로 할까 생각중*)
     - [x] ~~Collision~~

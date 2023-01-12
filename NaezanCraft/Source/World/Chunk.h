@@ -24,7 +24,7 @@ struct LightNode {
 
 	//최상위 1바이트는 y 다음 4비트는 x, 마지막 4비트는 z
 	short index; //this is the x y z coordinate!
-	signed char indexnegative;//0x00x-xy-yz-z
+	unsigned char indexnegative;//0x00x-xy-yz-z
 	
 	inline int GetX() { return (index >> 4) & 0xF; }
 	inline int GetY() { return (index >> 8); }
@@ -109,7 +109,7 @@ public:
 	std::weak_ptr<Chunk> BackChunk;
 
 	//Lighting
-	vector_3d LightMap;//0xF(torch), 0xF0(sun)
+	vector_3d LightMap;//0x0F(torch), 0xF0(sun)
 	std::queue <LightNode> sunlightBfsQueue;
 	std::queue <LightNode> sunlightReloadBfsQueue;
 	std::queue <LightNode> lightBfsQueue;
