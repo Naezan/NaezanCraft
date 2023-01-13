@@ -22,7 +22,8 @@ Chunk::Chunk(const glm::vec3& pos) :
 	chunkBox(glm::vec3(pos.x* CHUNK_X, pos.y* CHUNK_Y, pos.z* CHUNK_Z), CHUNK_X, CHUNK_Y, CHUNK_Z),
 	LightMap(CHUNK_X, std::vector<std::vector<unsigned char>>(CHUNK_Y, std::vector<unsigned char>(CHUNK_Z, 0x00))),
 	emptyBlock(BlockType::Air),
-	chunkBlocks(CHUNK_X, std::vector<std::vector<Block>>(CHUNK_Y, std::vector<Block>(CHUNK_Z, BlockType::Air)))
+	chunkBlocks(CHUNK_X, std::vector<std::vector<Block>>(CHUNK_Y, std::vector<Block>(CHUNK_Z, BlockType::Air))),
+	serialStatus(ChunkSerialStatus::Loaded)
 {
 	//TO DO change blocktype
 	//memset(&chunkBlocks[0][0][0], BlockType::Diamond, CHUNK_X * CHUNK_Y * CHUNK_Z * sizeof(Block));
@@ -465,16 +466,33 @@ void Chunk::GenerateTerrain(std::unique_ptr<WorldGenerator>& worldGenerator)
 	worldGenerator->GenerateTerrain(shared_from_this());
 }
 
-void Chunk::SaveChunk()
+void Chunk::SaveChunk(const std::string& path)
 {
 	OPTICK_EVENT();
-	//TO DO
+	std::string filepath = GetChunkDataPath(position.x, position.z, path);
+	FILE* fp = fopen(filepath.c_str(), "wb");
+	if (!fp)
+	{
+		NC_LOG_ERROR("Failed to open chunk file {0}, {1}", position.x, position.z);
+		return;
+	}
+	//RawMemory chunkData = chunk.serialize();
+	//fwrite(chunkData.data, chunkData.size, 1, fp);
+	//chunkData.free();
+	fclose(fp);
+	serialStatus = ChunkSerialStatus::Saved;
 }
 
-void Chunk::LoadChunk()
+void Chunk::LoadChunk(const std::string& path)
 {
 	OPTICK_EVENT();
 	//TO DO
+	//비동기호출
+}
+
+std::string Chunk::GetChunkDataPath(int x, int z, const std::string& path)
+{
+	return path + "/" + std::to_string(x) + "_" + std::to_string(z) + ".bin";
 }
 
 void Chunk::RebuildChunkMesh()

@@ -36,6 +36,7 @@ public:
 	World();
 	~World();
 
+	void SetSavePath(std::string& path);
 	void SetBlockDatas();
 	void LoadCullingShader();
 	void LoadSimpleCubeShader();
@@ -71,6 +72,9 @@ public:
 	static std::mutex worldMutex;
 	static int drawCall;
 	static const std::array <glm::vec2, 32> animOffsets;
+
+	//Save
+	static std::string worldPath;
 
 private:
 	std::unique_ptr<Renderer> renderer;

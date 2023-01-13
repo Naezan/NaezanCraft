@@ -18,6 +18,11 @@ enum class ChunkLoadState
 	Unloaded, TerrainGenerated, MeshLoaded, Builted
 };
 
+enum class ChunkSerialStatus
+{
+	Loaded, Saving, Saved
+};
+
 struct LightNode {
 
 	LightNode(short _index = 0, signed char _in = 0) : index(_index), indexnegative(_in) {}
@@ -70,8 +75,14 @@ public:
 	void CreateMeshBuffer();
 	void GenerateTerrain(std::unique_ptr<WorldGenerator>& worldGenerator);
 
-	void SaveChunk();
-	void LoadChunk();
+	void SaveChunk(const std::string& path);
+	void LoadChunk(const std::string& path);
+	inline void SetSerialStatus(ChunkSerialStatus status) { serialStatus = status; }
+	inline bool IsLoaded() { return serialStatus == ChunkSerialStatus::Loaded; }
+	inline bool IsSaving() { return serialStatus == ChunkSerialStatus::Saving; }
+	inline bool IsSaved() { return serialStatus == ChunkSerialStatus::Saved; }
+
+	static std::string GetChunkDataPath(int x, int z, const std::string& path);
 
 	//Not used
 	void RebuildChunkMesh();
@@ -125,4 +136,6 @@ public:
 	//Query
 	unsigned int queryID;
 	std::unique_ptr<Mesh> chunkBoxMesh;
+
+	ChunkSerialStatus serialStatus;
 };

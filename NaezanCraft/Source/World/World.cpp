@@ -11,6 +11,8 @@
 #include "../World/Generator/WorldGenerator.h"
 #include "../World/Environment/SkyBox.h"
 
+#include "../ChunkThread.h"
+
 
 std::unordered_map<BlockType, std::pair<int, int>> World::BlockCoordData;
 std::mutex World::worldMutex;
@@ -22,6 +24,7 @@ const std::array <glm::vec2, 32> World::animOffsets
 	glm::vec2(0, 1),glm::vec2(1, 1),glm::vec2(2, 1), glm::vec2(3, 1), glm::vec2(4, 1), glm::vec2(5, 1), glm::vec2(6, 1), glm::vec2(7, 1),
 	glm::vec2(8, 1),glm::vec2(9, 1),glm::vec2(10,1), glm::vec2(11,1), glm::vec2(12,1), glm::vec2(13,1), glm::vec2(14,1), glm::vec2(15,1)
 };
+std::string World::worldPath = "";
 
 static const GLfloat cubeVertices[] = {
 	-1.0f,-1.0f,-1.0f, // triangle 1 : begin
@@ -74,6 +77,7 @@ World::World() : occlusionCull(true)
 
 	playerPosition = scene->GetPlayerPosition();
 
+	SetSavePath(worldPath);
 	SetBlockDatas();
 
 	//Load HiZ Shader
@@ -88,6 +92,26 @@ World::World() : occlusionCull(true)
 World::~World()
 {
 	Shutdown();
+}
+
+void World::SetSavePath(std::string& path)
+{
+	std::string str = std::filesystem::current_path().string();
+	str = str.substr(0, str.find_last_of("/\\"));
+	str = (str / std::filesystem::path("WorldData")).string();
+
+	DWORD fileAttrib = GetFileAttributesA(str.c_str());
+	if (fileAttrib == INVALID_FILE_ATTRIBUTES)
+	{
+		if (!CreateDirectoryA(str.c_str(), NULL))
+		{
+			path = "";
+			NC_LOG_ERROR("Failed to find save folder");
+			return;
+		}
+	}
+
+	path = str;
 }
 
 void World::SetBlockDatas()
@@ -480,7 +504,7 @@ void World::AsyncLoadChunk()
 				if (!IsChunkGenerated(std::make_pair<int, int>(static_cast<int>(chunk.second->position.x), static_cast<int>(chunk.second->position.z))))
 					GenerateChunkTerrain(chunk.second, chunk.second->position.x, chunk.second->position.z);
 				else
-					chunk.second->LoadChunk();
+					chunk.second->LoadChunk(worldPath);
 				chunk.second->SetLoadState(ChunkLoadState::TerrainGenerated);
 			}
 		}
@@ -559,22 +583,35 @@ void World::UpdateChunk()
 
 void World::RemoveWorldChunk(std::vector<decltype(worldChunks)::key_type>& _deletableKey)
 {
-	for (auto key : _deletableKey)
+	auto iter = _deletableKey.begin();
+	for (; iter != _deletableKey.end();)
 	{
-		if (worldChunks[key]->chunkMesh != nullptr)
+		//세이브 완료가 되지 않았다면 건너뛰고 세이브가 완료되었다면 딜리트함수 수행
+		if (worldChunks[*iter]->IsSaved())
 		{
-			worldChunks[key]->SaveChunk();
-
-			worldChunks[key]->chunkMesh->DeleteChunkMesh();
-			if (glIsQuery(worldChunks[key]->queryID) == TRUE)
+			if (worldChunks[*iter]->chunkMesh != nullptr)
 			{
-				glDeleteQueries(1, &worldChunks[key]->queryID);
+				worldChunks[*iter]->chunkMesh->DeleteChunkMesh();
+				if (glIsQuery(worldChunks[*iter]->queryID) == TRUE)
+				{
+					glDeleteQueries(1, &worldChunks[*iter]->queryID);
+				}
+				worldChunks[*iter].reset();
+				worldChunks.erase(*iter);
+
+				iter = _deletableKey.erase(iter);
 			}
 		}
-		worldChunks[key].reset();
-		worldChunks.erase(key);
+		else
+		{
+			if (worldChunks[*iter]->IsLoaded())
+			{
+				ChunkThread::saveChunks.push_back(worldChunks[*iter]);
+				worldChunks[*iter]->SetSerialStatus(ChunkSerialStatus::Saving);
+			}
+			++iter;
+		}
 	}
-	_deletableKey.clear();
 }
 
 
