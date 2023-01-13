@@ -46,6 +46,7 @@ public:
 
 	void AsyncLoadChunk();
 	void RemoveChunk();
+	void GenerateChunkTerrain(std::weak_ptr<Chunk> chunk, int x, int z);
 	void CreateChunk(std::weak_ptr<Chunk> chunk);
 	void UpdateChunk();
 	void RemoveWorldChunk(std::vector<std::pair<int, int>>& _deletableKey);
@@ -62,6 +63,8 @@ public:
 	bool SetBlockByWorldPos(int x, int y, int z, BlockType blocktype);
 	bool CanEmplaceBlockByWorldPos(int blockX, int blockY, int blockZ, int faceblockX, int faceblockY, int faceblockZ);
 	void RegisterReloadChunk(std::pair<int, int> key, const glm::vec3& blockPos);
+	bool IsChunkGenerated(std::pair<int, int> key);
+	void SetWorldChunkLoadStatus(std::pair<int, int> key, bool status);
 
 public:
 	static std::unordered_map<BlockType, std::pair<int, int>> BlockCoordData;
@@ -77,6 +80,7 @@ private:
 	std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> worldChunks;
 	std::unordered_map<std::pair<int, int>, std::shared_ptr<Chunk>, Pair_IntHash> loadChunks;
 	std::map<std::pair<int, int>, glm::vec3> reloadChunks;
+	std::unordered_map<std::pair<int, int>, bool, Pair_IntHash> worldChunkLoadStatus;
 
 	const int renderDistance = 5;
 	glm::vec3 playerPosition;

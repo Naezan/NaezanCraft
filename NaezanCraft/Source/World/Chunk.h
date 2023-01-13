@@ -25,7 +25,7 @@ struct LightNode {
 	//최상위 1바이트는 y 다음 4비트는 x, 마지막 4비트는 z
 	short index; //this is the x y z coordinate!
 	unsigned char indexnegative;//0x00x-xy-yz-z
-	
+
 	inline int GetX() { return (index >> 4) & 0xF; }
 	inline int GetY() { return (index >> 8); }
 	inline int GetZ() { return index & 0xF; }
@@ -70,14 +70,17 @@ public:
 	void CreateMeshBuffer();
 	void GenerateTerrain(std::unique_ptr<WorldGenerator>& worldGenerator);
 
-	//rebuild
+	void SaveChunk();
+	void LoadChunk();
+
+	//Not used
 	void RebuildChunkMesh();
 
 	inline bool IsRebuild() { return !rebuildVertices.empty(); }
 
 	//Lighting
 	void CreateLightMap();
-	void ReloadLightMap();//TODO change Reload Code
+	void ReloadLightMap();//TODO Not used change Reload Code
 	int GetBlockMaxGroundHeight(int x, int z);
 	int GetBlockMaxSolidHeight(int x, int z);
 
@@ -111,7 +114,6 @@ public:
 	//Lighting
 	vector_3d LightMap;//0x0F(torch), 0xF0(sun)
 	std::queue <LightNode> sunlightBfsQueue;
-	std::queue <LightNode> sunlightReloadBfsQueue;
 	std::queue <LightNode> lightBfsQueue;
 
 	static const std::array <glm::ivec3, 6> nearFaces;

@@ -413,7 +413,7 @@ void World::Render()
 		}
 	}
 	//change water offset
-	//0, 0 -> 1, 0 -> 0, 1 -> 1, 1
+	//x first, y last, (width 16, height 2)
 	waterAnimIndex += 0.1f;
 	waterAnimIndex = waterAnimIndex >= 32 ? 0 : waterAnimIndex;
 
@@ -477,12 +477,14 @@ void World::AsyncLoadChunk()
 			if (chunk.second->chunkLoadState == ChunkLoadState::Unloaded)
 			{
 				chunk.second->SetupChunkNeighbor();
-				chunk.second->GenerateTerrain(worldGenerator);
+				if (!IsChunkGenerated(std::make_pair<int, int>(static_cast<int>(chunk.second->position.x), static_cast<int>(chunk.second->position.z))))
+					GenerateChunkTerrain(chunk.second, chunk.second->position.x, chunk.second->position.z);
+				else
+					chunk.second->LoadChunk();
 				chunk.second->SetLoadState(ChunkLoadState::TerrainGenerated);
 			}
 		}
 
-		//LoadChunkList에 있는 녀석들만 렌더링하고 삭제하고 등 처리
 		for (const auto chunk : loadChunks)
 		{
 			if (chunk.second->chunkLoadState == ChunkLoadState::TerrainGenerated)
@@ -520,6 +522,13 @@ void World::RemoveChunk()
 	}
 }
 
+void World::GenerateChunkTerrain(std::weak_ptr<Chunk> chunk, int x, int z)
+{
+	chunk.lock()->GenerateTerrain(worldGenerator);
+	std::pair<int, int> key(x, z);
+	SetWorldChunkLoadStatus(key, true);
+}
+
 void World::CreateChunk(std::weak_ptr<Chunk> chunk)
 {
 	chunk.lock()->CreateLightMap();
@@ -554,6 +563,8 @@ void World::RemoveWorldChunk(std::vector<decltype(worldChunks)::key_type>& _dele
 	{
 		if (worldChunks[key]->chunkMesh != nullptr)
 		{
+			worldChunks[key]->SaveChunk();
+
 			worldChunks[key]->chunkMesh->DeleteChunkMesh();
 			if (glIsQuery(worldChunks[key]->queryID) == TRUE)
 			{
@@ -701,4 +712,19 @@ bool World::CanEmplaceBlockByWorldPos(int blockX, int blockY, int blockZ, int fa
 void World::RegisterReloadChunk(std::pair<int, int> key, const glm::vec3& blockPos)
 {
 	reloadChunks.emplace(key, blockPos);
+}
+
+bool World::IsChunkGenerated(std::pair<int, int> key)
+{
+	//찾으면 return true or false 일반적으로 찾으면 true return
+	if (worldChunkLoadStatus.find(key) != worldChunkLoadStatus.end())
+		return worldChunkLoadStatus[key];
+
+	//아직 생성되지 않은경우
+	return false;
+}
+
+void World::SetWorldChunkLoadStatus(std::pair<int, int> key, bool status)
+{
+	worldChunkLoadStatus[key] = status;
 }

@@ -91,7 +91,6 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 						//Defualt set block by biome, stone(mountain) or dirt(forest) or sand(desert)
 						//TODO GetBiome(x, z).GetSurfaceBlockType();
 						chunk.lock()->SetBlock(x, y, z, BlockType::Grass);
-						//chunk.lock()->SetSunLight(x, y, z, 0);
 
 						//TODO Flower, Tree, Catus, Grass
 
@@ -107,7 +106,6 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 						//Defualt set block by biome, stone(mountain) or dirt(forest) or sand(desert)
 						//TODO GetBiome(x, z).GetInWaterBlockType();
 						chunk.lock()->SetBlock(x, y, z, BlockType::Sand);
-						//chunk.lock()->SetSunLight(x, y, z, 0);
 					}
 				}
 				else if (y >= h - 1)
@@ -120,7 +118,6 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 					{
 						chunk.lock()->SetBlock(x, y, z, BlockType::Sand);
 					}
-					//chunk.lock()->SetSunLight(x, y, z, 0);
 				}
 				else if (y >= h - 2)
 				{
@@ -136,7 +133,6 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 					{
 						chunk.lock()->SetBlock(x, y, z, BlockType::Sand);
 					}
-					//chunk.lock()->SetSunLight(x, y, z, 0);
 				}
 				//블록최대 높이 아래3칸
 				else if (y >= h - 3)
@@ -144,13 +140,11 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 					//set block by biome, stone(mountain) or dirt(forest) or sand(desert)
 					//TODO GetBiome(x, z).GetUnderGroundBlockType();
 					chunk.lock()->SetBlock(x, y, z, BlockType::Stone);
-					//chunk.lock()->SetSunLight(x, y, z, 0);
 				}
 				//맨바닥
 				else if (y == 0)
 				{
 					chunk.lock()->SetBlock(x, y, z, BlockType::Bedrock);
-					//chunk.lock()->SetSunLight(x, y, z, 0);
 				}
 				//맨바닥3칸위
 				else if (y <= 3)
@@ -180,14 +174,12 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 						else
 							chunk.lock()->SetBlock(x, y, z, BlockType::Stone);
 					}
-					//chunk.lock()->SetSunLight(x, y, z, 0);
 				}
 				//나머지
 				else
 				{
 					//stone
 					chunk.lock()->SetBlock(x, y, z, BlockType::Stone);
-					//chunk.lock()->SetSunLight(x, y, z, 0);
 				}
 			}
 		}
@@ -196,8 +188,6 @@ void WorldGenerator::SetChunkBlocks(int maxHeight, std::weak_ptr<Chunk> chunk)
 	//Generate Tree
 	for (auto& treePos : treePositions)
 	{
-		//위치범위밖에 청크가 없다면?
-
 		if (chunk.lock()->GetBlock(treePos).blockType == BlockType::Air)
 		{
 			if (chunk.lock()->GetBlock(treePos.x, treePos.y - 1, treePos.z).IsGrowable())
@@ -336,8 +326,6 @@ void WorldGenerator::GenerateTree(std::weak_ptr<Chunk> chunk, int x, int y, int 
 	for (auto& blockInfo : treeBlocks)
 	{
 		chunk.lock()->SetBlock(blockInfo.pos, blockInfo.block);
-		//if (blockInfo.block == logType)
-		//	chunk.lock()->SetSunLight(blockInfo.pos.x, blockInfo.pos.y, blockInfo.pos.z, 0);
 	}
 	treeBlocks.clear();
 }

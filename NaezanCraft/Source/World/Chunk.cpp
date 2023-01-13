@@ -465,6 +465,18 @@ void Chunk::GenerateTerrain(std::unique_ptr<WorldGenerator>& worldGenerator)
 	worldGenerator->GenerateTerrain(shared_from_this());
 }
 
+void Chunk::SaveChunk()
+{
+	OPTICK_EVENT();
+	//TO DO
+}
+
+void Chunk::LoadChunk()
+{
+	OPTICK_EVENT();
+	//TO DO
+}
+
 void Chunk::RebuildChunkMesh()
 {
 	//recreate vertexbuffer and indexbuffer
@@ -555,7 +567,6 @@ void Chunk::CreateLightMap()
 			Block& block = GetBlock(dx, dy, dz);
 			if (block.IsNotShadow() && GetSunLight(dx, dy, dz) < sunLight - 1)
 			{
-				// Set its light level
 				SetSunLight(dx, dy, dz, sunLight - 1);
 
 				if (dx >= -1 && dx <= CHUNK_X && dz >= -1 && dz <= CHUNK_Z)
