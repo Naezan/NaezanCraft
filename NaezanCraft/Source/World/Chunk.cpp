@@ -7,6 +7,8 @@
 #include "../Renderer/Renderer.h"
 #include "../World/Generator/WorldGenerator.h"
 
+#include "../Util/FileMemory.h"
+
 const std::array<glm::ivec3, 6> Chunk::nearFaces
 {
 	glm::ivec3(-1, 0, 0),
@@ -476,9 +478,9 @@ void Chunk::SaveChunk(const std::string& path)
 		NC_LOG_ERROR("Failed to open chunk file {0}, {1}", position.x, position.z);
 		return;
 	}
-	//RawMemory chunkData = chunk.serialize();
-	//fwrite(chunkData.data, chunkData.size, 1, fp);
-	//chunkData.free();
+	FileMemory data = SerializeData();
+	fwrite(data.rawdata, data.datasize, 1, fp);
+	data.reset();
 	fclose(fp);
 	serialStatus = ChunkSerialStatus::Saved;
 }
@@ -486,8 +488,90 @@ void Chunk::SaveChunk(const std::string& path)
 void Chunk::LoadChunk(const std::string& path)
 {
 	OPTICK_EVENT();
-	//TO DO
-	//비동기호출
+	std::string filepath = GetChunkDataPath(position.x, position.z, path);
+	FILE* fp = fopen(filepath.c_str(), "rb");
+	if (!fp)
+	{
+		NC_LOG_ERROR("Failed to open chunk file {0}, {1}", position.x, position.z);
+		return;
+	}
+
+	FileMemory data;
+	fread(data.rawdata, data.datasize, 1, fp);
+	DeserializeData(data);
+	data.reset();
+
+	// Close file
+	fclose(fp);
+}
+
+FileMemory Chunk::SerializeData()
+{
+	FileMemory filedata;
+
+	auto curBlocktype = chunkBlocks[0][0][0].blockType;
+	uint16_t curBlockCount = 0;
+	for (int8_t y = 0; y < CHUNK_Y; ++y)
+	{
+		for (int8_t z = 0; z < CHUNK_Z; ++z)
+		{
+			for (int8_t x = 0; x < CHUNK_X; ++x)
+			{
+				if (curBlocktype != chunkBlocks[x][y][z].blockType)
+				{
+					filedata.write<uint8_t>((uint8_t)curBlocktype);
+					filedata.write<uint16_t>(curBlockCount);
+
+					curBlocktype = chunkBlocks[x][y][z].blockType;
+					curBlockCount = 0;
+				}
+				++curBlockCount;
+			}
+		}
+	}
+	if (curBlockCount > 0)
+	{
+		filedata.write<uint8_t>((uint8_t)curBlocktype);
+		filedata.write<uint16_t>(curBlockCount);
+	}
+
+	return filedata;
+}
+
+void Chunk::DeserializeData(FileMemory& fileData)
+{
+	uint16_t curBlockCount = 0, totalBlockCount = 0;
+	int x = 0, y = 0, z = 0;
+
+	while (totalBlockCount != CHUNK_X * CHUNK_Y * CHUNK_Z)
+	{
+		uint8_t curBlocktype;
+		uint16_t curBlockCount;
+		fileData.read<uint8_t>(curBlocktype);
+		fileData.read<uint16_t>(curBlockCount);
+
+		for (int i = 0; i < curBlockCount; ++i)
+		{
+			chunkBlocks[x][y][z].blockType = (BlockType)curBlocktype;
+			++totalBlockCount;
+			++x;
+			if (x == CHUNK_X)
+			{
+				x = 0;
+				++z;
+			}
+			if (z == CHUNK_Z)
+			{
+				z = 0;
+				++y;
+			}
+			if (y == CHUNK_Y)
+			{
+				return;
+			}
+		}
+		++curBlockCount;
+	}
 }
 
 std::string Chunk::GetChunkDataPath(int x, int z, const std::string& path)
@@ -520,7 +604,7 @@ void Chunk::CreateLightMap()
 				{
 					//Y축 위 상태가 모두 IsNotShadow라면 15 아니면 0
 					//if (GetSunLight(x, y, z) == 0)
-						SetSunLight(ix, iy, iz, lightMask[ix + 1][iz + 1]);
+					SetSunLight(ix, iy, iz, lightMask[ix + 1][iz + 1]);
 
 					if (lightMask[ix + 1][iz + 1] == 0)
 					{
@@ -532,7 +616,7 @@ void Chunk::CreateLightMap()
 							SetSunLight(ix, iy, iz, 0xF - 1);
 
 							//-1이면0 16이면15
-							LightNode node;
+							CoordNode node;
 							node.SetXN(ix < 0 ? 1 : (ix > CHUNK_X - 1 ? 2 : 0));
 							node.SetZN(iz < 0 ? 1 : (iz > CHUNK_Z - 1 ? 2 : 0));
 
@@ -555,7 +639,7 @@ void Chunk::CreateLightMap()
 
 	while (!sunlightBfsQueue.empty())
 	{
-		LightNode& node = sunlightBfsQueue.front();
+		CoordNode& node = sunlightBfsQueue.front();
 
 		int x = node.GetX();
 		if (node.GetXN() == 1)//x < 0 이였다
@@ -589,7 +673,7 @@ void Chunk::CreateLightMap()
 
 				if (dx >= -1 && dx <= CHUNK_X && dz >= -1 && dz <= CHUNK_Z)
 				{
-					LightNode node;
+					CoordNode node;
 					node.SetXN(dx < 0 ? 1 : (dx > CHUNK_X - 1 ? 2 : 0));
 					node.SetZN(dz < 0 ? 1 : (dz > CHUNK_Z - 1 ? 2 : 0));
 					int tempX = dx < 0 ? 0 : (dx > CHUNK_X - 1 ? CHUNK_X - 1 : dx);
@@ -606,7 +690,7 @@ void Chunk::ReloadLightMap()
 {
 	/*while (!sunlightReloadBfsQueue.empty())
 	{
-		LightNode& node = sunlightReloadBfsQueue.front();
+		CoordNode& node = sunlightReloadBfsQueue.front();
 
 		int x = node.GetX();
 		int y = node.GetY();
@@ -629,7 +713,7 @@ void Chunk::ReloadLightMap()
 
 				if (dx >= -1 && dx <= CHUNK_X && dz >= -1 && dz <= CHUNK_Z)
 				{
-					LightNode node;
+					CoordNode node;
 					node.SetXYZ(dx, dy, dz);
 					sunlightReloadBfsQueue.emplace(node);
 				}

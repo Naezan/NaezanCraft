@@ -11,6 +11,7 @@ class Mesh;
 class Water;
 class ChunkMesh;
 class WorldGenerator;
+class FileMemory;
 struct VertTexCoord;
 
 enum class ChunkLoadState
@@ -23,9 +24,9 @@ enum class ChunkSerialStatus
 	Loaded, Saving, Saved
 };
 
-struct LightNode {
+struct CoordNode {
 
-	LightNode(short _index = 0, signed char _in = 0) : index(_index), indexnegative(_in) {}
+	CoordNode(short _index = 0, signed char _in = 0) : index(_index), indexnegative(_in) {}
 
 	//최상위 1바이트는 y 다음 4비트는 x, 마지막 4비트는 z
 	short index; //this is the x y z coordinate!
@@ -77,6 +78,8 @@ public:
 
 	void SaveChunk(const std::string& path);
 	void LoadChunk(const std::string& path);
+	FileMemory SerializeData();
+	void DeserializeData(FileMemory& fileData);
 	inline void SetSerialStatus(ChunkSerialStatus status) { serialStatus = status; }
 	inline bool IsLoaded() { return serialStatus == ChunkSerialStatus::Loaded; }
 	inline bool IsSaving() { return serialStatus == ChunkSerialStatus::Saving; }
@@ -124,8 +127,8 @@ public:
 
 	//Lighting
 	vector_3d LightMap;//0x0F(torch), 0xF0(sun)
-	std::queue <LightNode> sunlightBfsQueue;
-	std::queue <LightNode> lightBfsQueue;
+	std::queue <CoordNode> sunlightBfsQueue;
+	std::queue <CoordNode> lightBfsQueue;
 
 	static const std::array <glm::ivec3, 6> nearFaces;
 	Block emptyBlock;

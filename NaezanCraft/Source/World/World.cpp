@@ -25,6 +25,7 @@ const std::array <glm::vec2, 32> World::animOffsets
 	glm::vec2(8, 1),glm::vec2(9, 1),glm::vec2(10,1), glm::vec2(11,1), glm::vec2(12,1), glm::vec2(13,1), glm::vec2(14,1), glm::vec2(15,1)
 };
 std::string World::worldPath = "";
+//std::vector<std::weak_ptr<Chunk>> ChunkThread::saveChunks;
 
 static const GLfloat cubeVertices[] = {
 	-1.0f,-1.0f,-1.0f, // triangle 1 : begin
@@ -86,6 +87,7 @@ World::World() : occlusionCull(true)
 
 	//CreateChunk memory
 	//worldChunks.reserve(LOOK_CHUNK_SIZE * LOOK_CHUNK_SIZE);
+	chunkThread = std::make_unique<ChunkThread>();
 	updateFutures.push_back(std::future<void>(std::async(std::launch::async, &World::AsyncLoadChunk, this)));
 }
 
@@ -476,6 +478,8 @@ void World::Shutdown()
 {
 	renderer->Shutdown();
 	updateFutures.clear();
+	chunkThread.reset();
+
 	worldChunks.clear();
 }
 
@@ -501,8 +505,8 @@ void World::AsyncLoadChunk()
 			if (chunk.second->chunkLoadState == ChunkLoadState::Unloaded)
 			{
 				chunk.second->SetupChunkNeighbor();
-				if (!IsChunkGenerated(std::make_pair<int, int>(static_cast<int>(chunk.second->position.x), static_cast<int>(chunk.second->position.z))))
-					GenerateChunkTerrain(chunk.second, chunk.second->position.x, chunk.second->position.z);
+				if (!ExistChunkFilePath(Chunk::GetChunkDataPath(chunk.second->position.x, chunk.second->position.z, worldPath)))
+					GenerateChunkTerrain(chunk.second);
 				else
 					chunk.second->LoadChunk(worldPath);
 				chunk.second->SetLoadState(ChunkLoadState::TerrainGenerated);
@@ -546,11 +550,9 @@ void World::RemoveChunk()
 	}
 }
 
-void World::GenerateChunkTerrain(std::weak_ptr<Chunk> chunk, int x, int z)
+void World::GenerateChunkTerrain(std::weak_ptr<Chunk> chunk)
 {
 	chunk.lock()->GenerateTerrain(worldGenerator);
-	std::pair<int, int> key(x, z);
-	SetWorldChunkLoadStatus(key, true);
 }
 
 void World::CreateChunk(std::weak_ptr<Chunk> chunk)
@@ -596,22 +598,23 @@ void World::RemoveWorldChunk(std::vector<decltype(worldChunks)::key_type>& _dele
 				{
 					glDeleteQueries(1, &worldChunks[*iter]->queryID);
 				}
-				worldChunks[*iter].reset();
-				worldChunks.erase(*iter);
-
-				iter = _deletableKey.erase(iter);
 			}
+			worldChunks[*iter].reset();
+			worldChunks.erase(*iter);
+
+			iter = _deletableKey.erase(iter);
 		}
 		else
 		{
 			if (worldChunks[*iter]->IsLoaded())
 			{
-				ChunkThread::saveChunks.push_back(worldChunks[*iter]);
+				chunkThread->saveChunks.push_back(worldChunks[*iter]);
 				worldChunks[*iter]->SetSerialStatus(ChunkSerialStatus::Saving);
 			}
 			++iter;
 		}
 	}
+	chunkThread->BeginThread();
 }
 
 
@@ -751,17 +754,8 @@ void World::RegisterReloadChunk(std::pair<int, int> key, const glm::vec3& blockP
 	reloadChunks.emplace(key, blockPos);
 }
 
-bool World::IsChunkGenerated(std::pair<int, int> key)
+bool World::ExistChunkFilePath(const std::string& path)
 {
-	//찾으면 return true or false 일반적으로 찾으면 true return
-	if (worldChunkLoadStatus.find(key) != worldChunkLoadStatus.end())
-		return worldChunkLoadStatus[key];
-
-	//아직 생성되지 않은경우
-	return false;
-}
-
-void World::SetWorldChunkLoadStatus(std::pair<int, int> key, bool status)
-{
-	worldChunkLoadStatus[key] = status;
+	struct stat buffer;
+	return (stat(path.c_str(), &buffer) == 0);
 }
