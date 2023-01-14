@@ -478,10 +478,12 @@ void Chunk::SaveChunk(const std::string& path)
 		NC_LOG_ERROR("Failed to open chunk file {0}, {1}", position.x, position.z);
 		return;
 	}
-	FileMemory data = SerializeData();
+	FileMemory data;
+	SerializeData(data);
 	fwrite(data.rawdata, data.datasize, 1, fp);
-	data.reset();
+	data.reset(false);
 	fclose(fp);
+
 	serialStatus = ChunkSerialStatus::Saved;
 }
 
@@ -496,19 +498,25 @@ void Chunk::LoadChunk(const std::string& path)
 		return;
 	}
 
+	//DataSize is not Ready
+	//마지막부분4바이트만 읽어옴
+	int size;
+	fseek(fp, 0, SEEK_END);
+	size = ftell(fp);
+	rewind(fp);
+
 	FileMemory data;
-	fread(data.rawdata, data.datasize, 1, fp);
+	data.allocatedata(size);
+	fread(data.rawdata, size, 1, fp);
 	DeserializeData(data);
-	data.reset();
+	data.reset(true);
 
 	// Close file
 	fclose(fp);
 }
 
-FileMemory Chunk::SerializeData()
+void Chunk::SerializeData(FileMemory& outFileData)
 {
-	FileMemory filedata;
-
 	auto curBlocktype = chunkBlocks[0][0][0].blockType;
 	uint16_t curBlockCount = 0;
 	for (int8_t y = 0; y < CHUNK_Y; ++y)
@@ -519,8 +527,8 @@ FileMemory Chunk::SerializeData()
 			{
 				if (curBlocktype != chunkBlocks[x][y][z].blockType)
 				{
-					filedata.write<uint8_t>((uint8_t)curBlocktype);
-					filedata.write<uint16_t>(curBlockCount);
+					outFileData.write<uint8_t>((uint8_t)curBlocktype);
+					outFileData.write<uint16_t>(curBlockCount);
 
 					curBlocktype = chunkBlocks[x][y][z].blockType;
 					curBlockCount = 0;
@@ -531,29 +539,25 @@ FileMemory Chunk::SerializeData()
 	}
 	if (curBlockCount > 0)
 	{
-		filedata.write<uint8_t>((uint8_t)curBlocktype);
-		filedata.write<uint16_t>(curBlockCount);
+		outFileData.write<uint8_t>((uint8_t)curBlocktype);
+		outFileData.write<uint16_t>(curBlockCount);
 	}
-
-	return filedata;
 }
 
 void Chunk::DeserializeData(FileMemory& fileData)
 {
-	uint16_t curBlockCount = 0, totalBlockCount = 0;
+	uint8_t curBlocktype = 0;
+	uint16_t curBlockCount = 0;
 	int x = 0, y = 0, z = 0;
 
-	while (totalBlockCount != CHUNK_X * CHUNK_Y * CHUNK_Z)
+	while (fileData.readoffset < fileData.datasize)
 	{
-		uint8_t curBlocktype;
-		uint16_t curBlockCount;
-		fileData.read<uint8_t>(curBlocktype);
-		fileData.read<uint16_t>(curBlockCount);
+		fileData.read<uint8_t>(&curBlocktype);
+		fileData.read<uint16_t>(&curBlockCount);
 
 		for (int i = 0; i < curBlockCount; ++i)
 		{
 			chunkBlocks[x][y][z].blockType = (BlockType)curBlocktype;
-			++totalBlockCount;
 			++x;
 			if (x == CHUNK_X)
 			{
@@ -567,6 +571,9 @@ void Chunk::DeserializeData(FileMemory& fileData)
 			}
 			if (y == CHUNK_Y)
 			{
+				y = 0;
+				curBlocktype = 0;
+				curBlockCount = 0;
 				return;
 			}
 		}

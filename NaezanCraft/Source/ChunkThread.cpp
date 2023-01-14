@@ -11,6 +11,11 @@ ChunkThread::ChunkThread() :
 
 ChunkThread::~ChunkThread()
 {
+	{
+		std::lock_guard lock(chunkMutex);
+		IsThreadRunning = false;
+	}
+
 	chunkCV.notify_all();
 
 	chunkThread.join();
@@ -28,7 +33,7 @@ void ChunkThread::RunChunkThread()
 			{
 				//쓰레드가 실행중이라면 특정조건을 만족하기전까지 무한정 대기합니다.
 				//pred가 true라면 wait를 멈춥니다
-				chunkCV.wait(lock, [&] { return !saveChunks.empty(); });
+				chunkCV.wait(lock, [&] { return !IsThreadRunning || !saveChunks.empty(); });
 				loopCondition = true;
 			}
 			else

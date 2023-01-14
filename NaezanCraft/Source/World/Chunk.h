@@ -11,8 +11,8 @@ class Mesh;
 class Water;
 class ChunkMesh;
 class WorldGenerator;
-class FileMemory;
 struct VertTexCoord;
+struct FileMemory;
 
 enum class ChunkLoadState
 {
@@ -78,7 +78,7 @@ public:
 
 	void SaveChunk(const std::string& path);
 	void LoadChunk(const std::string& path);
-	FileMemory SerializeData();
+	void SerializeData(FileMemory& outFileData);
 	void DeserializeData(FileMemory& fileData);
 	inline void SetSerialStatus(ChunkSerialStatus status) { serialStatus = status; }
 	inline bool IsLoaded() { return serialStatus == ChunkSerialStatus::Loaded; }
