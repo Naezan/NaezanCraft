@@ -33,8 +33,8 @@ struct FileMemory
 	void read(T* writeData)
 	{
 		//rawdata + offset부터 sizeof(writeData)크기만큼의 데이터를 불러온다
-		memcpy_s(writeData, sizeof(writeData), rawdata + readoffset, sizeof(writeData));
-		readoffset += sizeof(writeData);
+		memcpy_s(writeData, sizeof(T), rawdata + readoffset, sizeof(T));
+		readoffset += sizeof(T);
 	}
 
 	void reset(bool isallocate)

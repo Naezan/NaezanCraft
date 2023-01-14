@@ -546,18 +546,18 @@ void Chunk::SerializeData(FileMemory& outFileData)
 
 void Chunk::DeserializeData(FileMemory& fileData)
 {
-	uint8_t curBlocktype = 0;
-	uint16_t curBlockCount = 0;
+	uint8_t* curBlocktype = new uint8_t;
+	uint16_t* curBlockCount = new uint16_t;
 	int x = 0, y = 0, z = 0;
 
 	while (fileData.readoffset < fileData.datasize)
 	{
-		fileData.read<uint8_t>(&curBlocktype);
-		fileData.read<uint16_t>(&curBlockCount);
+		fileData.read<uint8_t>(curBlocktype);
+		fileData.read<uint16_t>(curBlockCount);
 
-		for (int i = 0; i < curBlockCount; ++i)
+		for (int i = 0; i < *curBlockCount; ++i)
 		{
-			chunkBlocks[x][y][z].blockType = (BlockType)curBlocktype;
+			chunkBlocks[x][y][z].blockType = (BlockType)*curBlocktype;
 			++x;
 			if (x == CHUNK_X)
 			{
@@ -572,12 +572,14 @@ void Chunk::DeserializeData(FileMemory& fileData)
 			if (y == CHUNK_Y)
 			{
 				y = 0;
-				curBlocktype = 0;
-				curBlockCount = 0;
+				delete curBlocktype;
+				delete curBlockCount;
+				curBlocktype = nullptr;
+				curBlockCount = nullptr;
 				return;
 			}
 		}
-		++curBlockCount;
+		++*curBlockCount;
 	}
 }
 
