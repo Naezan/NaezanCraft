@@ -105,6 +105,34 @@ void Player::Update()
 			Input::isRightMousePressed = false;
 		}
 	}
+	if (Input::GetIsKeyPressed(GLFW_KEY_1))
+	{
+	}
+	if (Input::GetIsKeyPressed(GLFW_KEY_2))
+	{
+	}
+	if (Input::GetIsKeyPressed(GLFW_KEY_3))
+	{
+	}
+	if (Input::GetIsKeyPressed(GLFW_KEY_4))
+	{
+	}
+	if (Input::GetIsKeyPressed(GLFW_KEY_5))
+	{
+	}
+	if (Input::GetIsKeyPressed(GLFW_KEY_6))
+	{
+	}
+	if (Input::GetIsKeyPressed(GLFW_KEY_7))
+	{
+	}
+	if (Input::GetIsKeyPressed(GLFW_KEY_8))
+	{
+	}
+	if (Input::GetIsKeyPressed(GLFW_KEY_9))
+	{
+	}
+
 
 	//월드 기준 벡터
 	glm::normalize(velocity);

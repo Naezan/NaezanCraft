@@ -10,6 +10,10 @@ constexpr int ATLAS_HEIGHT = 512;
 constexpr int SPRITE_WIDTH = 16;
 constexpr int SPRITE_HEIGHT = 16;
 constexpr float CROSSHAIR_HALFSIZE = 16.f;
+constexpr float INVEN_SLOT_HALF_WIDTH = 182.f;
+constexpr float INVEN_SLOT_HEIGHT = 44.f;
+constexpr float INVEN_SLOT_POINT_HALF_WIDTH = 48.f;
+constexpr float INVEN_SLOT_POINT_HEIGHT = 46.f;
 
 constexpr float SKY_SIZE = 500;
 

@@ -16,7 +16,8 @@ Renderer::Renderer()
 	TextureManager::AddTexture("Cloud", "../Assets/Textures/clouds.png");
 	TextureManager::AddTexture("Water", "../Assets/Textures/water.png");
 	TextureManager::AddTexture("Crosshair", "../Assets/Textures/crosshair.png");
-	TextureManager::AddTexture("Inventory", "../Assets/Textures/widgets.png");
+	TextureManager::AddTexture("InventorySlots", "../Assets/Textures/slots.png");
+	TextureManager::AddTexture("InventorySlotPoint", "../Assets/Textures/slotPoint.png");
 
 	//Ω¶¿Ã¥ı
 	CreateRenderShader();
