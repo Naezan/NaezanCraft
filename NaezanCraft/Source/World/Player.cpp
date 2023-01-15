@@ -51,12 +51,12 @@ void Player::Update()
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_Q))
 	{
-		velocity.y = 1;
+		velocity.y = -1;
 		isMoving = true;
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_E))
 	{
-		velocity.y = -1;
+		velocity.y = 1;
 		isMoving = true;
 	}
 	if (Input::GetIsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))

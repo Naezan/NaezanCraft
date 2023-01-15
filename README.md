@@ -42,7 +42,7 @@ MineCraft Copy Naezan's Engine
         * ~~Render Chunk When Player Move~~
         * ~~청크 랜덤 블록 렌더링~~
         * ~~World Objects(like tree, catus etc..)~~
-        * 그리디 메싱(X) + ~~비등방성문제~~(reference : https://0fps.net/2013/07/03/ambient-occlusion-for-minecraft-like-worlds/ + https://bbtarzan12.github.io/Voxel-Part-3/)
+        * 그리디 메싱(X) + ~~비등방성문제~~(ref : https://0fps.net/2013/07/03/ambient-occlusion-for-minecraft-like-worlds/ + https://bbtarzan12.github.io/Voxel-Part-3/)
         * ~~Water~~
         * *Water Physics*
         * *Instancing(메모리관리 후 검토)*
@@ -50,10 +50,10 @@ MineCraft Copy Naezan's Engine
         * *Region Weather System(later if possible)*
     - [x] ~~Lighting~~
         * ~~Ambient Occlusion(+라이트컬링)~~
-        * ~~Sun Light Flood fill algorithm~~(reference : https://codepen.io/xgundam05/pen/nydzXE?editors=100)
+        * ~~Sun Light Flood fill algorithm~~(ref : https://codepen.io/xgundam05/pen/nydzXE?editors=100)
         * ~~Object Light(Flood fill Algorithm)~~
         * *레이 트레이싱(X)*
-    - [ ] 세이브 로드 청크 & 월드(SaveWorld, LoadWorld, SaveChunk, LoadChunk)
+    - [x] ~~세이브 로드 청크 & 월드(SaveWorld, LoadWorld, SaveChunk, LoadChunk)~~(ref : https://github.com/eyalz800/serializer, https://github.com/codingminecraft/StreamMinecraftClone)
     - [ ] Inventory
     - [ ] BGM & Sound
     - [N] ECS(X)

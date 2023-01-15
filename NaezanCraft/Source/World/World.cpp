@@ -93,6 +93,8 @@ World::World() : occlusionCull(true)
 
 World::~World()
 {
+	SaveWorldChunks();
+
 	Shutdown();
 }
 
@@ -612,6 +614,22 @@ void World::RemoveWorldChunk(std::vector<decltype(worldChunks)::key_type>& _dele
 				worldChunks[*iter]->SetSerialStatus(ChunkSerialStatus::Saving);
 			}
 			++iter;
+		}
+	}
+	chunkThread->BeginThread();
+}
+
+void World::SaveWorldChunks()
+{
+	for (auto& chunk : worldChunks)
+	{
+		if (!chunk.second->IsSaved())
+		{
+			if (chunk.second->IsLoaded())
+			{
+				chunkThread->saveChunks.push_back(chunk.second);
+				chunk.second->SetSerialStatus(ChunkSerialStatus::Saving);
+			}
 		}
 	}
 	chunkThread->BeginThread();

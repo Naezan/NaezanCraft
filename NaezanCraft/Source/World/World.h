@@ -53,6 +53,8 @@ public:
 	void UpdateChunk();
 	void RemoveWorldChunk(std::vector<std::pair<int, int>>& _deletableKey);
 
+	void SaveWorldChunks();
+
 	static inline std::unique_ptr<World> CreateCraftWorld()
 	{
 		return std::make_unique<World>();
