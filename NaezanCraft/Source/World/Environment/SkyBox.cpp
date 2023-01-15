@@ -193,8 +193,6 @@ SkyBox::SkyBox()
 			GL_FLOAT, GL_FLOAT);
 		moonMesh->SetVertexBufferData(MoonVertexCoords.size() * sizeof(SunMoonVertexCoord), &MoonVertexCoords.front());
 
-		sunMoonIndicesSize = IndexCoords.size();
-
 		moonMesh->UnBindVertexBuffer();
 		moonMesh->UnBindVertexArray();
 	}
@@ -234,8 +232,9 @@ void SkyBox::Update(glm::vec3& playerPos)
 
 void SkyBox::Render(std::weak_ptr<Camera>& camera)
 {
-	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
+	glDisable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 
 
 	//Render Sky
@@ -253,13 +252,13 @@ void SkyBox::Render(std::weak_ptr<Camera>& camera)
 	//Sun
 	TextureManager::BindTexture("Sun");
 	sunMesh->BindVertexArray();
-	glDrawElements(GL_TRIANGLES, sunMoonIndicesSize, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_TRIANGLES, sunMesh->GetIndicesCount(), GL_UNSIGNED_INT, nullptr);
 	sunMesh->UnBindVertexArray();
 
 	//Moon
 	TextureManager::BindTexture("Moon");
 	moonMesh->BindVertexArray();
-	glDrawElements(GL_TRIANGLES, sunMoonIndicesSize, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_TRIANGLES, moonMesh->GetIndicesCount(), GL_UNSIGNED_INT, nullptr);
 	moonMesh->UnBindVertexArray();
 
 	//Cloud

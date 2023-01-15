@@ -6,6 +6,7 @@
 
 class Camera;
 class Event;
+class HUD;
 
 enum Dir
 {
@@ -38,4 +39,7 @@ private:
 	//설치할 위치
 	glm::vec3 outFaceBlockPosition;
 	BlockType handBlockType;
+
+	//GUI
+	std::unique_ptr<HUD> hud;
 };

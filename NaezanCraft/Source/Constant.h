@@ -9,6 +9,7 @@ constexpr int ATLAS_WIDTH = 512;
 constexpr int ATLAS_HEIGHT = 512;
 constexpr int SPRITE_WIDTH = 16;
 constexpr int SPRITE_HEIGHT = 16;
+constexpr float CROSSHAIR_HALFSIZE = 16.f;
 
 constexpr float SKY_SIZE = 500;
 

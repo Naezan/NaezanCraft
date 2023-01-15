@@ -26,16 +26,21 @@ public:
 	inline void SetIndicesCount(int count) { indicesCount = count; }
 
 	void CreateVertexArray();
+
 	void CreateVertexBuffer(int vertexStride, const void* vertexPointer,
 		int texcoordStride, const void* texcoordPointer,
 		int lightStride, const void* lightPointer,
 		int AOStride, const void* AOPointer,
-		unsigned int posType, unsigned int texType, unsigned int lightType, unsigned int AOType);
+		unsigned int posType, unsigned int texType, unsigned int lightType, unsigned int AOType,
+		int posSize = 3, int texSize = 2, int lightSize = 1, int AOSize = 1);
+
 	void CreateVertexBuffer(int vertexStride, const void* vertexPointer,
 		int texcoordStride, const void* texcoordPointer,
-		unsigned int posType, unsigned int texType);
+		unsigned int posType, unsigned int texType, int posSize = 3, int texSize = 2);
+
 	void CreateVertexBuffer(int vertexStride, const void* vertexPointer,
 		unsigned int posType = GL_FLOAT, int size = 4);
+
 	virtual void CreateIndexBuffer();
 	virtual void SetVertexBufferData(size_t size, const void* data);
 	virtual void SetIndexBufferVector(std::vector<unsigned int>& indexData);

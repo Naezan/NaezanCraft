@@ -9,3 +9,4 @@ tmp/
 # Files
 *.user
 *.sln
+*.bin

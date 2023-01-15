@@ -25,6 +25,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <gl/GLU.h>
 
 #include "Constant.h"
 

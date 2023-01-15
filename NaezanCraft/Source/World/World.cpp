@@ -445,8 +445,8 @@ void World::Render()
 	waterAnimIndex += 0.1f;
 	waterAnimIndex = waterAnimIndex >= 32 ? 0 : waterAnimIndex;
 
-	scene->Render();
 	sky->Render(scene->GetCamera());
+	scene->Render();
 
 	RemoveChunk();
 

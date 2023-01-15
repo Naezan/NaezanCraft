@@ -15,6 +15,8 @@ Renderer::Renderer()
 	TextureManager::AddTexture("Moon", "../Assets/Textures/moon_phases.png");
 	TextureManager::AddTexture("Cloud", "../Assets/Textures/clouds.png");
 	TextureManager::AddTexture("Water", "../Assets/Textures/water.png");
+	TextureManager::AddTexture("Crosshair", "../Assets/Textures/crosshair.png");
+	TextureManager::AddTexture("Inventory", "../Assets/Textures/widgets.png");
 
 	//Ω¶¿Ã¥ı
 	CreateRenderShader();

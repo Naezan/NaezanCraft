@@ -20,15 +20,16 @@ VertexBuffer::VertexBuffer(int vertexStride, const void* vertexPointer, unsigned
 VertexBuffer::VertexBuffer(
 	int vertexStride, const void* vertexPointer,
 	int texcoordStride, const void* texcoordPointer,
-	unsigned int posType, unsigned int texType)
+	unsigned int posType, unsigned int texType, 
+	int posSize, int texSize)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, posType, GL_FALSE, vertexStride, vertexPointer);
+	glVertexAttribPointer(0, posSize, posType, GL_FALSE, vertexStride, vertexPointer);
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, texType, GL_FALSE, texcoordStride, texcoordPointer);
+	glVertexAttribPointer(1, texSize, texType, GL_FALSE, texcoordStride, texcoordPointer);
 }
 
 VertexBuffer::VertexBuffer(
@@ -36,26 +37,27 @@ VertexBuffer::VertexBuffer(
 	int texcoordStride, const void* texcoordPointer,
 	int lightStride, const void* lightPointer,
 	int AOStride, const void* AOPointer,
-	unsigned int posType, unsigned int texType, unsigned int lightType, unsigned int AOType)
+	unsigned int posType, unsigned int texType, unsigned int lightType, unsigned int AOType,
+	int posSize, int texSize, int lightSize, int AOSize)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 
 	//index, size(vec3 개수), type(점 하나의 타입, 크기), normalized(정규화 여부), stride(건너뛸 거리), pointer(상대적 시작 위치, 거리?)
 	//position(u8vec3)
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, posType, GL_FALSE, vertexStride, vertexPointer);
+	glVertexAttribPointer(0, posSize, posType, GL_FALSE, vertexStride, vertexPointer);
 
 	//texture(16vec2)
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, texType, GL_FALSE, texcoordStride, texcoordPointer);
+	glVertexAttribPointer(1, texSize, texType, GL_FALSE, texcoordStride, texcoordPointer);
 
 	//texture(uint8_t)
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 1, lightType, GL_FALSE, lightStride, lightPointer);
+	glVertexAttribPointer(2, lightSize, lightType, GL_FALSE, lightStride, lightPointer);
 
 	//AO(uint8_t)
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 1, AOType, GL_FALSE, AOStride, AOPointer);
+	glVertexAttribPointer(3, AOSize, AOType, GL_FALSE, AOStride, AOPointer);
 }
 
 VertexBuffer::~VertexBuffer() = default;

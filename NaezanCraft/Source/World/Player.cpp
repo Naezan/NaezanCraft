@@ -10,6 +10,8 @@
 #include "../Util/OutLine.h"
 #include "../Util/Line.h"
 
+#include "../../GUI/HUD.h"
+
 Player::Player(glm::vec3 pos, glm::vec3 vel, glm::vec3 acc, glm::vec3 dir)
 	: velocity(vel), acceleration(acc), forwardDirection(dir), playerBox(glm::vec3(-.3f, -1.5f, -.3f), .6f, 1.5f, .6f),
 	outBlockPosition(0, 0, 0), outFaceBlockPosition(0, 0, 0), handBlockType(BlockType::Diamond)
@@ -20,10 +22,14 @@ Player::Player(glm::vec3 pos, glm::vec3 vel, glm::vec3 acc, glm::vec3 dir)
 	//SetupEventCallback
 	Window::GetEventDispatcher().AddCallbackFunction(EventType::CursorPos, std::bind(&Player::OnCursorPos, this, std::placeholders::_1));
 
-	//TO DO SetCameraToChild?
+	hud = std::make_unique<HUD>();
+	hud->SetOwner(this);
 }
 
-Player::~Player() = default;
+Player::~Player()
+{
+	hud.reset();
+}
 
 void Player::Update()
 {
@@ -119,6 +125,7 @@ void Player::Update()
 				position.z += PLAYER_SPEED * velocity.z;
 				break;
 			}
+			//TO DO
 			//Collision(directions[i]);
 		}
 	}
@@ -128,6 +135,9 @@ void Player::Update()
 
 	//raycast
 	rayBlock = Ray::BlockTraversal(position, mainCamera->GetForwadDir(), outBlockPosition, outFaceBlockPosition);
+
+	//UI
+	hud->Update();
 }
 
 void Player::Render()
@@ -139,15 +149,14 @@ void Player::Render()
 		outlineblock.SetColor(glm::vec3(1, 0, 0));
 		outlineblock.Render();
 
-		OutLine outlinefaceblock(outFaceBlockPosition);
+		/*OutLine outlinefaceblock(outFaceBlockPosition);
 		outlinefaceblock.SetPV(mainCamera->GetViewProjectionMatrix());
 		outlinefaceblock.SetColor(glm::vec3(0, 1, 0));
-		outlinefaceblock.Render();
+		outlinefaceblock.Render();*/
 	}
-
-	/*Line line(position, position + mainCamera->GetForwadDir() * 10.f);
-	line.setMVP(mainCamera->GetViewProjectionMatrix());
-	line.Render();*/
+	
+	//UI
+	hud->Render();
 }
 
 void Player::Collision(const glm::vec3& dir)
@@ -177,6 +186,7 @@ void Player::Collision(const glm::vec3& dir)
 				GET_World()->GetBlockByWorldPos(x, y, z, block);
 				if (!block.IsFluid())
 				{
+					//TO DO head is higher
 					if (dir.y > 0)
 					{
 						position.y = y;

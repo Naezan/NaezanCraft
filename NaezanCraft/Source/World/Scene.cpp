@@ -9,7 +9,7 @@ float sunIntensity = 1.f;
 Scene::Scene()
 {
 	//TO DO player position setting
-	player = Actor::CreateUnique<Player>(glm::vec3(0.f, 80.f, 0.f));
+	player = std::make_unique<Player>(glm::vec3(0.f, 80.f, 0.f));
 	playerCamera = player->GetCamera();
 }
 

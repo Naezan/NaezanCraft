@@ -40,7 +40,6 @@ private:
 	std::map<ShaderType, std::unique_ptr<SunMoonShader>> sunMoonShaders;
 	std::unique_ptr<Mesh> sunMesh;
 	std::unique_ptr<Mesh> moonMesh;
-	int sunMoonIndicesSize;
 
 	std::unique_ptr<Cloud> cloud;
 };

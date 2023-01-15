@@ -26,22 +26,28 @@ void Mesh::CreateVertexBuffer(int vertexStride, const void* vertexPointer,
 	int texcoordStride, const void* texcoordPointer,
 	int lightStride, const void* lightPointer,
 	int AOStride, const void* AOPointer,
-	unsigned int posType, unsigned int texType, unsigned int lightType, unsigned int AOType)
+	unsigned int posType, unsigned int texType, unsigned int lightType, unsigned int AOType,
+	int posSize, int texSize, int lightSize, int AOSize)
 {
 	vertexBuffer = std::make_unique<VertexBuffer>(
 		static_cast<int>(vertexStride), vertexPointer,
 		static_cast<int>(texcoordStride), texcoordPointer,
 		static_cast<int>(lightStride), lightPointer,
 		static_cast<int>(AOStride), AOPointer,
-		posType, texType, lightType, AOType);
+		posType, texType, lightType, AOType,
+		posSize, texSize, lightSize, AOSize);
 }
 
-void Mesh::CreateVertexBuffer(int vertexStride, const void* vertexPointer, int texcoordStride, const void* texcoordPointer, unsigned int posType, unsigned int texType)
+void Mesh::CreateVertexBuffer(
+	int vertexStride, const void* vertexPointer,
+	int texcoordStride, const void* texcoordPointer,
+	unsigned int posType, unsigned int texType,
+	int posSize, int texSize)
 {
 	vertexBuffer = std::make_unique<VertexBuffer>(
 		static_cast<int>(vertexStride), vertexPointer,
 		static_cast<int>(texcoordStride), texcoordPointer,
-		posType, texType);
+		posType, texType, posSize, texSize);
 }
 
 void Mesh::CreateVertexBuffer(int vertexStride, const void* vertexPointer, unsigned int posType, int size)

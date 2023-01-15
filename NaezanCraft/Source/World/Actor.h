@@ -23,12 +23,6 @@ public:
 	inline glm::vec3& GetRotation() { return rotation; }
 	inline glm::vec3& GetScale() { return scale; }
 
-	template<typename T, typename... Args>
-	static std::unique_ptr<T> CreateUnique(Args... args)
-	{
-		return std::make_unique<T>(args...);
-	}
-
 public:
 	static const glm::vec3 UpVector;
 
