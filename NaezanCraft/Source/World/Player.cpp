@@ -11,6 +11,7 @@
 #include "../Util/Line.h"
 
 #include "../../GUI/HUD.h"
+#include "../../GUI/Inventory.h"
 
 Player::Player(glm::vec3 pos, glm::vec3 vel, glm::vec3 acc, glm::vec3 dir)
 	: velocity(vel), acceleration(acc), forwardDirection(dir), playerBox(glm::vec3(-.3f, -1.5f, -.3f), .6f, 1.5f, .6f),
@@ -24,6 +25,9 @@ Player::Player(glm::vec3 pos, glm::vec3 vel, glm::vec3 acc, glm::vec3 dir)
 
 	hud = std::make_unique<HUD>();
 	hud->SetOwner(this);
+
+	hud->GetInventory()->SetSlotID(0);
+	handBlockType = hud->GetInventory()->GetInventorySlotBlockType();
 }
 
 Player::~Player()
@@ -93,7 +97,8 @@ void Player::Update()
 				outFaceBlockPosition.x, outFaceBlockPosition.y, outFaceBlockPosition.z)
 				)
 			{
-				GET_World()->SetBlockByWorldPos(outFaceBlockPosition.x, outFaceBlockPosition.y, outFaceBlockPosition.z, handBlockType);
+				if (handBlockType != BlockType::Air)
+					GET_World()->SetBlockByWorldPos(outFaceBlockPosition.x, outFaceBlockPosition.y, outFaceBlockPosition.z, handBlockType);
 			}
 		}
 	}
@@ -107,30 +112,48 @@ void Player::Update()
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_1))
 	{
+		hud->GetInventory()->SetSlotID(0);
+		handBlockType = hud->GetInventory()->GetInventorySlotBlockType();
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_2))
 	{
+		hud->GetInventory()->SetSlotID(1);
+		handBlockType = hud->GetInventory()->GetInventorySlotBlockType();
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_3))
 	{
+		hud->GetInventory()->SetSlotID(2);
+		handBlockType = hud->GetInventory()->GetInventorySlotBlockType();
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_4))
 	{
+		hud->GetInventory()->SetSlotID(3);
+		handBlockType = hud->GetInventory()->GetInventorySlotBlockType();
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_5))
 	{
+		hud->GetInventory()->SetSlotID(4);
+		handBlockType = hud->GetInventory()->GetInventorySlotBlockType();
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_6))
 	{
+		hud->GetInventory()->SetSlotID(5);
+		handBlockType = hud->GetInventory()->GetInventorySlotBlockType();
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_7))
 	{
+		hud->GetInventory()->SetSlotID(6);
+		handBlockType = hud->GetInventory()->GetInventorySlotBlockType();
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_8))
 	{
+		hud->GetInventory()->SetSlotID(7);
+		handBlockType = hud->GetInventory()->GetInventorySlotBlockType();
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_9))
 	{
+		hud->GetInventory()->SetSlotID(8);
+		handBlockType = hud->GetInventory()->GetInventorySlotBlockType();
 	}
 
 
@@ -182,7 +205,7 @@ void Player::Render()
 		outlinefaceblock.SetColor(glm::vec3(0, 1, 0));
 		outlinefaceblock.Render();*/
 	}
-	
+
 	//UI
 	hud->Render();
 }

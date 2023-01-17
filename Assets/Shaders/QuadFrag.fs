@@ -8,7 +8,8 @@ uniform sampler2D quadTexture;
 
 void main()
 {
-	vec4 color = texture(quadTexture, vsTexCoord);
-	FragColor = color;
+	//texelFetch(quadTexture, ivec2(vsTexCoord.xy), 0);
+	//vec4 color = texelFetch(quadTexture, ivec2(vsTexCoord.xy), 0);
+	FragColor = texelFetch(quadTexture, ivec2(vsTexCoord.xy), 0);
 	if(FragColor.a == 0) discard;
 }

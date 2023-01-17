@@ -15,6 +15,8 @@ public:
 	virtual void Update() override;
 	virtual void Render() override;
 
+	inline std::unique_ptr<Inventory>& GetInventory() { return inventory; }
+
 private:
 	std::unique_ptr<Inventory> inventory;
 

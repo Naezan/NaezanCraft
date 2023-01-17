@@ -18,6 +18,7 @@ Renderer::Renderer()
 	TextureManager::AddTexture("Crosshair", "../Assets/Textures/crosshair.png");
 	TextureManager::AddTexture("InventorySlots", "../Assets/Textures/slots.png");
 	TextureManager::AddTexture("InventorySlotPoint", "../Assets/Textures/slotPoint.png");
+	TextureManager::AddTexture("InventoryBlockSprite", "../Assets/Textures/InvSprite.png");
 
 	//Ω¶¿Ã¥ı
 	CreateRenderShader();

@@ -30,9 +30,9 @@ HUD::HUD()
 
 	std::vector<QuadCoord> QuadCoords
 	{
-		{ glm::vec3(SCREEN_WIDTH / 2.f - CROSSHAIR_HALFSIZE, SCREEN_HEIGHT / 2.f + CROSSHAIR_HALFSIZE, 1.f),	glm::vec2(0, 1) },
-		{ glm::vec3(SCREEN_WIDTH / 2.f + CROSSHAIR_HALFSIZE, SCREEN_HEIGHT / 2.f + CROSSHAIR_HALFSIZE, 1.f),	glm::vec2(1, 1) },
-		{ glm::vec3(SCREEN_WIDTH / 2.f + CROSSHAIR_HALFSIZE, SCREEN_HEIGHT / 2.f - CROSSHAIR_HALFSIZE, 1.f),	glm::vec2(1, 0) },
+		{ glm::vec3(SCREEN_WIDTH / 2.f - CROSSHAIR_HALFSIZE, SCREEN_HEIGHT / 2.f + CROSSHAIR_HALFSIZE, 1.f),	glm::vec2(0, 15) },
+		{ glm::vec3(SCREEN_WIDTH / 2.f + CROSSHAIR_HALFSIZE, SCREEN_HEIGHT / 2.f + CROSSHAIR_HALFSIZE, 1.f),	glm::vec2(15, 15) },
+		{ glm::vec3(SCREEN_WIDTH / 2.f + CROSSHAIR_HALFSIZE, SCREEN_HEIGHT / 2.f - CROSSHAIR_HALFSIZE, 1.f),	glm::vec2(15, 0) },
 		{ glm::vec3(SCREEN_WIDTH / 2.f - CROSSHAIR_HALFSIZE, SCREEN_HEIGHT / 2.f - CROSSHAIR_HALFSIZE, 1.f),	glm::vec2(0, 0) }
 	};
 

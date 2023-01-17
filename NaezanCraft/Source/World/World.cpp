@@ -138,6 +138,7 @@ void World::SetBlockDatas()
 	BlockCoordData[Gold] = std::make_pair(4, 13);
 	BlockCoordData[Diamond] = std::make_pair(13, 0);
 	BlockCoordData[Bedrock] = std::make_pair(7, 4);
+	BlockCoordData[GrowStone] = std::make_pair(3, 13);
 }
 
 void World::LoadCullingShader()
@@ -440,7 +441,7 @@ void World::Render()
 			renderer->RenderWater(waterchunk.second, animOffsets[waterAnimIndex]);
 		}
 	}
-	//change water offset
+	//water offset
 	//x first, y last, (width 16, height 2)
 	waterAnimIndex += 0.1f;
 	waterAnimIndex = waterAnimIndex >= 32 ? 0 : waterAnimIndex;

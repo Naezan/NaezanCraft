@@ -14,6 +14,10 @@ constexpr float INVEN_SLOT_HALF_WIDTH = 182.f;
 constexpr float INVEN_SLOT_HEIGHT = 44.f;
 constexpr float INVEN_SLOT_POINT_HALF_WIDTH = 48.f;
 constexpr float INVEN_SLOT_POINT_HEIGHT = 46.f;
+constexpr float INVEN_SLOT_POINT_INER_WIDTH = 40.f;
+
+constexpr int INVEN_SPRITE_WIDTH = 32;
+constexpr int INVEN_SPRITE_HEIGHT = 32;
 
 constexpr float SKY_SIZE = 500;
 
