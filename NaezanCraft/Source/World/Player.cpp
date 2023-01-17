@@ -208,7 +208,7 @@ void Player::Update()
 
 	if (isJumping && isGround)
 	{
-		velocity.y = sqrt(jumpHeight * -2.f * GRAVITY);
+		velocity.y = sqrt(jumpHeight * -2.f * GRAVITY) / 5.f;
 		isGround = false;
 	}
 
@@ -222,7 +222,7 @@ void Player::Update()
 	//땅이면 속도 고정
 	if (isGround && velocity.y < 0)
 	{
-		velocity.y = -2.f;
+		velocity.y = -1.5f;
 	}
 
 	std::cout << velocity.y << std::endl;
