@@ -17,7 +17,7 @@
 std::unordered_map<BlockType, std::pair<int, int>> World::BlockCoordData;
 std::mutex World::worldMutex;
 int World::drawCall;
-const std::array <glm::vec2, 32> World::animOffsets
+const std::array <glm::vec2, 32> World::waterAnimOffsets
 {
 	glm::vec2(0, 0),glm::vec2(1, 0),glm::vec2(2, 0), glm::vec2(3, 0), glm::vec2(4, 0), glm::vec2(5, 0), glm::vec2(6, 0), glm::vec2(7, 0),
 	glm::vec2(8, 0),glm::vec2(9, 0),glm::vec2(10,0), glm::vec2(11,0), glm::vec2(12,0), glm::vec2(13,0), glm::vec2(14,0), glm::vec2(15,0),
@@ -25,7 +25,6 @@ const std::array <glm::vec2, 32> World::animOffsets
 	glm::vec2(8, 1),glm::vec2(9, 1),glm::vec2(10,1), glm::vec2(11,1), glm::vec2(12,1), glm::vec2(13,1), glm::vec2(14,1), glm::vec2(15,1)
 };
 std::string World::worldPath = "";
-//std::vector<std::weak_ptr<Chunk>> ChunkThread::saveChunks;
 
 static const GLfloat cubeVertices[] = {
 	-1.0f,-1.0f,-1.0f, // triangle 1 : begin
@@ -65,7 +64,6 @@ static const GLfloat cubeVertices[] = {
 	-1.0f, 1.0f, 1.0f,
 	1.0f,-1.0f, 1.0f
 };
-
 
 World::World() : occlusionCull(true)
 {
@@ -438,7 +436,7 @@ void World::Render()
 	{
 		if (waterchunk.second->chunkLoadState == ChunkLoadState::Builted)
 		{
-			renderer->RenderWater(waterchunk.second, animOffsets[waterAnimIndex]);
+			renderer->RenderWater(waterchunk.second, waterAnimOffsets[waterAnimIndex]);
 		}
 	}
 	//water offset
@@ -742,6 +740,31 @@ bool World::SetBlockByWorldPos(int x, int y, int z, BlockType blocktype)
 			z += CHUNK_Z;
 			z %= CHUNK_Z;
 		}
+
+		//사이드 청크 리로드
+		std::pair<int, int> sidekey = key;
+		if (x == 0)
+		{	
+			sidekey.first -= 1;
+			RegisterReloadChunk(sidekey, glm::vec3(15, y, z));
+		}
+		else if (x == 15)
+		{
+			sidekey.first += 1;
+			RegisterReloadChunk(sidekey, glm::vec3(0, y, z));
+		}
+		sidekey = key;
+		if (z == 0)
+		{
+			sidekey.second -= 1;
+			RegisterReloadChunk(sidekey, glm::vec3(x, y, 15));
+		}
+		else if (z == 15)
+		{
+			sidekey.second += 1;
+			RegisterReloadChunk(sidekey, glm::vec3(x, y, 0));
+		}
+
 		outChunk.lock()->SetBlock(x, y, z, blocktype);
 
 		outChunk.lock()->SetSunLight(x, y, z, 0);

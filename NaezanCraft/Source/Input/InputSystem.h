@@ -8,6 +8,11 @@
 
 //TO DO something key enumtype
 
+enum KeyState : uint8_t
+{
+	DEFAULT, PRESS, RELEASE
+};
+
 class Input
 {
 public:
@@ -39,4 +44,5 @@ public:
 public:
 	static inline bool isLeftMousePressed = false;
 	static inline bool isRightMousePressed = false;
+	static inline bool isSpacePressed = false;
 };

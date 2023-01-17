@@ -22,9 +22,6 @@ void SkyBoxShader::GetUniform(uint32_t shaderID)
 void SkyBoxShader::Update(std::weak_ptr<Camera>& camera, const glm::mat4& _modelMatrix)
 {
 	worldTime += .1f;
-	if (worldTime > 23999) {
-		worldTime = 0;
-	}
 
 	if (Input::GetIsKeyPressed(GLFW_KEY_HOME))
 	{
@@ -33,6 +30,14 @@ void SkyBoxShader::Update(std::weak_ptr<Camera>& camera, const glm::mat4& _model
 	if (Input::GetIsKeyPressed(GLFW_KEY_END))
 	{
 		worldTime -= 100.f;
+	}
+
+	if (worldTime > 23999) {
+		worldTime = 0;
+	}
+	else if (worldTime < 0)
+	{
+		worldTime = 23999;
 	}
 
 	//0 -> 오전6시, 6000 정오, 12000 오후6시, 18000 밤12시

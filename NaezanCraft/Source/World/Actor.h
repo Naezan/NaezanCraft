@@ -29,6 +29,7 @@ public:
 protected:
 	//TO DO need to transform struct?
 	glm::vec3 position, rotation, scale;
+	bool isGravity = false;
 
 private:
 	//오로지 자식만이 가질 수 있는 하나의 부모다

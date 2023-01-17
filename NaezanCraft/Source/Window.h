@@ -49,10 +49,14 @@ public:
 	void OnMouseButton(const Event& event);
 	void OnScroll(const Event& event);
 
+	static bool IsKeyPressed(int keycode);
+	static bool IsKeyReleased(int keycode);
+
 	//TO DO add imgui Callback Function
 
 private:
 	static Dispatcher eventDispatcher;
+	static uint8_t keyState[249];
 
 private:
 	std::string windowName;

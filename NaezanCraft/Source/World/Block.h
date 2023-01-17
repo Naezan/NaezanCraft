@@ -66,7 +66,7 @@ struct Block
 
 	inline bool IsGround() {
 		return 
-		(this->blockType == BlockType::Air) ||
+		(this->blockType == BlockType::Grass) ||
 		(this->blockType == BlockType::Dirt) || 
 		(this->blockType == BlockType::Stone) || 
 		(this->blockType == BlockType::Sand);

@@ -18,6 +18,8 @@ Player::Player(glm::vec3 pos, glm::vec3 vel, glm::vec3 acc, glm::vec3 dir)
 	outBlockPosition(0, 0, 0), outFaceBlockPosition(0, 0, 0), handBlockType(BlockType::Diamond)
 {
 	position = pos;
+	velocity.y = -.1f;
+	isGravity = true;
 	mainCamera = std::make_shared<Camera>(position);
 	mainCamera->SetOwner(this);
 	//SetupEventCallback
@@ -38,36 +40,79 @@ Player::~Player()
 void Player::Update()
 {
 	bool isMoving = false;
-	velocity = glm::vec3();
-	if (Input::GetIsKeyPressed(GLFW_KEY_W))
+	if (Window::IsKeyPressed(GLFW_KEY_W))
 	{
-		velocity += mainCamera->GetForwadDir();
+		velocity += glm::normalize(glm::vec3(mainCamera->GetForwadDir().x, 0, mainCamera->GetForwadDir().z));
+
 		isMoving = true;
 	}
-	if (Input::GetIsKeyPressed(GLFW_KEY_S))
+	if (Window::IsKeyReleased(GLFW_KEY_W))
 	{
-		velocity -= mainCamera->GetForwadDir();
+		velocity = glm::vec3(0, velocity.y, 0);
+	}
+	if (Window::IsKeyPressed(GLFW_KEY_S))
+	{
+		velocity -= glm::normalize(glm::vec3(mainCamera->GetForwadDir().x, 0, mainCamera->GetForwadDir().z));
 		isMoving = true;
 	}
-	if (Input::GetIsKeyPressed(GLFW_KEY_A))
+	if (Window::IsKeyReleased(GLFW_KEY_S))
+	{
+		velocity = glm::vec3(0, velocity.y, 0);
+	}
+	if (Window::IsKeyPressed(GLFW_KEY_A))
 	{
 		velocity -= glm::normalize(glm::cross(mainCamera->GetForwadDir(), Actor::UpVector));
 		isMoving = true;
 	}
-	if (Input::GetIsKeyPressed(GLFW_KEY_D))
+	if (Window::IsKeyReleased(GLFW_KEY_A))
+	{
+		velocity = glm::vec3(0, velocity.y, 0);
+	}
+	if (Window::IsKeyPressed(GLFW_KEY_D))
 	{
 		velocity += glm::normalize(glm::cross(mainCamera->GetForwadDir(), Actor::UpVector));
 		isMoving = true;
 	}
+	if (Window::IsKeyReleased(GLFW_KEY_D))
+	{
+		velocity = glm::vec3(0, velocity.y, 0);
+	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_Q))
 	{
-		velocity.y = -1;
-		isMoving = true;
+		if (!isGravity)
+		{
+			velocity.y = -1;
+			isMoving = true;
+		}
 	}
 	if (Input::GetIsKeyPressed(GLFW_KEY_E))
 	{
-		velocity.y = 1;
-		isMoving = true;
+		if (!isGravity)
+		{
+			velocity.y = 1;
+			isMoving = true;
+		}
+	}
+	if (Input::GetIsKeyPressed(GLFW_KEY_SPACE))
+	{
+		if (!Input::isSpacePressed)
+		{
+			Input::isSpacePressed = true;
+
+			if (isGround == true)
+			{
+				isMoving = true;
+
+				isJumping = true;
+			}
+		}
+	}
+	if (Input::GetIsKeyReleased(GLFW_KEY_SPACE))
+	{
+		if (Input::isSpacePressed)
+		{
+			Input::isSpacePressed = false;
+		}
 	}
 	if (Input::GetIsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
 	{
@@ -156,28 +201,51 @@ void Player::Update()
 		handBlockType = hud->GetInventory()->GetInventorySlotBlockType();
 	}
 
-
 	//월드 기준 벡터
-	glm::normalize(velocity);
+	float ytemp = velocity.y;
+	velocity = glm::normalize(velocity);
+	velocity.y = ytemp;
+
+	if (isJumping && isGround)
+	{
+		velocity.y = sqrt(jumpHeight * -2.f * GRAVITY);
+		isGround = false;
+	}
+
+	if (isGravity)
+	{
+		velocity.y += GRAVITY * 0.01f;
+	}
+
+	velocity.y += velocity.y * 0.01f;
+
+	//땅이면 속도 고정
+	if (isGround && velocity.y < 0)
+	{
+		velocity.y = -2.f;
+	}
+
+	std::cout << velocity.y << std::endl;
+
 	std::array<glm::vec3, 3> directions = { glm::vec3(velocity.x, 0, 0), glm::vec3(0, velocity.y, 0), glm::vec3(0, 0, velocity.z) };
-	if (isMoving)
+	if (isGravity || isMoving)
 	{
 		for (int i = 0; i < DIR_END; ++i)
 		{
 			switch (i)
 			{
-			case DIR_X:
-				position.x += PLAYER_SPEED * velocity.x;
-				break;
 			case DIR_Y:
 				position.y += PLAYER_SPEED * velocity.y;
+				break;
+			case DIR_X:
+				position.x += PLAYER_SPEED * velocity.x;
 				break;
 			case DIR_Z:
 				position.z += PLAYER_SPEED * velocity.z;
 				break;
 			}
 			//TO DO
-			//Collision(directions[i]);
+			Collision(directions[i]);
 		}
 	}
 
@@ -237,13 +305,14 @@ void Player::Collision(const glm::vec3& dir)
 				GET_World()->GetBlockByWorldPos(x, y, z, block);
 				if (!block.IsFluid())
 				{
-					//TO DO head is higher
 					if (dir.y > 0)
 					{
-						position.y = y;
+						position.y = y - 0.05f;
 					}
 					else if (dir.y < 0)
 					{
+						isGround = true;
+						isJumping = false;
 						position.y = (y + 1) + playerBox.y;
 					}
 
@@ -268,6 +337,10 @@ void Player::Collision(const glm::vec3& dir)
 			}
 		}
 	}
+}
+
+void Player::Jump()
+{
 }
 
 void Player::OnCursorPos(const Event& event)

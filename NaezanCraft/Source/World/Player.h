@@ -22,6 +22,7 @@ public:
 	virtual void Update() override;
 	virtual void Render() override;
 	void Collision(const glm::vec3& dir);
+	void Jump();
 
 	inline glm::vec3& GetVelocity() { return velocity; }
 	inline glm::vec3& GetAcceleration() { return acceleration; }
@@ -42,4 +43,8 @@ private:
 
 	//GUI
 	std::unique_ptr<HUD> hud;
+
+	bool isGround = false;
+	bool isJumping = false;
+	float jumpHeight = 3.f;
 };

@@ -54,9 +54,10 @@ MineCraft Copy Naezan's Engine
         * ~~Object Light(Flood fill Algorithm)~~
         * *레이 트레이싱(X)*
     - [x] ~~세이브 로드 청크 & 월드(SaveWorld, LoadWorld, SaveChunk, LoadChunk)~~(ref : https://github.com/eyalz800/serializer, https://github.com/codingminecraft/StreamMinecraftClone)
-    - [ ] UI
+    - [x] ~~UI~~
         * [x] ~~CrossHair~~(ref : https://manmohanbishnoi.wordpress.com/2014/12/02/2d-hud-graphics-over-3d-objects-in-modern-opengl/)
-        * [ ] Inventory
+        * [x] ~~Inventory~~
+    - [x] ~~Gravity & Jump~~
     - [ ] BGM & Sound
     - [N] ECS(X)
     - [N] Object Pool(*다른 사이드 프로젝트로 할까 생각중*)

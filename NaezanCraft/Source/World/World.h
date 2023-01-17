@@ -73,10 +73,9 @@ public:
 	static std::unordered_map<BlockType, std::pair<int, int>> BlockCoordData;
 	static std::mutex worldMutex;
 	static int drawCall;
-	static const std::array <glm::vec2, 32> animOffsets;
+	static const std::array <glm::vec2, 32> waterAnimOffsets;
 
 	//Save
-	//static std::vector<std::weak_ptr<Chunk>> saveChunks;
 	static std::string worldPath;
 
 private:

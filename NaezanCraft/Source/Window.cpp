@@ -5,6 +5,7 @@
 using namespace std::placeholders;
 
 Dispatcher Window::eventDispatcher;
+uint8_t Window::keyState[249];
 
 Window::Window(const std::string& name, uint32_t  width, uint32_t height)
 	: windowName(name), Width(width), Height(height)
@@ -183,6 +184,41 @@ void Window::OnKey(const Event& event)
 	if (Input::GetIsKeyPressed(GLFW_KEY_ESCAPE))
 		glfwSetWindowShouldClose(window, true);
 
+	if (Input::GetIsKeyPressed(GLFW_KEY_W) && EventTypeCast<KeyEvent>(event).Getkey() == GLFW_KEY_W)
+	{
+		keyState[GLFW_KEY_W] = PRESS;
+	}
+	if (Input::GetIsKeyReleased(GLFW_KEY_W) && EventTypeCast<KeyEvent>(event).Getkey() == GLFW_KEY_W)
+	{
+		keyState[GLFW_KEY_W] = RELEASE;
+	}
+
+	if (Input::GetIsKeyPressed(GLFW_KEY_S) && EventTypeCast<KeyEvent>(event).Getkey() == GLFW_KEY_S)
+	{
+		keyState[GLFW_KEY_S] = PRESS;
+	}
+	if (Input::GetIsKeyReleased(GLFW_KEY_S) && EventTypeCast<KeyEvent>(event).Getkey() == GLFW_KEY_S)
+	{
+		keyState[GLFW_KEY_S] = RELEASE;
+	}
+
+	if (Input::GetIsKeyPressed(GLFW_KEY_A) && EventTypeCast<KeyEvent>(event).Getkey() == GLFW_KEY_A)
+	{
+		keyState[GLFW_KEY_A] = PRESS;
+	}
+	if (Input::GetIsKeyReleased(GLFW_KEY_A) && EventTypeCast<KeyEvent>(event).Getkey() == GLFW_KEY_A)
+	{
+		keyState[GLFW_KEY_A] = RELEASE;
+	}
+
+	if (Input::GetIsKeyPressed(GLFW_KEY_D) && EventTypeCast<KeyEvent>(event).Getkey() == GLFW_KEY_D)
+	{
+		keyState[GLFW_KEY_D] = PRESS;
+	}
+	if (Input::GetIsKeyReleased(GLFW_KEY_D) && EventTypeCast<KeyEvent>(event).Getkey() == GLFW_KEY_D)
+	{
+		keyState[GLFW_KEY_D] = RELEASE;
+	}
 
 	//NC_LOG_DEBUG("'{0}'", event.ToString(event.GetEventType()));
 }
@@ -195,4 +231,21 @@ void Window::OnMouseButton(const Event& event)
 void Window::OnScroll(const Event& event)
 {
 	//NC_LOG_DEBUG("'{0}'", event.ToString(event.GetEventType()));
+}
+
+bool Window::IsKeyPressed(int keycode)
+{
+	if (keyState[keycode] == PRESS)
+		return true;
+	return false;
+}
+
+bool Window::IsKeyReleased(int keycode)
+{
+	if (keyState[keycode] == RELEASE)
+	{
+		keyState[keycode] = DEFAULT;
+		return true;
+	}
+	return false;
 }

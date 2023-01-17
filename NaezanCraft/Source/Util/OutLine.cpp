@@ -45,15 +45,15 @@ OutLine::OutLine(const glm::vec3& _position) : position(_position)
     glDeleteShader(fragmentShader);
 
     std::vector<GLfloat> vertexCoords{
-        -0.05f,  1.05f, -0.05f,
-         1.05f,  1.05f, -0.05f,
-         1.05f,  1.05f,  1.05f,
-        -0.05f,  1.05f,  1.05f,
+        -0.01f,  1.01f, -0.01f,
+         1.01f,  1.01f, -0.01f,
+         1.01f,  1.01f,  1.01f,
+        -0.01f,  1.01f,  1.01f,
 
-        -0.05f, -0.05f, -0.05f,
-         1.05f, -0.05f, -0.05f,
-         1.05f, -0.05f,  1.05f,
-        -0.05f, -0.05f,  1.05f,
+        -0.01f, -0.01f, -0.01f,
+         1.01f, -0.01f, -0.01f,
+         1.01f, -0.01f,  1.01f,
+        -0.01f, -0.01f,  1.01f,
     };
 
     std::vector<GLuint> indexCoords{
