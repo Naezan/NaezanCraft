@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Actor.h"
-#include "../../Collision/Collision.h"
+#include "../Collision/Collision.h"
 #include "Block.h"
 
 class Camera;

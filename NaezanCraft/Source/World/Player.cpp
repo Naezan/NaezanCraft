@@ -10,8 +10,8 @@
 #include "../Util/OutLine.h"
 #include "../Util/Line.h"
 
-#include "../../GUI/HUD.h"
-#include "../../GUI/Inventory.h"
+#include "../GUI/HUD.h"
+#include "../GUI/Inventory.h"
 
 Player::Player(glm::vec3 pos, glm::vec3 vel, glm::vec3 acc, glm::vec3 dir)
 	: velocity(vel), acceleration(acc), forwardDirection(dir), playerBox(glm::vec3(-.3f, -1.5f, -.3f), .6f, 1.5f, .6f),

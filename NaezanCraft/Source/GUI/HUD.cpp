@@ -1,7 +1,7 @@
 #include "../pch.h"
 #include "HUD.h"
 #include "Inventory.h"
-#include "../../World/Mesh.h"
+#include "../World/Mesh.h"
 #include "../TextureManager.h"
 
 HUD::HUD()

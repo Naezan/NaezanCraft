@@ -1,6 +1,6 @@
-#include "../../pch.h"
-#include "../../World/Block.h"
-#include "../../World/Chunk.h"
+#include "../pch.h"
+#include "../World/Block.h"
+#include "../World/Chunk.h"
 #include "../Application.h"
 #include "Ray.h"
 

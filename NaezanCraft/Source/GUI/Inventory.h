@@ -2,8 +2,8 @@
 
 #include "../World/Actor.h"
 #include "../Renderer/Shader.h"
-#include "../../World/Block.h"
-#include "../../World/Mesh.h"
+#include "../World/Block.h"
+#include "../World/Mesh.h"
 
 struct Slot
 {

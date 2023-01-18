@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../Collision/Collision.h"
+#include "../Collision/Collision.h"
 
 class Camera;
 

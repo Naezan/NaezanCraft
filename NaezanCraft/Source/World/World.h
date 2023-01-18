@@ -5,7 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Block.h"
-#include "../../Renderer/Shader.h"
+#include "../Renderer/Shader.h"
 
 class Renderer;
 class Scene;

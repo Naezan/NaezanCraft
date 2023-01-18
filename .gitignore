@@ -4,7 +4,6 @@ Binaries/
 Intermediate/
 Build/
 tmp/
-**/Optick/
 
 # Files
 *.user
