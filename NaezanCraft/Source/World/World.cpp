@@ -12,6 +12,7 @@
 #include "../World/Environment/SkyBox.h"
 
 #include "../ChunkThread.h"
+#include "../Sound/SoundManager.h"
 
 
 std::unordered_map<BlockType, std::pair<int, int>> World::BlockCoordData;
@@ -78,6 +79,7 @@ World::World() : occlusionCull(true)
 
 	SetSavePath(worldPath);
 	SetBlockDatas();
+	SetBlockSoundData();
 
 	//Load HiZ Shader
 	//LoadCullingShader();
@@ -137,6 +139,22 @@ void World::SetBlockDatas()
 	BlockCoordData[Diamond] = std::make_pair(13, 0);
 	BlockCoordData[Bedrock] = std::make_pair(7, 4);
 	BlockCoordData[GrowStone] = std::make_pair(3, 13);
+}
+
+void World::SetBlockSoundData()
+{
+	//default sound
+	blockSounds.emplace(Dirt, std::make_pair("dirt", 1));
+
+	blockSounds.emplace(Sand, std::make_pair("sand", 2));
+	blockSounds.emplace(Stone, std::make_pair("stone", 2));
+	blockSounds.emplace(Grass, std::make_pair("grass", 2));
+	blockSounds.emplace(OakLog, std::make_pair("wood", 2));
+	blockSounds.emplace(BirchLog, std::make_pair("wood", 2));
+
+	//not have base sound
+	blockSounds.emplace(Diamond, std::make_pair("cloth", 2));
+	blockSounds.emplace(Bedrock, std::make_pair("cloth", 2));
 }
 
 void World::LoadCullingShader()
@@ -744,7 +762,7 @@ bool World::SetBlockByWorldPos(int x, int y, int z, BlockType blocktype)
 		//사이드 청크 리로드
 		std::pair<int, int> sidekey = key;
 		if (x == 0)
-		{	
+		{
 			sidekey.first -= 1;
 			RegisterReloadChunk(sidekey, glm::vec3(15, y, z));
 		}
@@ -763,6 +781,54 @@ bool World::SetBlockByWorldPos(int x, int y, int z, BlockType blocktype)
 		{
 			sidekey.second += 1;
 			RegisterReloadChunk(sidekey, glm::vec3(x, y, 0));
+		}
+
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		if (outChunk.lock()->GetBlock(x, y, z).blockType == BlockType::Air && blocktype != BlockType::Air)
+		{
+			//Emplace Sound
+			std::pair<std::string, int> soundinfo;
+			if (blockSounds.find(blocktype) == blockSounds.end())
+			{
+				soundinfo.first = "dirt";
+				soundinfo.second = 1;
+			}
+			else
+			{
+				soundinfo = blockSounds[blocktype];
+			}
+
+			if (soundinfo.second != 1)
+			{
+				std::uniform_int_distribution<int> dis(1, soundinfo.second);
+				soundinfo.first += std::to_string(dis(gen));
+			}
+
+			SoundManager::Play2D(soundinfo.first, false);
+		}
+		else if (outChunk.lock()->GetBlock(x, y, z).blockType != BlockType::Air && blocktype == BlockType::Air)
+		{
+			//Delete Sound
+			auto& soundBlockType = outChunk.lock()->GetBlock(x, y, z).blockType;
+			std::pair<std::string, int> soundinfo;
+			if (blockSounds.find(soundBlockType) == blockSounds.end())
+			{
+				soundinfo.first = "dirt";
+				soundinfo.second = 1;
+			}
+			else
+			{
+				soundinfo = blockSounds[soundBlockType];
+			}
+
+			if (soundinfo.second != 1)
+			{
+				std::uniform_int_distribution<int> dis(1, soundinfo.second);
+				soundinfo.first += std::to_string(dis(gen));
+			}
+
+			SoundManager::Play2D(soundinfo.first, false);
 		}
 
 		outChunk.lock()->SetBlock(x, y, z, blocktype);

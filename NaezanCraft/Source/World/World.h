@@ -39,6 +39,7 @@ public:
 
 	void SetSavePath(std::string& path);
 	void SetBlockDatas();
+	void SetBlockSoundData();
 	void LoadCullingShader();
 	void LoadSimpleCubeShader();
 	void Update();
@@ -111,4 +112,7 @@ private:
 
 	//save
 	std::unique_ptr<ChunkThread> chunkThread;
+
+	//sound 블록타입에 맞는 사운드key값과 사운드 개수
+	std::map<BlockType, std::pair<std::string, int>> blockSounds;
 };

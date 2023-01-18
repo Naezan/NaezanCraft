@@ -10,7 +10,7 @@ public:
 
 public:
 	static void Init();
-	static void Play2D(const std::string& key, bool isLoop);
+	static void Play2D(const std::string& key, bool isLoop = false);
 	static void PlayBGM(int index);
 	static void AddSound(const std::string& key, const std::string& path);
 	static std::string& GetSound(const std::string& key);

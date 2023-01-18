@@ -58,7 +58,7 @@ MineCraft Copy Naezan's Engine
         * [x] ~~CrossHair~~(ref : https://manmohanbishnoi.wordpress.com/2014/12/02/2d-hud-graphics-over-3d-objects-in-modern-opengl/)
         * [x] ~~Inventory~~
     - [x] ~~Gravity & Jump~~
-    - [ ] BGM & Sound
+    - [x] ~~BGM & Sound~~
     - [ ] Fog
     - [N] ECS(X)
     - [N] Object Pool(*다른 사이드 프로젝트로 할까 생각중*)
