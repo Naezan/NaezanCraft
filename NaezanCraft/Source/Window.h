@@ -35,7 +35,7 @@ public:
 	inline GLFWwindow* GetWindowObject() const { return window; }//static?
 	inline static Dispatcher& GetEventDispatcher() { return eventDispatcher; }
 
-	//TO DO Sync
+	void PlayBGM();
 
 	//Callback Function
 	void OnWindowPos(const Event& event);
@@ -63,4 +63,8 @@ private:
 	uint32_t Width;
 	uint32_t Height;
 	GLFWwindow* window;
+
+	std::thread bgmThread;
+	std::mutex bgmMutex;
+	bool IsSoundThreadRunning;
 };

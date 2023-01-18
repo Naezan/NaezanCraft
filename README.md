@@ -59,6 +59,7 @@ MineCraft Copy Naezan's Engine
         * [x] ~~Inventory~~
     - [x] ~~Gravity & Jump~~
     - [ ] BGM & Sound
+    - [ ] Fog
     - [N] ECS(X)
     - [N] Object Pool(*다른 사이드 프로젝트로 할까 생각중*)
     - [x] ~~Collision~~

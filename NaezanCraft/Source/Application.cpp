@@ -12,6 +12,8 @@ Application::Application()
 	//craftWindow->SetEventCallback(std::bind(&Application::OnKeyEvent, this, std::placeholders::_1));
 }
 
+Application::~Application() = default;
+
 void Application::Run()
 {
 	while (isRunning)

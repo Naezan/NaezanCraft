@@ -9,17 +9,6 @@
 
 Renderer::Renderer()
 {
-	//텍스쳐 Atlas
-	TextureManager::AddTexture("CubeAtlas", "../Assets/Textures/AtlasEdit.png");
-	TextureManager::AddTexture("Sun", "../Assets/Textures/Sun.png");
-	TextureManager::AddTexture("Moon", "../Assets/Textures/moon_phases.png");
-	TextureManager::AddTexture("Cloud", "../Assets/Textures/clouds.png");
-	TextureManager::AddTexture("Water", "../Assets/Textures/water.png");
-	TextureManager::AddTexture("Crosshair", "../Assets/Textures/crosshair.png");
-	TextureManager::AddTexture("InventorySlots", "../Assets/Textures/slots.png");
-	TextureManager::AddTexture("InventorySlotPoint", "../Assets/Textures/slotPoint.png");
-	TextureManager::AddTexture("InventoryBlockSprite", "../Assets/Textures/InvSprite.png");
-
 	//쉐이더
 	CreateRenderShader();
 }

@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Window.h"
 #include "Input/InputSystem.h"
+#include "TextureManager.h"
+#include "Sound/SoundManager.h"
 
 using namespace std::placeholders;
 
@@ -8,13 +10,19 @@ Dispatcher Window::eventDispatcher;
 uint8_t Window::keyState[249];
 
 Window::Window(const std::string& name, uint32_t  width, uint32_t height)
-	: windowName(name), Width(width), Height(height)
+	: windowName(name), Width(width), Height(height), IsSoundThreadRunning(true)
 {
 	Init();
 }
 
 Window::~Window()
 {
+	{
+		std::lock_guard lock(bgmMutex);
+		IsSoundThreadRunning = false;
+	}
+	bgmThread.join();
+
 	Shutdown();
 }
 
@@ -62,6 +70,44 @@ void Window::Init()
 	//std::cout << "Vendor : "  << glGetString(GL_VENDOR) << std::endl;
 	//std::cout << "Renderer : " << glGetString(GL_RENDERER) << std::endl;
 	//std::cout << "Version : " << glGetString(GL_VERSION) << std::endl;
+
+	//ÅØ½ºÃÄ Atlas
+	TextureManager::AddTexture("CubeAtlas", "../Assets/Textures/AtlasEdit.png");
+	TextureManager::AddTexture("Sun", "../Assets/Textures/Sun.png");
+	TextureManager::AddTexture("Moon", "../Assets/Textures/moon_phases.png");
+	TextureManager::AddTexture("Cloud", "../Assets/Textures/clouds.png");
+	TextureManager::AddTexture("Water", "../Assets/Textures/water.png");
+	TextureManager::AddTexture("Crosshair", "../Assets/Textures/crosshair.png");
+	TextureManager::AddTexture("InventorySlots", "../Assets/Textures/slots.png");
+	TextureManager::AddTexture("InventorySlotPoint", "../Assets/Textures/slotPoint.png");
+	TextureManager::AddTexture("InventoryBlockSprite", "../Assets/Textures/InvSprite.png");
+
+	SoundManager::Init();
+
+	SoundManager::AddSound("BGM0", "../Assets/Sounds/Music/Clark.ogg");
+	SoundManager::AddSound("BGM1", "../Assets/Sounds/Music/Danny.ogg");
+	SoundManager::AddSound("BGM2", "../Assets/Sounds/Music/DryHands.ogg");
+	SoundManager::AddSound("BGM3", "../Assets/Sounds/Music/Haggstorm.ogg");
+	SoundManager::AddSound("BGM4", "../Assets/Sounds/Music/LivingMice.ogg");
+	SoundManager::AddSound("BGM5", "../Assets/Sounds/Music/MiceOnVenus.ogg");
+	SoundManager::AddSound("BGM6", "../Assets/Sounds/Music/Minecraft.ogg");
+	SoundManager::AddSound("BGM7", "../Assets/Sounds/Music/SubwooferLullaby.ogg");
+	SoundManager::AddSound("BGM8", "../Assets/Sounds/Music/Sweden.ogg");
+	SoundManager::AddSound("BGM9", "../Assets/Sounds/Music/WetHands.ogg");
+
+	SoundManager::AddSound("cloth1", "../Assets/Sounds/Block/cloth1.ogg");
+	SoundManager::AddSound("cloth2", "../Assets/Sounds/Block/cloth2.ogg");
+	SoundManager::AddSound("dirt", "../Assets/Sounds/Block/dirt.ogg");
+	SoundManager::AddSound("grass1", "../Assets/Sounds/Block/grass1.ogg");
+	SoundManager::AddSound("grass2", "../Assets/Sounds/Block/grass2.ogg");
+	SoundManager::AddSound("sand1", "../Assets/Sounds/Block/sand1.ogg");
+	SoundManager::AddSound("sand2", "../Assets/Sounds/Block/sand2.ogg");
+	SoundManager::AddSound("stone1", "../Assets/Sounds/Block/stone1.ogg");
+	SoundManager::AddSound("stone2", "../Assets/Sounds/Block/stone2.ogg");
+	SoundManager::AddSound("wood1", "../Assets/Sounds/Block/wood1.ogg");
+	SoundManager::AddSound("wood2", "../Assets/Sounds/Block/wood2.ogg");
+
+	bgmThread = std::thread(&Window::PlayBGM, this);
 }
 
 void Window::Update()
@@ -147,6 +193,25 @@ void Window::SetEventCallbacks()
 		{
 			eventDispatcher.PostCallbackFunction(ScrollEvent(xoffset, yoffset));
 		});
+}
+
+void Window::PlayBGM()
+{
+	std::random_device rd;
+	std::mt19937 gen(rd());
+
+	std::uniform_int_distribution<int> dis(0, 9);
+	int curindex = dis(gen);
+
+	while (IsSoundThreadRunning)
+	{
+		if (!SoundManager::IsPlaying("BGM" + std::to_string(curindex)))
+		{
+			std::uniform_int_distribution<int> dis1(0, 9);
+			curindex = dis1(gen);
+			SoundManager::PlayBGM(curindex);
+		}
+	}
 }
 
 void Window::OnWindowPos(const Event& event)
