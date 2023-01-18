@@ -11,8 +11,8 @@ Here is Short Video : https://youtu.be/dMamwtB50Rc
 
     - Build (Find the folder where "CMakeList.txt" exists)
   ```shell
-  mkdir WhatYouWantBuildDirectory
-  cd WhatYouWantBuildDirectory
+  mkdir Build
+  cd Build
   cmake ..
   cmake --build .
   #Only Debug is possible, later add Release Build, maybe?
@@ -50,7 +50,7 @@ Here is Short Video : https://youtu.be/dMamwtB50Rc
         * *BSP(Maybe Cave? or Town? but i am not implement cave and town)*
         * *Region Weather System(later if possible)*
     - [x] ~~Lighting~~
-        * ~~Ambient Occlusion(+라이트컬링)~~
+        * ~~Ambient Occlusion(+라이트컬링)~~(ref : https://github.com/Aidanhouk/Minecraft-Clone and more)
         * ~~Sun Light Flood fill algorithm~~(ref : https://codepen.io/xgundam05/pen/nydzXE?editors=100)
         * ~~Object Light(Flood fill Algorithm)~~
         * *레이 트레이싱(X)*
