@@ -225,7 +225,7 @@ void Player::Update()
 		velocity.y = -1.5f;
 	}
 
-	std::cout << velocity.y << std::endl;
+	//std::cout << velocity.y << std::endl;
 
 	std::array<glm::vec3, 3> directions = { glm::vec3(velocity.x, 0, 0), glm::vec3(0, velocity.y, 0), glm::vec3(0, 0, velocity.z) };
 	if (isGravity || isMoving)

@@ -4,6 +4,8 @@
 #include "TextureManager.h"
 #include "Sound/SoundManager.h"
 
+#include "Time/Timer.h"
+
 using namespace std::placeholders;
 
 Dispatcher Window::eventDispatcher;
@@ -113,6 +115,9 @@ void Window::Init()
 void Window::Update()
 {
 	OPTICK_EVENT();
+
+	std::string title = windowName + " [" + std::to_string(Timer::frameTime) + "ms]";
+	glfwSetWindowTitle(window, title.c_str());
 
 	glfwPollEvents();
 	//double buffering
