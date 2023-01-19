@@ -47,6 +47,7 @@ Here is Short Video : https://youtu.be/dMamwtB50Rc
 
 - TO DO List (Since 2023-01-19) 연제 구현할지 정확히 계획되지 않음
   - 
+    - [ ] VertexCoord의 position 2바이트로 최적화
     - [ ] 오컬루전 컬링
     - [ ] *Water Physics*
     - [ ] *BSP(Maybe Cave? or Town? but i am not implement cave and town)*
