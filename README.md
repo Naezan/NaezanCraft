@@ -7,7 +7,7 @@ Here is Short Video : https://youtu.be/dMamwtB50Rc
   - 
     - git clone
   ```shell
-  git clone --recursive https://github.com/Meizoa/NaezanCraft.git
+  git clone --recursive https://github.com/Naezan/NaezanCraft.git
   ```
 
     - Build (Find the folder where "CMakeList.txt" exists)
@@ -29,21 +29,22 @@ Here is Short Video : https://youtu.be/dMamwtB50Rc
   ```
 
 - Feature
-  - Chunk Rendering
-  - Different block face rendering
-  - SkyBox & WorldTime Lighting
-  - Frustum Culling
-  - Thread Base Procedural Map Generator
-  - Ambient Occlusion(SSAO)
-  - Water Animation
-  - Flood fill algorithm for Sun Shadow
-  - Thread Base Save(Serialization) And Load(Deserialization) Chunk
-  - Simple Inventory
-  - Gravity
-  - Thread Base BGM & Sound
-  - Collision
-  - Raycasting
-  - Installing and removing blocks
+  - 
+    - Chunk Rendering
+    - Different block face rendering
+    - SkyBox & WorldTime Lighting
+    - Frustum Culling
+    - Thread Base Procedural Map Generator
+    - Ambient Occlusion(SSAO)
+    - Water Animation
+    - Flood fill algorithm for Sun Shadow
+    - Thread Base Save(Serialization) And Load(Deserialization) Chunk
+    - Simple Inventory
+    - Gravity
+    - Thread Base BGM & Sound
+    - Collision
+    - Raycasting
+    - Installing and removing blocks
 
 - TO DO List (Since 2023-01-19) 연제 구현할지 정확히 계획되지 않음
   - 
