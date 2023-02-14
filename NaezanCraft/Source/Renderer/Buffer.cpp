@@ -43,15 +43,15 @@ VertexBuffer::VertexBuffer(
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 
 	//index, size(vec3 개수), type(점 하나의 타입, 크기), normalized(정규화 여부), stride(건너뛸 거리), pointer(상대적 시작 위치, 거리?)
-	//position(u8vec3)
+	//position(upos3(2byte))
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, posSize, posType, GL_FALSE, vertexStride, vertexPointer);
 
-	//texture(16vec2)
+	//texture(u8vec2)
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, texSize, texType, GL_FALSE, texcoordStride, texcoordPointer);
 
-	//texture(uint8_t)
+	//sunlight(uint8_t)
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, lightSize, lightType, GL_FALSE, lightStride, lightPointer);
 

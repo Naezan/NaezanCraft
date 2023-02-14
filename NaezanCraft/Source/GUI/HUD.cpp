@@ -24,7 +24,7 @@ HUD::HUD()
 	//Vertex
 	struct QuadCoord
 	{
-		glm::vec3 pos;
+		glm::vec3 qpos;
 		glm::vec2 texcoord;
 	};
 
@@ -50,7 +50,7 @@ HUD::HUD()
 		crosshairMesh->SetIndexBufferVector(IndexCoords);
 		crosshairMesh->CreateIndexBuffer();
 
-		crosshairMesh->CreateVertexBuffer(static_cast<int>(sizeof(QuadCoord)), (void*)offsetof(QuadCoord, pos),
+		crosshairMesh->CreateVertexBuffer(static_cast<int>(sizeof(QuadCoord)), (void*)offsetof(QuadCoord, qpos),
 			static_cast<int>(sizeof(QuadCoord)), (void*)offsetof(QuadCoord, texcoord),
 			GL_FLOAT, GL_FLOAT, 3, 2);
 		crosshairMesh->SetVertexBufferData(QuadCoords.size() * sizeof(QuadCoord), &QuadCoords.front());

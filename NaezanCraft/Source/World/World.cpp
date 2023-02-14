@@ -81,21 +81,21 @@ void World::SetSavePath(std::string& path)
 
 void World::SetBlockDatas()
 {
-	BlockCoordData[Dirt] = std::make_pair(13, 2);
-	BlockCoordData[Sand] = std::make_pair(22, 13);
-	BlockCoordData[Stone] = std::make_pair(23, 15);
-	//BlockCoordData[Grass] = std::make_pair(7, 24);
-	BlockCoordData[Grass] = std::make_pair(9, 24);
+	BlockCoordData[Dirt] = std::make_pair(13, 4);
+	BlockCoordData[Sand] = std::make_pair(4, 2);
+	BlockCoordData[Stone] = std::make_pair(5, 2);
+	//BlockCoordData[Grass] = std::make_pair(1, 3);
+	BlockCoordData[Grass] = std::make_pair(3, 3);
 	BlockCoordData[GrassSide] = std::make_pair(8, 13);
-	BlockCoordData[OakLog] = std::make_pair(16, 15);
-	BlockCoordData[OakLogTB] = std::make_pair(17, 0);
-	BlockCoordData[OakLeaves] = std::make_pair(16, 0);
-	BlockCoordData[BirchLog] = std::make_pair(16, 11);
-	BlockCoordData[BirchLogTB] = std::make_pair(16, 12);
-	BlockCoordData[BirchLeaves] = std::make_pair(16, 1);
+	BlockCoordData[OakLog] = std::make_pair(6, 0);
+	BlockCoordData[BirchLog] = std::make_pair(6, 2);
+	BlockCoordData[OakLogTB] = std::make_pair(6, 1);
+	BlockCoordData[BirchLogTB] = std::make_pair(6, 3);
+	BlockCoordData[OakLeaves] = std::make_pair(14, 0);
+	BlockCoordData[BirchLeaves] = std::make_pair(14, 1);
 	BlockCoordData[WaterT] = std::make_pair(0, 0);
 	BlockCoordData[Lava] = std::make_pair(4, 0);
-	BlockCoordData[Iron] = std::make_pair(6, 15);
+	BlockCoordData[Iron] = std::make_pair(13, 2);
 	BlockCoordData[Gold] = std::make_pair(4, 13);
 	BlockCoordData[Diamond] = std::make_pair(13, 0);
 	BlockCoordData[Bedrock] = std::make_pair(7, 4);

@@ -1,5 +1,6 @@
 #include "../pch.h"
 #include "Inventory.h"
+#include "../World/Mesh.h"
 #include "../TextureManager.h"
 
 std::unordered_map<BlockType, int> Inventory::InvenBlockCoordData;

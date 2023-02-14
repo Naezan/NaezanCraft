@@ -10,23 +10,31 @@
 const std::array<glm::i8vec3, 4> ChunkMesh::vertices[]
 {
 	//trb, tlb, tlf, trf (Top)
-	{ glm::i8vec3(1.f, 1.f, 0.f),	glm::i8vec3(0.f, 1.f, 0.f),	glm::i8vec3(0.f, 1.f, 1.f),	glm::i8vec3(1.f, 1.f, 1.f) },
+	{ glm::i8vec3(1, 1, 0),	glm::i8vec3(0, 1, 0),	glm::i8vec3(0, 1, 1),	glm::i8vec3(1, 1, 1) },
 
 	//Brf, Blf, Blb, Brb (Bottom)
-	{ glm::i8vec3(1.f, 0.f, 1.f),	glm::i8vec3(0.f, 0.f, 1.f),	glm::i8vec3(0.f, 0.f, 0.f),	glm::i8vec3(1.f, 0.f, 0.f) },
+	{ glm::i8vec3(1, 0, 1),	glm::i8vec3(0, 0, 1),	glm::i8vec3(0, 0, 0),	glm::i8vec3(1, 0, 0) },
 
 	//flB, frB, frt, flt (Front)
-	{ glm::i8vec3(0.f, 0.f, 1.f),	glm::i8vec3(1.f, 0.f, 1.f),	glm::i8vec3(1.f, 1.f, 1.f),	glm::i8vec3(0.f, 1.f, 1.f) },
+	{ glm::i8vec3(0, 0, 1),	glm::i8vec3(1, 0, 1),	glm::i8vec3(1, 1, 1),	glm::i8vec3(0, 1, 1) },
 
 	//brB, blB, blt, brt (Back)
-	{ glm::i8vec3(1.f, 0.f, 0.f),	glm::i8vec3(0.f, 0.f, 0.f),	glm::i8vec3(0.f, 1.f, 0.f),	glm::i8vec3(1.f, 1.f, 0.f) },
+	{ glm::i8vec3(1, 0, 0),	glm::i8vec3(0, 0, 0),	glm::i8vec3(0, 1, 0),	glm::i8vec3(1, 1, 0) },
 
 	//rBf, rBb, rtb, rtf (Right)
-	{ glm::i8vec3(1.f, 0.f, 1.f),	glm::i8vec3(1.f, 0.f, 0.f),	glm::i8vec3(1.f, 1.f, 0.f),	glm::i8vec3(1.f, 1.f, 1.f) },
+	{ glm::i8vec3(1, 0, 1),	glm::i8vec3(1, 0, 0),	glm::i8vec3(1, 1, 0),	glm::i8vec3(1, 1, 1) },
 
 	//lBb, lBf, ltf, ltb (Left)
-	{ glm::i8vec3(0.f, 0.f, 0.f),	glm::i8vec3(0.f, 0.f, 1.f),	glm::i8vec3(0.f, 1.f, 1.f),	glm::i8vec3(0.f, 1.f, 0.f) }
+	{ glm::i8vec3(0, 0, 0),	glm::i8vec3(0, 0, 1),	glm::i8vec3(0, 1, 1),	glm::i8vec3(0, 1, 0) }
 };
+
+//struct upos3 operator+(const struct upos3& a, const glm::i8vec3& b) {
+//	struct upos3 result = {};
+//	result.x = a.x + b.x;
+//	result.y = a.y + b.y;
+//	result.z = a.z + b.z;
+//	return result;
+//}
 
 ChunkMesh::ChunkMesh(std::shared_ptr<Chunk>&& chunk)
 {
@@ -43,7 +51,7 @@ ChunkMesh::~ChunkMesh()
 void ChunkMesh::CreateMesh()
 {
 	meshVertices.clear();//size to zero
-	std::vector<glm::vec3> waterPositions;
+	std::vector<glm::i8vec3> waterPositions;
 
 	for (int x = 0; x < CHUNK_X; ++x)
 	{
@@ -61,12 +69,12 @@ void ChunkMesh::CreateMesh()
 					if (!isWater)
 					{
 						isWater = true;
-						waterPositions.push_back(glm::vec3(x, y, z));
+						waterPositions.push_back(glm::i8vec3(x, y, z));
 					}
 					continue;
 				}
 
-				AddFaces(glm::uvec3(x, y, z), block);
+				AddFaces(glm::i8vec3(x, y, z), block);
 			}
 		}
 	}
@@ -103,7 +111,7 @@ void ChunkMesh::CreateBuffer()
 			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord),
 			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, lightlevel),
 			static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, AO),
-			GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE);
+			GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE);
 
 		SetVertexBufferData(meshVertices.size() * sizeof(VertTexCoord), &meshVertices.front());
 
@@ -246,7 +254,7 @@ void ChunkMesh::AddFaces(const glm::i8vec3& pos, Block& block)
 
 void ChunkMesh::AddFace(const glm::i8vec3& pos, Block& block, const FaceType& faceType, std::vector<VertTexCoord>& _meshVertices)
 {
-	glm::u16vec2 texcoord = GetTexCoord(block.blockType);
+	glm::u8vec2 texcoord = GetTexCoord(block.blockType);
 	if ((block.blockType == OakLog || block.blockType == BirchLog) && (faceType == FaceType::Top || faceType == FaceType::Bottom))
 	{
 		texcoord = GetTexCoord(BlockType(block.blockType + 1));
@@ -263,11 +271,11 @@ void ChunkMesh::AddFace(const glm::i8vec3& pos, Block& block, const FaceType& fa
 		}
 	}
 
-	const std::array<glm::u16vec2, 4> texcoords{
-		glm::u16vec2(SPRITE_WIDTH * texcoord.x, SPRITE_HEIGHT * (texcoord.y + 1.f)),
-		glm::u16vec2(SPRITE_WIDTH * (texcoord.x + 1.f), SPRITE_HEIGHT * (texcoord.y + 1.f)),
-		glm::u16vec2(SPRITE_WIDTH * (texcoord.x + 1.f), SPRITE_HEIGHT * texcoord.y),
-		glm::u16vec2(SPRITE_WIDTH * texcoord.x, SPRITE_HEIGHT * texcoord.y)
+	const std::array<glm::u8vec2, 4> texcoords{
+		glm::u8vec2(SPRITE_WIDTH * texcoord.x, SPRITE_HEIGHT * (texcoord.y + 1)),
+		glm::u8vec2(SPRITE_WIDTH * (texcoord.x + 1), SPRITE_HEIGHT * (texcoord.y + 1)),
+		glm::u8vec2(SPRITE_WIDTH * (texcoord.x + 1), SPRITE_HEIGHT * texcoord.y),
+		glm::u8vec2(SPRITE_WIDTH * texcoord.x, SPRITE_HEIGHT * texcoord.y)
 	};
 
 	const std::array<unsigned char, 6> lightLevels{
@@ -404,10 +412,10 @@ void ChunkMesh::DeleteChunkMesh()
 	meshVertices.clear();
 }
 
-glm::u16vec2 ChunkMesh::GetTexCoord(const BlockType& type)
+glm::u8vec2 ChunkMesh::GetTexCoord(const BlockType& type)
 {
 	std::pair<int, int> coord = World::BlockCoordData[type];
-	return glm::u16vec2(coord.first, coord.second);
+	return glm::u8vec2(coord.first, coord.second);
 }
 
 bool ChunkMesh::IsValidWaterMesh()

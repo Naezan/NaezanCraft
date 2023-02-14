@@ -41,7 +41,7 @@ void Water::CreateBuffer(std::vector<VertTexCoord>& vertexcoords)
 		static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, texcoord),
 		static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, lightlevel),
 		static_cast<int>(sizeof(VertTexCoord)), (void*)offsetof(VertTexCoord, AO),
-		GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE);
+		GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE);
 	waterMesh->SetVertexBufferData(vertexcoords.size() * sizeof(VertTexCoord), &vertexcoords.front());
 
 	//meshIndices.clear();

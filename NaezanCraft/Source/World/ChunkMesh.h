@@ -1,6 +1,5 @@
 #pragma once
 #include "Mesh.h"
-
 #include "Block.h"
 
 enum FaceType
@@ -28,7 +27,7 @@ public:
 	void AddFace(const glm::i8vec3& pos, Block& block, const FaceType& faceType, std::vector<VertTexCoord>& _meshVertices);
 	void DeleteChunkMesh();
 
-	glm::u16vec2 GetTexCoord(const BlockType& type);
+	glm::u8vec2 GetTexCoord(const BlockType& type);
 
 	bool IsValidWaterMesh();
 
