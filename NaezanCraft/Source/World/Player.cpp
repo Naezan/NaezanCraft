@@ -311,13 +311,13 @@ void Player::Collision(const glm::vec3& dir)
 				{
 					if (dir.y > 0)
 					{
-						position.y = y - 0.05f;
+						position.y = y - 0.001f;
 					}
 					else if (dir.y < 0)
 					{
 						isGround = true;
 						isJumping = false;
-						position.y = (y + 1) + playerBox.y;
+						position.y = (y + 1.001f) + playerBox.y;
 					}
 
 					if (dir.x > 0)
@@ -326,7 +326,7 @@ void Player::Collision(const glm::vec3& dir)
 					}
 					else if (dir.x < 0)
 					{
-						position.x = (x + 1) + (playerBox.x / 2.f);
+						position.x = (x + 1.001f) + (playerBox.x / 2.f);
 					}
 
 					if (dir.z > 0)
@@ -335,7 +335,7 @@ void Player::Collision(const glm::vec3& dir)
 					}
 					else if (dir.z < 0)
 					{
-						position.z = (z + 1) + (playerBox.z / 2.f);
+						position.z = (z + 1.001f) + (playerBox.z / 2.f);
 					}
 				}
 			}

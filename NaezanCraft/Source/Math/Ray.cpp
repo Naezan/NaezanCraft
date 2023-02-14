@@ -37,27 +37,28 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 
 	glm::vec3 blockPos;
 	//청크의 블럭 로컬위치(내림처리)
-	blockPos.x = ray_start.x >= 0 ? static_cast<int>(ray_start.x) % CHUNK_X : ((static_cast<int>(ray_start.x) % CHUNK_X) + CHUNK_X) % CHUNK_X;
+	blockPos.x = static_cast<int>(std::floor(ray_start.x)) % CHUNK_X;
 	blockPos.y = static_cast<int>(ray_start.y);
-	blockPos.z = ray_start.z >= 0 ? static_cast<int>(ray_start.z) % CHUNK_Z : ((static_cast<int>(ray_start.z) % CHUNK_Z) + CHUNK_Z) % CHUNK_Z;
+	blockPos.z = static_cast<int>(std::floor(ray_start.z)) % CHUNK_Z;
 
-	float stepX = dir.x >= 0 ? 1 : -1;
-	float stepY = dir.y >= 0 ? 1 : -1;
-	float stepZ = dir.z >= 0 ? 1 : -1;
+	float stepX = dir.x == 0 ? 0 : dir.x > 0 ? 1 : -1;
+	float stepY = dir.y == 0 ? 0 : dir.y > 0 ? 1 : -1;
+	float stepZ = dir.z == 0 ? 0 : dir.z > 0 ? 1 : -1;
 
-	//다음에 검사할 블럭 월드 위치
-	float curIndexX = dir.x >= 0 ? 1 : 0;
-	float curIndexY = dir.y >= 0 ? 1 : 0;
-	float curIndexZ = dir.z >= 0 ? 1 : 0;
-
-	//다음블럭위치 - 광선의 월드위치
-	float tMaxX = ray_start.x >= 0 ? (std::floor(ray_start.x) + curIndexX - ray_start.x) / dir.x : (std::ceil(ray_start.x) + curIndexX - ray_start.x) / dir.x;
-	float tMaxY = ray_start.y >= 0 ? (std::floor(ray_start.y) + curIndexY - ray_start.y) / dir.y : (std::ceil(ray_start.y) + curIndexY - ray_start.y) / dir.y;
-	float tMaxZ = ray_start.z >= 0 ? (std::floor(ray_start.z) + curIndexZ - ray_start.z) / dir.z : (std::ceil(ray_start.z) + curIndexZ - ray_start.z) / dir.z;
 	//한칸 전진할때의 대각선의 길이 단순히 dir의 역수로 이루어진다는걸 계산을 조금해보면 알 수 있다.
 	float tDeltaX = stepX / dir.x;
 	float tDeltaY = stepY / dir.y;
 	float tDeltaZ = stepZ / dir.z;
+
+	//다음에 검사할 블럭 월드 위치 보정값
+	float curIndexX = dir.x > 0 ? 1 : 0;
+	float curIndexY = dir.y > 0 ? 1 : 0;
+	float curIndexZ = dir.z > 0 ? 1 : 0;
+
+	//다음블럭위치 - 광선의 월드위치
+	float tMaxX = ray_start.x >= 0 ? (std::floor(ray_start.x) + curIndexX - ray_start.x) / dir.x : (std::floor(ray_start.x) + curIndexX - ray_start.x) / dir.x;
+	float tMaxY = ray_start.y >= 0 ? (std::floor(ray_start.y) + curIndexY - ray_start.y) / dir.y : (std::floor(ray_start.y) + curIndexY - ray_start.y) / dir.y;
+	float tMaxZ = ray_start.z >= 0 ? (std::floor(ray_start.z) + curIndexZ - ray_start.z) / dir.z : (std::floor(ray_start.z) + curIndexZ - ray_start.z) / dir.z;
 
 	//제일 작은 좌표를 저장할 뭔가 값이 필요
 	char faceDirInfo = 0b00000000;
@@ -152,6 +153,7 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 		block = curChunk.lock()->GetBlock(blockPos.x, blockPos.y, blockPos.z);
 	}
 
+	//닿는면에 따라 블럭을 놓아야 할 위치 찾기
 	if (block.blockType != Air)
 	{
 		outPosition = glm::vec3(blockPos.x + curChunk.lock()->position.x * CHUNK_X, blockPos.y, blockPos.z + curChunk.lock()->position.z * CHUNK_Z);

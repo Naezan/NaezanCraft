@@ -275,7 +275,7 @@ void World::Render()
 
 	RemoveChunk();
 
-	NC_LOG_DEBUG("Chunk DrawCall : {0}", chunkCount);
+	//NC_LOG_DEBUG("Chunk DrawCall : {0}", chunkCount);
 }
 
 void World::RenderBoundingBox(AABox& boundbox, std::unique_ptr<Mesh>& boxMesh)
