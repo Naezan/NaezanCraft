@@ -204,25 +204,29 @@ void Player::Update()
 	//월드 기준 벡터
 	float ytemp = velocity.y;
 	velocity = glm::normalize(velocity);
-	velocity.y = ytemp;
-
-	if (isJumping && isGround)
-	{
-		velocity.y = sqrt(jumpHeight * -2.f * GRAVITY) / 5.f;
-		isGround = false;
-	}
 
 	if (isGravity)
 	{
-		velocity.y += GRAVITY * 0.01f;
-	}
+		velocity.y = ytemp;
 
-	velocity.y += velocity.y * 0.01f;
+		if (isJumping && isGround)
+		{
+			velocity.y = sqrt(jumpHeight * -2.f * GRAVITY) / 5.f;
+			isGround = false;
+		}
 
-	//땅이면 속도 고정
-	if (isGround && velocity.y < 0)
-	{
-		velocity.y = -1.5f;
+		if (isGravity)
+		{
+			velocity.y += GRAVITY * 0.01f;
+		}
+
+		velocity.y += velocity.y * 0.01f;
+
+		//땅이면 속도 고정
+		if (isGround && velocity.y < 0)
+		{
+			velocity.y = -1.5f;
+		}
 	}
 
 	//std::cout << velocity.y << std::endl;

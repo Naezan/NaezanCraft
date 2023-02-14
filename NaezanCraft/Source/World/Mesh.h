@@ -8,6 +8,20 @@ class VertexArray;
 class VertexBuffer;
 class IndexBuffer;
 
+union upos3 {
+	struct XYZ {
+		union upos2 {
+			struct XZ {
+				uint8_t x : 4;
+				uint8_t z : 4;
+			};
+			unsigned char xz;
+		};
+		uint8_t y;
+	};
+	unsigned short xyz;
+};
+
 struct VertTexCoord
 {
 	glm::i8vec3 pos;

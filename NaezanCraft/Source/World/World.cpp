@@ -27,45 +27,6 @@ const std::array <glm::vec2, 32> World::waterAnimOffsets
 };
 std::string World::worldPath = "";
 
-static const GLfloat cubeVertices[] = {
-	-1.0f,-1.0f,-1.0f, // triangle 1 : begin
-	-1.0f,-1.0f, 1.0f,
-	-1.0f, 1.0f, 1.0f, // triangle 1 : end
-	1.0f, 1.0f,-1.0f, // triangle 2 : begin
-	-1.0f,-1.0f,-1.0f,
-	-1.0f, 1.0f,-1.0f, // triangle 2 : end
-	1.0f,-1.0f, 1.0f,
-	-1.0f,-1.0f,-1.0f,
-	1.0f,-1.0f,-1.0f,
-	1.0f, 1.0f,-1.0f,
-	1.0f,-1.0f,-1.0f,
-	-1.0f,-1.0f,-1.0f,
-	-1.0f,-1.0f,-1.0f,
-	-1.0f, 1.0f, 1.0f,
-	-1.0f, 1.0f,-1.0f,
-	1.0f,-1.0f, 1.0f,
-	-1.0f,-1.0f, 1.0f,
-	-1.0f,-1.0f,-1.0f,
-	-1.0f, 1.0f, 1.0f,
-	-1.0f,-1.0f, 1.0f,
-	1.0f,-1.0f, 1.0f,
-	1.0f, 1.0f, 1.0f,
-	1.0f,-1.0f,-1.0f,
-	1.0f, 1.0f,-1.0f,
-	1.0f,-1.0f,-1.0f,
-	1.0f, 1.0f, 1.0f,
-	1.0f,-1.0f, 1.0f,
-	1.0f, 1.0f, 1.0f,
-	1.0f, 1.0f,-1.0f,
-	-1.0f, 1.0f,-1.0f,
-	1.0f, 1.0f, 1.0f,
-	-1.0f, 1.0f,-1.0f,
-	-1.0f, 1.0f, 1.0f,
-	1.0f, 1.0f, 1.0f,
-	-1.0f, 1.0f, 1.0f,
-	1.0f,-1.0f, 1.0f
-};
-
 World::World() : occlusionCull(true)
 {
 	waterAnimIndex = 0;
@@ -83,11 +44,11 @@ World::World() : occlusionCull(true)
 
 	//Load HiZ Shader
 	//LoadCullingShader();
-	LoadSimpleCubeShader();
+	//LoadSimpleCubeShader();
 
 	//CreateChunk memory
-	//worldChunks.reserve(LOOK_CHUNK_SIZE * LOOK_CHUNK_SIZE);
 	chunkThread = std::make_unique<ChunkThread>();
+
 	updateFutures.push_back(std::future<void>(std::async(std::launch::async, &World::AsyncLoadChunk, this)));
 }
 
@@ -286,165 +247,12 @@ void World::Render()
 			{
 				chunk.second->CreateMeshBuffer();
 
-				glGenQueries(1, &chunk.second->queryID);
-
-				chunk.second->chunkBoxMesh = std::make_unique<Mesh>();
-				chunk.second->chunkBoxMesh->CreateVertexArray();
-				chunk.second->chunkBoxMesh->CreateVertexBuffer(0, (GLvoid*)0, GL_FLOAT, 3);
-				chunk.second->chunkBoxMesh->SetVertexBufferData(sizeof(cubeVertices), cubeVertices);
-				chunk.second->chunkBoxMesh->UnBindVertexBuffer();
-				chunk.second->chunkBoxMesh->UnBindVertexArray();
-
 				chunk.second->SetLoadState(ChunkLoadState::Builted);
 			}
 			if (chunk.second->chunkLoadState == ChunkLoadState::Builted)
 			{
-				/*
-				if (occlusionCull)
-				{
-					//BindFrameBuffer
-					glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-					glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-					glUseProgram(hiZmapShaderProgram);
-					glUniform1i(glGetUniformLocation(this->hiZmapShaderProgram, "LastMip"), 0);
-
-					// 뎁스 이미지만을 렌더링 하기 위해서 컬러 버퍼를 모두 끈다
-					glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-					glActiveTexture(GL_TEXTURE0);
-					glBindTexture(GL_TEXTURE_2D, depthTexID);
-					// 뎁스 검사를 끄고 뎁스를 쓸 수 있도록 변경
-					glDepthFunc(GL_ALWAYS);
-
-					// calculate the number of mipmap levels for NPOT texture
-					int numLevels = 1 + (int)floorf(log2f(fmaxf(SCREEN_WIDTH, SCREEN_HEIGHT)));
-					int currentWidth = SCREEN_WIDTH;
-					int currentHeight = SCREEN_HEIGHT;
-					for (int i = 1; i < numLevels; i++)
-					{
-						glUniform2i(glGetUniformLocation(hiZmapShaderProgram, "LastMipSize"), currentWidth, currentHeight);
-
-						// 다음 뷰포트 사이즈 계산
-						currentWidth /= 2;
-						currentHeight /= 2;
-						// ensure that the viewport size is always at least 1x1
-						currentWidth = currentWidth > 0 ? currentWidth : 1;
-						currentHeight = currentHeight > 0 ? currentHeight : 1;
-
-						glViewport(0, 0, currentWidth, currentHeight);
-						// bind next level for rendering but first restrict fetches only to previous level
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, i - 1);
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, i - 1);
-
-						glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexID, i);
-						// dummy draw command as the full screen quad is generated completely by a geometry shader
-						glDrawArrays(GL_POINTS, 0, 1);
-						drawCall++;
-					}
-
-					// reset mipmap level range for the depth image
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, numLevels - 1);
-					// reset the framebuffer configuration
-					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexID, 0);
-					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexID, 0);
-					// reenable color buffer writes, reset viewport and reenable depth test
-					glDepthFunc(GL_LEQUAL);
-					glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-				}
-				*/
-
-				/*
-				//render objects and apply culling
-				glUseProgram(cullingShaderProgram);
-				glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &this->subIndexVS[this->cullMode]);
-				glUniformSubroutinesuiv(GL_GEOMETRY_SHADER, 1, &this->subIndexGS[this->LODMode ? 1 : 0]);
-
-				glGenQueries(1, );
-
-				glGenBuffers(1, &TFBO);
-				glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, TFBO);
-				glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, TFBO);
-				glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, size, newData, GL_DYNAMIC_COPY);
-				//TODO TransformFeedback->SetOutVisible();
-
-				//SetColor
-				//SetClear
-
-				glEnable(GL_RASTERIZER_DISCARD);
-
-				glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, TFBO);
-				glBeginTransformFeedback(GL_POINTS);
-
-				glBeginQuery(GL_PRIMITIVES_GENERATED, QueryId);
-
-				for (int i = -3; i <= 3; i++)
-					for (int j = -3; j <= 3; j++)
-						if (visible[i + 3][j + 3])
-						{
-							glUniform2f(glGetUniformLocation(this->cullPO, "Offset"), TERRAIN_OBJECT_SIZE * (i - x), TERRAIN_OBJECT_SIZE * (j - z));
-							glDrawArrays(GL_POINTS, 0, this->instanceCount);
-						}
-
-				glEndQuery(GL_PRIMITIVES_GENERATED);
-				glEndTransformFeedback();
-
-				glDisable(GL_RASTERIZER_DISCARD);
-
-				// draw trees
-				glUseProgram(this->treePO);
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D_ARRAY, this->treeTex);
-				glActiveTexture(GL_TEXTURE1);
-				glBindTexture(GL_TEXTURE_2D, this->terrainTex);
-
-				glBindVertexArray(this->treeVA);
-				glGetQueryObjectiv(this->cullQuery, GL_QUERY_RESULT, &visible);
-				if (visible > 0)
-				{
-					// draw
-				}
-
-				//UnBindFrameBuffer
-				glBindFramebuffer(GL_FRAMEBUFFER, 0);
-				glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-				*/
-
-				//glShadeModel(GL_FLAT);
-				//glDisable(GL_LIGHTING);
-				//glDisable(GL_COLOR_MATERIAL);
-				//glDisable(GL_NORMALIZE);
-				//glColorMask(false, false, false, false);
-				//glDisable(GL_TEXTURE);
-				//glDepthMask(GL_FALSE);
-
-				////DrawBoundingBox
-				//RenderBoundingBox(chunk.second->chunkBox, chunk.second->chunkBoxMesh);
-				//glBeginQuery(GL_SAMPLES_PASSED, chunk.second->queryID);
-				////DrawBoundingBox
-				//glEnable(GL_DEPTH_TEST);
-				//RenderBoundingBox(chunk.second->chunkBox, chunk.second->chunkBoxMesh);
-				//glEndQuery(GL_SAMPLES_PASSED);
-
-				//glColorMask(true, true, true, true);
-				//glEnable(GL_TEXTURE);
-				//glDepthMask(GL_TRUE);
-
-				//glClear(GL_DEPTH_BUFFER_BIT);
-
-
-				//GLint iPassingSamples = 0;
-				//glGetQueryObjectiv(chunk.second->queryID, GL_QUERY_RESULT, &iPassingSamples);
-
-				//if (iPassingSamples > 0)
-				//{
-				//	//RenderBoundingBox(chunk.second->chunkBox, chunk.second->chunkBoxMesh);
-				//	renderer->RenderChunk(chunk.second);//이미 렌더링 된 녀석은 제외 시켜야함
-				//	//++chunkCount;
-				//	++drawCall;
-				//}
-
 				renderer->RenderChunk(chunk.second);//이미 렌더링 된 녀석은 제외 시켜야함
+				++chunkCount;
 				//RenderBoundingBox(chunk.second->chunkBox, chunk.second->chunkBoxMesh);
 			}
 		}
@@ -467,8 +275,7 @@ void World::Render()
 
 	RemoveChunk();
 
-	//std::cout << ChunkCount << std::endl;
-	//NC_LOG_DEBUG("drawCall : {0}", drawCall);
+	NC_LOG_DEBUG("Chunk DrawCall : {0}", chunkCount);
 }
 
 void World::RenderBoundingBox(AABox& boundbox, std::unique_ptr<Mesh>& boxMesh)
@@ -613,10 +420,6 @@ void World::RemoveWorldChunk(std::vector<decltype(worldChunks)::key_type>& _dele
 			if (worldChunks[*iter]->chunkMesh != nullptr)
 			{
 				worldChunks[*iter]->chunkMesh->DeleteChunkMesh();
-				if (glIsQuery(worldChunks[*iter]->queryID) == TRUE)
-				{
-					glDeleteQueries(1, &worldChunks[*iter]->queryID);
-				}
 			}
 			worldChunks[*iter].reset();
 			worldChunks.erase(*iter);
