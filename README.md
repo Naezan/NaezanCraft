@@ -72,7 +72,7 @@ Here is Short Video : https://youtu.be/dMamwtB50Rc
     ![FloodFill](https://github.com/Naezan/NaezanCraft/blob/main/img/FloodFill.gif?raw=true)
 
    - Raycasting  
-    ![AO](https://github.com/Naezan/NaezanCraft/blob/main/img/AO.png?raw=true)
+    ![Raycasting](https://github.com/Naezan/NaezanCraft/blob/main/img/Raycasting.gif?raw=true)
 
    - Water Animation  
     ![Water](https://github.com/Naezan/NaezanCraft/blob/main/img/Water.gif?raw=true)
