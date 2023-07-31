@@ -220,7 +220,7 @@ void ChunkMesh::AddFaces(const glm::i8vec3& pos, Block& block)
 	//X Left
 	if (pos.x > 0)
 	{
-		//만약 이전박스가 없다면 비어있으면 안되므로 현재 왼쪽면의 정보를 추가해준다
+		//만약 이전 블록이 없다면 비어있으면 안되므로 현재 왼쪽면의 정보를 추가해준다
 		Block& leftBlock = parentChunk.lock()->GetBlock(glm::vec3(pos.x - 1, pos.y, pos.z));
 		if (leftBlock.IsTransparent() && !block.IsSameFluid(leftBlock.blockType))
 			AddFace(pos, block, FaceType::Left, meshVertices);
@@ -237,7 +237,7 @@ void ChunkMesh::AddFaces(const glm::i8vec3& pos, Block& block)
 	//X Right
 	if (pos.x < CHUNK_X - 1)
 	{
-		//만약 다음박스가 없다면 비어있으면 안되므로 현재 오른쪽면의 정보를 추가해준다
+		//만약 다음 블록이 없다면 비어있으면 안되므로 현재 오른쪽면의 정보를 추가해준다
 		Block& rightBlock = parentChunk.lock()->GetBlock(glm::vec3(pos.x + 1, pos.y, pos.z));
 		if (rightBlock.IsTransparent() && !block.IsSameFluid(rightBlock.blockType))
 			AddFace(pos, block, FaceType::Right, meshVertices);
