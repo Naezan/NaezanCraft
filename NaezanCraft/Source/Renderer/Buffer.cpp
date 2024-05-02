@@ -51,7 +51,7 @@ VertexBuffer::VertexBuffer(
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, texSize, texType, GL_FALSE, texcoordStride, texcoordPointer);
 
-	//sunlight(uint8_t)
+	//light(uint8_t)
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, lightSize, lightType, GL_FALSE, lightStride, lightPointer);
 

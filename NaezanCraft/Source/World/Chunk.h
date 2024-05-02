@@ -29,8 +29,9 @@ struct CoordNode {
 	CoordNode(short _index = 0, signed char _in = 0) : index(_index), indexnegative(_in) {}
 
 	//최상위 1바이트는 y 다음 4비트는 x, 마지막 4비트는 z
-	short index; //this is the x y z coordinate!
-	unsigned char indexnegative;//0x00x-xy-yz-z
+	short index; //x,y,z좌표의 비트형태
+	//청크를 벗어난지를 체크하는 용도
+	unsigned char indexnegative;//0x00 x-xy-yz-z
 
 	inline int GetX() { return (index >> 4) & 0xF; }
 	inline int GetY() { return (index >> 8); }
@@ -68,8 +69,9 @@ public:
 
 	void SetSunLight(int x, int y, int z, int level);
 	unsigned char GetSunLight(int x, int y, int z);
-	void SetTorchLight(int x, int y, int z, int level);
-	unsigned char GetTorchLight(int x, int y, int z);
+	void SetBlockLight(int x, int y, int z, int level);
+	unsigned char GetBlockLight(int x, int y, int z);
+	unsigned char GetLight(int x, int y, int z);
 
 	void SetupChunkNeighbor();
 	void CreateChunkMesh(bool isReload);
@@ -99,9 +101,9 @@ public:
 	int GetBlockMaxSolidHeight(int x, int z);
 
 	//AO
-	void CreateSSAO();
-	void ReloadSSAO(int x, int y, int z);
-	void ReloadSSAO(const glm::vec3& loadPos);
+	void CreateAO();
+	void ReloadAO(int x, int y, int z);
+	void ReloadAO(const glm::vec3& loadPos);
 	void CaculateAO(int x, int y, int z, const glm::ivec3& dir);
 	uint8_t CacluateVertexAO(bool side1, bool side2, bool corner);
 
@@ -126,9 +128,9 @@ public:
 	std::weak_ptr<Chunk> BackChunk;
 
 	//Lighting
-	vector_3d LightMap;//0x0F(torch), 0xF0(sun)
+	vector_3d LightMap;//0x0F(Block), 0xF0(sun)
 	std::queue <CoordNode> sunlightBfsQueue;
-	std::queue <CoordNode> lightBfsQueue;
+	std::queue <CoordNode> BlocklightBfsQueue;
 
 	static const std::array <glm::ivec3, 6> nearFaces;
 	Block emptyBlock;

@@ -129,6 +129,9 @@ Inventory::Inventory(int shaderID) : slotID(0)
 		InvenBlockCoordData[Sand] = 3;
 		InvenBlockCoordData[GrowStone] = 4;
 		InvenBlockCoordData[Bedrock] = 5;
+		InvenBlockCoordData[Glass] = 6;
+		InvenBlockCoordData[OakWood] = 7;
+		InvenBlockCoordData[CobbleStone] = 8;
 	}
 
 	inventorySlots.push_back(Slot(BlockType::Dirt));
@@ -137,6 +140,9 @@ Inventory::Inventory(int shaderID) : slotID(0)
 	inventorySlots.push_back(Slot(BlockType::Sand));
 	inventorySlots.push_back(Slot(BlockType::GrowStone));
 	inventorySlots.push_back(Slot(BlockType::Bedrock));
+	inventorySlots.push_back(Slot(BlockType::Glass));
+	inventorySlots.push_back(Slot(BlockType::OakWood));
+	inventorySlots.push_back(Slot(BlockType::CobbleStone));
 }
 
 Inventory::~Inventory()

@@ -108,6 +108,8 @@ void Window::Init()
 	SoundManager::AddSound("stone2", "../Assets/Sounds/Block/stone2.ogg");
 	SoundManager::AddSound("wood1", "../Assets/Sounds/Block/wood1.ogg");
 	SoundManager::AddSound("wood2", "../Assets/Sounds/Block/wood2.ogg");
+	//SoundManager::AddSound("glass1", "../Assets/Sounds/Block/glass1.ogg");
+	//SoundManager::AddSound("glass2", "../Assets/Sounds/Block/glass2.ogg");
 
 	bgmThread = std::thread(&Window::PlayBGM, this);
 }

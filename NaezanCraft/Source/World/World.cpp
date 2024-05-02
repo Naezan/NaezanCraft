@@ -16,6 +16,7 @@
 
 
 std::unordered_map<BlockType, std::pair<int, int>> World::BlockCoordData;
+std::unordered_map<BlockType, unsigned char> World::BlockLightScale;
 std::mutex World::worldMutex;
 int World::drawCall;
 const std::array <glm::vec2, 32> World::waterAnimOffsets
@@ -100,6 +101,13 @@ void World::SetBlockDatas()
 	BlockCoordData[Diamond] = std::make_pair(13, 0);
 	BlockCoordData[Bedrock] = std::make_pair(7, 4);
 	BlockCoordData[GrowStone] = std::make_pair(3, 13);
+
+	BlockCoordData[Glass] = std::make_pair(1, 11);
+	BlockCoordData[OakWood] = std::make_pair(8,3);
+	BlockCoordData[CobbleStone] = std::make_pair(9, 4);
+
+	//Set LightScale
+	BlockLightScale.emplace(GrowStone, 0x0F);
 }
 
 void World::SetBlockSoundData()
@@ -109,13 +117,17 @@ void World::SetBlockSoundData()
 
 	blockSounds.emplace(Sand, std::make_pair("sand", 2));
 	blockSounds.emplace(Stone, std::make_pair("stone", 2));
+	blockSounds.emplace(CobbleStone, std::make_pair("stone", 2));
 	blockSounds.emplace(Grass, std::make_pair("grass", 2));
 	blockSounds.emplace(OakLog, std::make_pair("wood", 2));
 	blockSounds.emplace(BirchLog, std::make_pair("wood", 2));
+	blockSounds.emplace(OakWood, std::make_pair("wood", 2));
+	blockSounds.emplace(Glass, std::make_pair("stone", 2));
+	blockSounds.emplace(GrowStone, std::make_pair("stone", 2));
 
 	//not have base sound
-	blockSounds.emplace(Diamond, std::make_pair("cloth", 2));
-	blockSounds.emplace(Bedrock, std::make_pair("cloth", 2));
+	blockSounds.emplace(Diamond, std::make_pair("stone", 2));
+	blockSounds.emplace(Bedrock, std::make_pair("stone", 2));
 }
 
 void World::LoadCullingShader()
@@ -384,7 +396,7 @@ void World::GenerateChunkTerrain(std::weak_ptr<Chunk> chunk)
 void World::CreateChunk(std::weak_ptr<Chunk> chunk)
 {
 	chunk.lock()->CreateLightMap();
-	chunk.lock()->CreateSSAO();
+	chunk.lock()->CreateAO();
 
 	std::unique_lock<std::mutex> lock(worldMutex);
 	chunk.lock()->CreateChunkMesh(false);
@@ -401,7 +413,7 @@ void World::UpdateChunk()
 			if (chunk->second->chunkLoadState == ChunkLoadState::Builted)
 			{
 				chunk->second->CreateLightMap();
-				chunk->second->ReloadSSAO(loadinfo.second);
+				chunk->second->ReloadAO(loadinfo.second);
 				chunk->second->CreateChunkMesh(true);
 			}
 		}
@@ -588,7 +600,9 @@ bool World::SetBlockByWorldPos(int x, int y, int z, BlockType blocktype)
 
 		std::random_device rd;
 		std::mt19937 gen(rd());
-		if (outChunk.lock()->GetBlock(x, y, z).blockType == BlockType::Air && blocktype != BlockType::Air)
+
+		Block& OutBlock = outChunk.lock()->GetBlock(x, y, z);
+		if (OutBlock.blockType == BlockType::Air && blocktype != BlockType::Air)
 		{
 			//Emplace Sound
 			std::pair<std::string, int> soundinfo;
@@ -610,7 +624,7 @@ bool World::SetBlockByWorldPos(int x, int y, int z, BlockType blocktype)
 
 			SoundManager::Play2D(soundinfo.first, false);
 		}
-		else if (outChunk.lock()->GetBlock(x, y, z).blockType != BlockType::Air && blocktype == BlockType::Air)
+		else if (OutBlock.blockType != BlockType::Air && blocktype == BlockType::Air)
 		{
 			//Delete Sound
 			auto& soundBlockType = outChunk.lock()->GetBlock(x, y, z).blockType;
@@ -636,7 +650,15 @@ bool World::SetBlockByWorldPos(int x, int y, int z, BlockType blocktype)
 
 		outChunk.lock()->SetBlock(x, y, z, blocktype);
 
-		outChunk.lock()->SetSunLight(x, y, z, 0);
+		//블럭 라이팅 추가
+		if (OutBlock.IsShining())
+		{
+			outChunk.lock()->SetBlockLight(x, y, z, BlockLightScale[OutBlock.blockType]);
+		}
+		else
+		{
+			outChunk.lock()->SetBlockLight(x, y, z, 0);
+		}
 
 		//리로드할 청크 추가
 		RegisterReloadChunk(key, glm::vec3(x, y, z));

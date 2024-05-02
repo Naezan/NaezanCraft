@@ -279,12 +279,12 @@ void ChunkMesh::AddFace(const glm::i8vec3& pos, Block& block, const FaceType& fa
 	};
 
 	const std::array<unsigned char, 6> lightLevels{
-		parentChunk.lock()->GetSunLight(pos.x, pos.y + 1, pos.z),
-		parentChunk.lock()->GetSunLight(pos.x, pos.y - 1, pos.z),
-		parentChunk.lock()->GetSunLight(pos.x, pos.y, pos.z + 1),
-		parentChunk.lock()->GetSunLight(pos.x, pos.y, pos.z - 1),
-		parentChunk.lock()->GetSunLight(pos.x + 1, pos.y, pos.z),
-		parentChunk.lock()->GetSunLight(pos.x - 1, pos.y, pos.z)
+		parentChunk.lock()->GetLight(pos.x, pos.y + 1, pos.z),
+		parentChunk.lock()->GetLight(pos.x, pos.y - 1, pos.z),
+		parentChunk.lock()->GetLight(pos.x, pos.y, pos.z + 1),
+		parentChunk.lock()->GetLight(pos.x, pos.y, pos.z - 1),
+		parentChunk.lock()->GetLight(pos.x + 1, pos.y, pos.z),
+		parentChunk.lock()->GetLight(pos.x - 1, pos.y, pos.z)
 	};
 
 	/*

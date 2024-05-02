@@ -25,6 +25,9 @@ enum BlockType : uint8_t
 	Bedrock,
 	Air,
 	GrowStone,
+	Glass,
+	OakWood,
+	CobbleStone,
 	None
 };
 
@@ -40,13 +43,13 @@ struct Block
 	unsigned char FrontAO = 0xff;
 	unsigned char BackAO = 0xff;
 
-	inline bool IsNotShadow() {
-		return (this->blockType == BlockType::Air) || (this->blockType == BlockType::WaterT);
+	inline bool IsShadowable() {
+		return (this->blockType == BlockType::Air) || (this->blockType == BlockType::WaterT) || (this->blockType == BlockType::Glass);
 	}
 
 	inline bool IsTransparent() {
 		return (this->blockType == BlockType::Air) || (this->blockType == BlockType::OakLeaves) ||
-			(this->blockType == BlockType::BirchLeaves) || (this->blockType == BlockType::WaterT);
+			(this->blockType == BlockType::BirchLeaves) || (this->blockType == BlockType::WaterT) || (this->blockType == BlockType::Glass);
 	}
 	inline bool IsFluid() {
 		return (this->blockType == BlockType::Air) || (this->blockType == BlockType::WaterT) || (this->blockType == BlockType::Lava);
@@ -79,6 +82,10 @@ struct Block
 		}
 
 		return false;
+	}
+
+	inline bool IsShining() {
+		return (this->blockType == BlockType::GrowStone);
 	}
 
 	bool operator==(Block rv) const

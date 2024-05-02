@@ -72,6 +72,7 @@ public:
 
 public:
 	static std::unordered_map<BlockType, std::pair<int, int>> BlockCoordData;
+	static std::unordered_map<BlockType, unsigned char> BlockLightScale;
 	static std::mutex worldMutex;
 	static int drawCall;
 	static const std::array <glm::vec2, 32> waterAnimOffsets;
