@@ -356,6 +356,24 @@ void World::AsyncLoadChunk()
 			if (chunk.second->chunkLoadState == ChunkLoadState::TerrainGenerated)
 			{
 				if (chunk.second->AllDirectionChunkIsReady())
+					CreatePreShadow(chunk.second);
+			}
+		}
+
+		for (const auto chunk : loadChunks)
+		{
+			if (chunk.second->chunkLoadState == ChunkLoadState::TerrainGenerated)
+			{
+				if (chunk.second->AllDirectionChunkIsReady())
+					CreatePostShadow(chunk.second);
+			}
+		}
+
+		for (const auto chunk : loadChunks)
+		{
+			if (chunk.second->chunkLoadState == ChunkLoadState::TerrainGenerated)
+			{
+				if (chunk.second->AllDirectionChunkIsReady())
 					CreateChunk(chunk.second);
 			}
 		}
@@ -393,11 +411,19 @@ void World::GenerateChunkTerrain(std::weak_ptr<Chunk> chunk)
 	chunk.lock()->GenerateTerrain(worldGenerator);
 }
 
-void World::CreateChunk(std::weak_ptr<Chunk> chunk)
+void World::CreatePreShadow(std::weak_ptr<Chunk> chunk)
 {
 	chunk.lock()->CreateLightMap();
 	chunk.lock()->CreateAO();
+}
 
+void World::CreatePostShadow(std::weak_ptr<Chunk> chunk)
+{
+	chunk.lock()->LoadBlockLightMap();
+}
+
+void World::CreateChunk(std::weak_ptr<Chunk> chunk)
+{
 	std::unique_lock<std::mutex> lock(worldMutex);
 	chunk.lock()->CreateChunkMesh(false);
 }
@@ -414,10 +440,36 @@ void World::UpdateChunk()
 			{
 				chunk->second->CreateLightMap();
 				chunk->second->ReloadAO(loadinfo.second);
+			}
+		}
+	}
+
+	//블럭 라이팅은 별개로 수행합니다.
+	for (auto& loadinfo : reloadChunks)
+	{
+		auto chunk = worldChunks.find(loadinfo.first);
+		if (chunk != worldChunks.end())
+		{
+			if (chunk->second->chunkLoadState == ChunkLoadState::Builted)
+			{
+				chunk->second->LoadBlockLightMap();
+			}
+		}
+	}
+
+	//라이팅까지 생성한 후, 최종으로 메시를 업데이트합니다.
+	for (auto& loadinfo : reloadChunks)
+	{
+		auto chunk = worldChunks.find(loadinfo.first);
+		if (chunk != worldChunks.end())
+		{
+			if (chunk->second->chunkLoadState == ChunkLoadState::Builted)
+			{
 				chunk->second->CreateChunkMesh(true);
 			}
 		}
 	}
+
 	reloadChunks.clear();
 }
 
@@ -660,7 +712,6 @@ bool World::SetBlockByWorldPos(int x, int y, int z, BlockType blocktype)
 			outChunk.lock()->SetBlockLight(x, y, z, 0);
 		}
 
-		//리로드할 청크 추가
 		RegisterReloadChunk(key, glm::vec3(x, y, z));
 		return true;
 	}

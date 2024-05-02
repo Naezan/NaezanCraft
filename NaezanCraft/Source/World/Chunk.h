@@ -96,7 +96,7 @@ public:
 
 	//Lighting
 	void CreateLightMap();
-	void ReloadLightMap();//TODO Not used change Reload Code
+	void LoadBlockLightMap();
 	int GetBlockMaxGroundHeight(int x, int z);
 	int GetBlockMaxSolidHeight(int x, int z);
 

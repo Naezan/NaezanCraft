@@ -16,6 +16,7 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 	{
 		dz = std::floor(dz);
 	}
+
 	std::pair<int, int> key(dx, dz);
 	if (key.first < 0)
 	{
@@ -38,8 +39,16 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 	glm::vec3 blockPos;
 	//청크의 블럭 로컬위치(내림처리)
 	blockPos.x = static_cast<int>(std::floor(ray_start.x)) % CHUNK_X;
+	while (blockPos.x < 0)
+	{
+		blockPos.x += CHUNK_X;
+	}
 	blockPos.y = static_cast<int>(ray_start.y);
 	blockPos.z = static_cast<int>(std::floor(ray_start.z)) % CHUNK_Z;
+	while (blockPos.z < 0)
+	{
+		blockPos.z += CHUNK_Z;
+	}
 
 	float stepX = dir.x == 0 ? 0 : dir.x > 0 ? 1 : -1;
 	float stepY = dir.y == 0 ? 0 : dir.y > 0 ? 1 : -1;
@@ -190,6 +199,7 @@ Block Ray::BlockTraversal(const glm::vec3& ray_start, const glm::vec3& dir, glm:
 				curChunk = curChunk.lock()->BackChunk;
 			}
 		}
+
 		outBlockFacePosition = glm::vec3(blockPos.x + curChunk.lock()->position.x * CHUNK_X, blockPos.y, blockPos.z + curChunk.lock()->position.z * CHUNK_Z);
 	}
 

@@ -50,6 +50,8 @@ public:
 	void AsyncLoadChunk();
 	void RemoveChunk();
 	void GenerateChunkTerrain(std::weak_ptr<Chunk> chunk);
+	void CreatePreShadow(std::weak_ptr<Chunk> chunk);
+	void CreatePostShadow(std::weak_ptr<Chunk> chunk);
 	void CreateChunk(std::weak_ptr<Chunk> chunk);
 	void UpdateChunk();
 	void RemoveWorldChunk(std::vector<std::pair<int, int>>& _deletableKey);

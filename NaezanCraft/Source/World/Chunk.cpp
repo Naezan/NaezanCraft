@@ -679,6 +679,8 @@ void Chunk::CreateLightMap()
 				}
 				else if (GetBlock(ix, iy, iz).IsShining())
 				{
+					SetBlockLight(ix, iy, iz, 0xF);
+
 					CoordNode node;
 					node.SetXYZ(ix, iy, iz);
 					BlocklightBfsQueue.emplace(node);
@@ -739,7 +741,10 @@ void Chunk::CreateLightMap()
 			}
 		}
 	}
+}
 
+void Chunk::LoadBlockLightMap()
+{
 	while (!BlocklightBfsQueue.empty())
 	{
 		CoordNode& node = BlocklightBfsQueue.front();
@@ -789,42 +794,6 @@ void Chunk::CreateLightMap()
 			}
 		}
 	}
-}
-
-void Chunk::ReloadLightMap()
-{
-	/*while (!sunlightReloadBfsQueue.empty())
-	{
-		CoordNode& node = sunlightReloadBfsQueue.front();
-
-		int x = node.GetX();
-		int y = node.GetY();
-		int z = node.GetZ();
-		int sunLight = GetSunLight(x, y, z);
-
-		sunlightReloadBfsQueue.pop();
-
-		for (int i = 0; i < 6; ++i)
-		{
-			int dx = x + nearFaces[i].x;
-			int dy = y + nearFaces[i].y;
-			int dz = z + nearFaces[i].z;
-			if (dy < 0 || dy >= CHUNK_Y) continue;
-
-			Block& block = GetWorldBlock(dx, dy, dz);
-			if (block.IsShadowable() && GetSunLight(dx, dy, dz) < sunLight - 1)
-			{
-				SetSunLight(dx, dy, dz, sunLight - 1);
-
-				if (dx >= -1 && dx <= CHUNK_X && dz >= -1 && dz <= CHUNK_Z)
-				{
-					CoordNode node;
-					node.SetXYZ(dx, dy, dz);
-					sunlightReloadBfsQueue.emplace(node);
-				}
-			}
-		}
-	}*/
 }
 
 int Chunk::GetBlockMaxGroundHeight(int x, int z)
