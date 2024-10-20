@@ -4,12 +4,12 @@
 [submodule "NaezanCraft/ThirdParty/glfw"]
 	path = NaezanCraft/ThirdParty/glfw
 	url = https://github.com/glfw/glfw
-[submodule "NaezanCraft/ThirdParty/imgui"]
-	path = NaezanCraft/ThirdParty/imgui
-	url = https://github.com/ocornut/imgui
 [submodule "NaezanCraft/ThirdParty/glm"]
 	path = NaezanCraft/ThirdParty/glm
 	url = https://github.com/g-truc/glm
 [submodule "NaezanCraft/ThirdParty/FastNoise2"]
 	path = NaezanCraft/ThirdParty/FastNoise2
 	url = https://github.com/Auburn/FastNoise2
+[submodule "NaezanCraft/ThirdParty/GLAD"]
+	path = NaezanCraft/ThirdParty/GLAD
+	url = https://github.com/Dav1dde/glad
