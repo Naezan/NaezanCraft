@@ -12,6 +12,7 @@ Here is Short Video : https://youtu.be/dMamwtB50Rc
 
     - Build (Find the folder where "CMakeList.txt" exists)
   ```shell
+  cd NaezanCraft
   mkdir Build
   cd Build
   cmake ..
