@@ -27,8 +27,6 @@ add_executable(NaezanCraft ${SRC_ENGINE})
 target_include_directories(NaezanCraft PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/spdlog/include)
 target_include_directories(NaezanCraft PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/glfw/include)
 target_include_directories(NaezanCraft PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/GLAD/include)
-target_include_directories(NaezanCraft PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/imgui)
-target_include_directories(NaezanCraft PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/imgui/backends)
 target_include_directories(NaezanCraft PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/glm)
 target_include_directories(NaezanCraft PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/FastNoise2/include)
 
@@ -44,9 +42,6 @@ add_subdirectory(NaezanCraft/ThirdParty/glfw EXCLUDE_FROM_ALL)
 # GLAD (do not build GLAD)
 add_subdirectory(NaezanCraft/ThirdParty/GLAD EXCLUDE_FROM_ALL)
 
-# imgui (do not build imgui)
-add_subdirectory(NaezanCraft/ThirdParty/imgui EXCLUDE_FROM_ALL)
-
 # glm (do not build glm)
 add_subdirectory(NaezanCraft/ThirdParty/glm EXCLUDE_FROM_ALL)
 
@@ -54,8 +49,7 @@ add_subdirectory(NaezanCraft/ThirdParty/glm EXCLUDE_FROM_ALL)
 add_subdirectory(NaezanCraft/ThirdParty/FastNoise2)
 
 # linking
-target_link_libraries(NaezanCraft PUBLIC glfw glad imgui glm ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/Optick/lib/x64/debug/OptickCore.lib ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/irrKlang/lib/irrKlang.lib)
-target_link_libraries(imgui PRIVATE glfw)
+target_link_libraries(NaezanCraft PUBLIC glfw glad glm ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/Optick/lib/x64/debug/OptickCore.lib ${CMAKE_CURRENT_SOURCE_DIR}/NaezanCraft/ThirdParty/irrKlang/lib/irrKlang.lib)
 target_link_libraries(NaezanCraft PUBLIC FastNoise)
 
 add_custom_command(
