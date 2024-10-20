@@ -10,6 +10,3 @@
 [submodule "NaezanCraft/ThirdParty/FastNoise2"]
 	path = NaezanCraft/ThirdParty/FastNoise2
 	url = https://github.com/Auburn/FastNoise2
-[submodule "NaezanCraft/ThirdParty/GLAD"]
-	path = NaezanCraft/ThirdParty/GLAD
-	url = https://github.com/Dav1dde/glad
